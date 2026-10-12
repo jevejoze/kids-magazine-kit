@@ -38,7 +38,7 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 2. **找素材**：封面照片、本周新闻和配图、今日一问的图解（规则见下文"图片与新闻"）。图片放 `data/issues/images/NNN/`
 3. **写本期 JSON**，存为 `data/issues/NNN.json`，格式严格照 `examples/demo/issues/003.json`（字段说明见下文）。图片路径写相对 JSON 的路径，如 `images/004/cover.jpg`
 4. **渲染**：`node scripts/render.mjs data/issues/NNN.json output`
-   产出 `output/issue-NNN/card-1..7.png`（card-1 是封面，card-7 是环球小报）和 PDF（由 PNG 拼成，和图片完全一致）。需要 Node 22+ 和 Chrome（或设环境变量 `CHROME`）
+   产出 `output/issue-NNN/card-1..7.png`（card-1 是封面，card-7 是环球小报）和 PDF（由 PNG 拼成，和图片完全一致）。需要 Node 22+ 和 Chrome（或设环境变量 `CHROME`）。JSON 里写了 `narration` 的，再按"讲读版"一节出视频
 5. **自检**：逐张看 PNG，确认没有文字溢出、截断、重叠；溢出就删字，模板保持原样
 6. **更新状态**：`vocab.json` 追加本期单词；`story-bible.md` 追加本集摘要和新伏笔；`profile.md` 记录调整过的档位
 
@@ -115,6 +115,71 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 - 一次反馈只算一个数据点；连续 3 期一致再改权重或档位
 - `MY_CHILD.md` 是家长的，agent 只读
 - 孩子的名字、照片、来信、反馈只写进数据目录
+
+## 讲读版（有声视频）
+
+每期除了图片和 PDF，还可以出一个 8–10 分钟的讲读视频：7 张图当画面，编辑部分角色朗读。目的是补英文听力，也让孩子不用大人陪就能"听懂"这一期。
+
+### 写法：`narration` 字段
+
+写本期 JSON 时一并写好，按页排列，`card` 对应 card-N.png（1 = 封面，7 = 环球小报）：
+
+```json
+"narration": [
+  {"card": 1, "lines": [
+    {"who": "dog", "lang": "zh", "text": "蜜蜂没学过数学，为啥把格子造成六边形？"},
+    {"who": "narrator", "lang": "zh", "text": "A、B、C，你选哪个？先暂停想一想！", "pause": 5, "hold": "⏸ 先暂停猜一猜"}
+  ]},
+  {"card": 3, "lines": [
+    {"who": "mouse", "lang": "en", "text": "hexagon", "repeat": 2, "pause": 2},
+    {"who": "mouse", "lang": "en", "text": "A hexagon has more sides than a square.", "rate": "slow", "pause": 3}
+  ]}
+]
+```
+
+- `who`：`narrator`（旁白）`dog` `mouse` `owl` `raccoon`
+- `lang`：`zh` 或 `en`，决定用哪个声音
+- `pause`：这句念完后停几秒（默认 0.6）；`repeat`：念几遍；`rate`：`slow` 表示放慢 20%
+- `hold`：停顿期间画面上叠一行提示（如"⏸ 先暂停猜一猜""🗣 跟着读"）
+
+### 声音（固定不变，让孩子一听就知道是谁）
+
+| 角色 | 中文 | 英文 |
+|---|---|---|
+| 旁白 | `zh-CN-XiaoxiaoNeural`（温暖女声） | `en-GB-LibbyNeural` |
+| 团子狗 | `zh-CN-YunxiaNeural`（童声，憨） | — |
+| 波波鼠 | `zh-CN-XiaoyiNeural`（偶尔蹩脚中文） | `en-GB-MaisieNeural`（英式小女孩） |
+| 咕咕博士 | `zh-CN-YunjianNeural`（沉稳男声） | `en-GB-RyanNeural` |
+| 捣蛋浣熊 | `zh-CN-YunxiNeural`（调皮） | `en-GB-ThomasNeural` |
+
+声音名用的是微软神经语音，Azure 语音服务和 Edge 朗读通用。
+
+### 每页讲什么
+
+| 页 | 讲法 |
+|---|---|
+| 封面 | 刊名一句问候 → 引导语 → 问题 → 三个选项 → 停 5 秒（`hold` 提示暂停）。不说答案 |
+| 今日一问 | 4 格按角色念 → 咕咕博士对着图解再讲一遍机制和数字 → 旁白念冷知识 |
+| 单词屋 | 波波鼠念开场 → 每个单词念 2 遍、停 2 秒 → 例句先慢速一遍、再正常一遍，停 3 秒跟读（`hold`："🗣 跟着读"）→ 旁白念任务 |
+| 小剧场 | 中文集按角色分配对白、旁白念叙述；英文集先慢速全文一遍，再正常速度一遍 → 念侦探笔记，停 5 秒 |
+| 挑战 | 浣熊念挑衅 → 旁白念谜题（每个小问之间停 3 秒）→ 英文三关只念题目 |
+| 信箱 | 旁白念回信 → 开放题 → 一句话提醒做今日打卡 |
+| 环球小报 | 每条念地点、标题、正文，英文关键词由波波鼠念 2 遍 → 念"你怎么看" |
+
+### 规矩
+
+- **不念答案**。谜题、英文题、封面题的答案只在下一期信箱公布
+- 口语化，可以和页面上的字略有不同，但事实、数字必须和页面一致；数字和符号写成读法（"7%"写"百分之七"，"18.5 公斤"写"十八点五公斤"）
+- 每句 ≤ 40 字或 ≤ 15 个英文单词，长句拆开
+- 不念来源、照片署名、页码这类信息
+- 全期朗读总时长控制在 10 分钟以内；一期大约 2000–3000 字
+- 孩子的名字可以出现在问候里（如"妮妮早上好"），这属于数据目录里的内容
+
+### 合成（待实现）
+
+计划由 `scripts/narrate.mjs` 完成：逐句调用语音合成，生成 `output/issue-NNN/audio/card-N.mp3`，再用 ffmpeg 把每张图和对应音频拼成 `output/issue-NNN/讲读版.mp4`（每页时长 = 这页音频总长，`hold` 期间叠加提示文字）。语音服务通过环境变量选择：
+- `TTS_PROVIDER=azure`：需要 `AZURE_SPEECH_KEY` 和 `AZURE_SPEECH_REGION`，免费额度每月 50 万字符，够每天出刊
+- `TTS_PROVIDER=edge`：免费，适合在自己电脑上跑；部分云端环境会拦截
 
 ## 周节奏
 

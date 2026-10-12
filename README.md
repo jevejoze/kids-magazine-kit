@@ -28,6 +28,7 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 | 挑战 | 逻辑谜题 + 英文三关（填空 / 阅读 / 写作）|
 | 信箱 | 回信、开放题、今日打卡、集章 |
 | 环球小报 | 本周 3 条适合孩子的真实新闻，交叉核实来源 |
+| 讲读版（规划中）| 7 张图配分角色朗读的 8–10 分钟视频，英文单词和故事带慢速跟读，规则见 `SKILL.md`「讲读版」|
 
 ## 快速开始
 
