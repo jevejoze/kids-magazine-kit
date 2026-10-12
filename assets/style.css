@@ -141,7 +141,7 @@ svg.ch{display:block}
 #c1.photo-cover .mast{text-align:center;margin-top:6px;position:relative}
 #c1.photo-cover .mast .zh{font-size:120px;letter-spacing:6px;color:#fff;text-shadow:5px 5px 0 var(--ink)}
 #c1.photo-cover .mast .en{font-size:40px;letter-spacing:3px;text-shadow:0 2px 6px rgba(0,0,0,.6)}
-#c1.photo-cover .stamp{position:absolute;left:64px;top:410px;font-size:40px;font-weight:800;color:#FF9A3C;letter-spacing:2px;text-shadow:0 0 10px rgba(255,140,40,.6),0 2px 4px rgba(0,0,0,.6)}
+#c1.photo-cover .stamp{position:absolute;left:64px;top:410px;font-size:36px;font-weight:800;color:#FFB054;letter-spacing:2px;background:rgba(20,14,8,.55);border-radius:14px;padding:4px 16px}
 #c1.photo-cover .q{margin-top:auto;position:relative;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 #c1.photo-cover .q .lb{display:inline-block;font-size:30px;background:var(--butter);color:var(--ink);border-radius:999px;padding:4px 20px;text-shadow:none}
 #c1.photo-cover .q .t{font-size:48px;line-height:1.25;margin-top:14px}
