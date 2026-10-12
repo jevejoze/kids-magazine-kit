@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Baloo+2:wght@600;800&display=block" rel="stylesheet">
+<style>
+{{STYLE}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+{{CHARACTERS}}
+const D = {{DATA}};
+
+const N = String(D.issue).padStart(3, "0");
+const ch = spec => { const [n, m = "normal", s = 180, p = ""] = spec.split(":"); return draw(n, m, +s, p); };
+const bub = b => `<div class="bub ${b.lang === "en" ? "en" : "fun"}">${b.text}</div>`;
+const topBar = (tag, right) => `<div class="dots"></div><div class="top"><span class="tag fun">${tag}</span><span class="en">${right ?? N}</span></div>`;
+let pg = 0;
+const foot = left => `<div class="foot"><span class="fun">${left}</span><span class="page en">${++pg} / {{TOTAL}}</span></div>`;
+const coverFoot = left => `<div class="foot"><span class="fun">${left}</span></div>`;
+const TOC = [["🤔", "今日一问"], ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], ["💌", "信箱"]];
+if (D.news) TOC.push(["🌏", "环球小报"]);
+const GANG = ["owl:happy:230", "dog:happy:290", "mouse:wave:260", "raccoon:smirk:220"];
+
+const cards = [];
+
+// 1 封面：有 cover.photo 用照片封面，否则用角色封面
+const CV = D.cover;
+if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1">
+  <div class="photo" style="background-image:url('${CV.photo}');background-position:${CV.photo_pos || "center"}"></div><div class="shade"></div>
+  <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
+  <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div>${D.masthead.by ? `<div class="by fun">${D.masthead.by}</div>` : ""}</div>
+  ${CV.stamp ? `<div class="stamp en">${CV.stamp}</div>` : ""}
+  <div class="q"><div class="lb fun">${CV.kicker || "🤔 先猜一猜，再往后翻！"}</div>
+    <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div>
+    ${D.question.options ? `<div class="opts fun">${D.question.options.map((o, i) => `<div><i class="en">${"ABC"[i]}</i>${o}</div>`).join("")}</div>` : ""}</div>
+  ${CV.crew ? `<div class="crew">${CV.crew.map(ch).join("")}${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}</div>` : ""}
+  <div class="credit en">${CV.credit}</div></section>`);
+else cards.push(`<section class="card" id="c1"><div class="dots"></div>
+  <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
+  <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
+  ${D.badge ? `<div class="badge fun">${D.badge.zh}<small class="en">${D.badge.en}</small></div>` : ""}
+  <div class="gang">${(D.cover_gang || GANG).map(ch).join("")}</div>
+  <div class="box q"><div class="lb fun">🐶 今天团子狗想知道……</div>
+    <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div></div>
+  <div class="toc fun">${TOC.map(([e, t]) => `<div><b>${e}</b>${t}</div>`).join("")}</div>
+  ${coverFoot(D.cover_greeting || "编辑部全员向你问好！Hello!")}</section>`);
+
+// 2 今日一问：4 格漫画 + 图解 + 便利贴冷知识
+const C = D.comic;
+const hl = (text, word) => word ? text.replace(new RegExp(`\\b(${word}\\w*)`, "i"), "<b>$1</b>") : text;
+const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
+cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} 今日一问 · Big Question`)}
+  <div class="h1 fun">${C.title_zh || D.question.zh}<span class="en">${C.title_en || D.question.en}</span></div>
+  <div class="grid">${C.panels.map((p, i) => `<div class="box panel p${i}"><span class="n en">${i + 1}</span>
+    <div class="bubs">${p.bubbles.map(bub).join("")}</div>
+    <div class="cast">${p.chars.map(ch).join("")}</div></div>`).join("")}</div>
+  ${C.diagram ? `<div class="box diagram"><div class="dl fun">🦉 咕咕博士画给你看</div>${C.diagram}</div>` : ""}
+  <div class="fact fun"><b>💡 冷知识</b>${C.fact}</div>
+  ${foot(C.host || "主持：团子狗 × 咕咕博士")}</section>`);
+
+// 3 单词屋：单词卡 + 写字格
+const W = D.words;
+cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
+  <div class="intro">${ch("mouse:wave:190")}<div class="bub en">${W.intro}</div></div>
+  ${W.items.map((w, i) => `<div class="box w c${i}"><div class="ico">${w.icon}</div><div class="wd">
+    <div class="word en">${w.word}${w.new ? `<em class="fun">新词</em>` : ""}</div>
+    <div class="cn fun">${w.cn}</div><div class="ex en">${hl(w.example, w.word)}</div></div></div>`).join("")}
+  <div class="box task"><div class="fun">✍️ 轮到你：${W.task}</div>${lines(W.lines || 2)}</div>
+  ${foot("主持：波波鼠 Boba Mouse")}</section>`);
+
+// 4 连载小剧场：上面是阁楼场景，下面是故事
+const ST = D.story;
+const ATTIC = `<svg class="bg" viewBox="0 0 952 340" preserveAspectRatio="none"><path d="M0 0 H952 V250 H0z" fill="#FFF1D6"/>
+  <path d="M0 0 L300 0 L0 150z M952 0 L652 0 L952 150z" fill="#E7C9A0"/><path d="M0 150 L300 0 M952 150 L652 0" stroke="#4A3B32" stroke-width="5"/>
+  <circle cx="476" cy="96" r="62" fill="${ST.night ? "#2D3A66" : "#BFE3FF"}" stroke="#4A3B32" stroke-width="6"/><path d="M476 34 V158 M414 96 H538" stroke="#4A3B32" stroke-width="5"/>
+  ${ST.night ? `<circle cx="452" cy="74" r="14" fill="#FFE58F"/>` : ""}
+  <path d="M0 250 H952 V340 H0z" fill="#D9A465"/><path d="M0 250 H952" stroke="#4A3B32" stroke-width="5"/>
+  <path d="M40 300 h90 M300 320 h120 M640 296 h110" stroke="#B9844A" stroke-width="5" stroke-linecap="round"/>
+  <rect x="780" y="180" width="120" height="90" fill="#E7B97F" stroke="#4A3B32" stroke-width="5"/><rect x="808" y="130" width="80" height="54" fill="#D9A465" stroke="#4A3B32" stroke-width="5"/></svg>`;
+cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · Story Time", "EP." + ST.ep)}
+  <div class="h1 fun">第${ST.ep}集　${ST.title_zh}<span class="en">${ST.title_en}</span></div>
+  <div class="box stage">${ATTIC}<div class="scene">${ST.scene.map(ch).join("")}</div></div>
+  <div class="story ${ST.lang === "en" ? "en" : "fun"}">${ST.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
+  <div class="tbc fun"><span>${ST.tbc}</span>${ST.clue ? `<span class="clue">🔍 ${ST.clue}</span>` : ""}</div>
+  ${foot("单日中文 · 双日英文")}</section>`);
+
+// 5 挑战：浣熊出题 + 三关闯关路线
+const P = D.challenge;
+cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
+  <div class="taunt">${ch("raccoon:smirk:160:" + (P.prop || ""))}<div class="bub fun">${P.taunt_zh}<br><span class="en">${P.taunt_en}</span></div></div>
+  <div class="box puz fun"><h3>${P.puzzle.title}</h3><div class="body">${P.puzzle.body}</div>
+    ${P.puzzle.slots ? `<div class="slots">${P.puzzle.slots.map(x => `<span>${x}</span>`).join("")}</div>` : ""}</div>
+  <div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
+    <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div>${e.stars === 3 ? lines(2) : ""}</div></div>`).join("")}</div>
+  ${foot("答案明天公布！")}</section>`);
+
+// 6 信箱：回信 + 开放题 + 今日打卡（给编辑部的反馈）+ 集章
+const M = D.mailbox, done = M.stamps_done;
+const pages = TOC.map(([e, t], i) => `<span>${e}${t}</span>`).join("");
+cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
+  <div class="box letter fun">${M.letter}</div>
+  <div class="box ask"><div class="fun">${M.ask_zh}</div><div class="en">${M.ask_en}</div>${lines(2)}</div>
+  <div class="box checkin fun"><h3>📝 今日打卡 · 告诉编辑部</h3>
+    <div class="row"><b>最喜欢哪一页？</b><div class="pick">${pages}</div></div>
+    <div class="row"><b>今天难不难？</b><div class="pick"><span>😴 太简单</span><span>🤔 刚刚好</span><span>🤯 有点难</span></div></div>
+    <div class="row"><b>我也想问一个问题：</b>${lines(1)}</div></div>
+  <div class="stamps fun">${[1,2,3,4,5,6,7].map(i => i <= done ? `<div class="ok">第${i}天<br>✓</div>` : `<div>${i}</div>`).join("")}<p>${M.reward}</p></div>
+  ${foot((M.send_note || "拍照发给家长") + (D.news ? " · 翻到最后一页看世界新闻 →" : " · 明天见！See you tomorrow!"))}</section>`);
+
+// 环球小报（可选，放最后一页）：1 条头条 + 2 条小新闻
+const NW = D.news;
+const story = (n, cls) => `<div class="box nw ${cls}"><div class="pic" style="background-image:url('${n.photo}');background-position:${n.photo_pos || "center"}"></div>
+  <div class="txt"><div class="loc fun">${n.flag} ${n.place}</div><h3 class="fun">${n.title}</h3><p class="fun">${n.text}${n.word ? `<span class="kw en">🔑 ${n.word.en} <small class="fun">${n.word.zh}</small></span>` : ""}</p></div></div>`;
+if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报 · World News", NW.week)}
+  ${story(NW.items[0], "lead")}
+  <div class="pair">${NW.items.slice(1, 3).map(n => story(n, "")).join("")}</div>
+  <div class="box ask2 fun">💬 ${NW.ask_zh}<br><span class="en">${NW.ask_en}</span></div>
+  <div class="credit2 en">${NW.credits}</div>
+  ${foot(NW.foot || "新闻来源已交叉核实 · 明天见！See you tomorrow!")}</section>`);
+
+document.getElementById("root").outerHTML = cards.join("\n").replaceAll("{{TOTAL}}", pg);
+if (location.hash) { document.body.classList.add("single"); document.querySelector(location.hash).classList.add("on"); }
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" font-family="ZCOOL KuaiLe, PingFang SC, sans-serif">
+  <defs>
+    <clipPath id="earth"><circle cx="560" cy="160" r="110"/></clipPath>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#F2A13A"/></marker>
+  </defs>
+  <!-- 太阳和光线 -->
+  <g stroke="#F2A13A" stroke-width="5" stroke-linecap="round">
+    <path d="M90 60 v-24 M90 260 v24 M10 160 h-0 M150 100 l16 -16 M150 220 l16 16 M30 100 l-16 -16 M30 220 l-16 16"/>
+  </g>
+  <circle cx="90" cy="160" r="66" fill="#FFD45C" stroke="#4A3B32" stroke-width="5"/>
+  <text x="90" y="170" text-anchor="middle" font-size="30" fill="#4A3B32">太阳</text>
+  <g stroke="#F2A13A" stroke-width="4" stroke-dasharray="10 9" marker-end="url(#ar)">
+    <path d="M170 130 H430"/><path d="M175 175 H430"/><path d="M170 220 H430"/>
+  </g>
+  <!-- 地球：左半边白天，右半边黑夜 -->
+  <circle cx="560" cy="160" r="110" fill="#8EC5FF" stroke="#4A3B32" stroke-width="5"/>
+  <g clip-path="url(#earth)">
+    <g transform="rotate(-23.5 560 160)">
+      <path d="M440 74 H680 V20 H440z" fill="#FFE27A"/>
+      <ellipse cx="560" cy="74" rx="66" ry="14" fill="#FFE27A" stroke="#E0A100" stroke-width="4"/>
+      <ellipse cx="560" cy="160" rx="110" ry="22" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>
+      <ellipse cx="560" cy="100" rx="88" ry="16" fill="none" stroke="#fff" stroke-width="3" opacity=".5"/>
+      <path d="M470 120 q20 -30 50 -20 q10 30 -20 46z M560 150 q40 -10 60 20 q-20 40 -50 20z" fill="#7FD3BC"/>
+    </g>
+    <rect x="560" y="40" width="130" height="240" fill="#1F2A4A" opacity=".55"/>
+  </g>
+  <circle cx="560" cy="160" r="110" fill="none" stroke="#4A3B32" stroke-width="5"/>
+  <!-- 斜着的地轴 -->
+  <g transform="rotate(-23.5 560 160)">
+    <path d="M560 22 V298" stroke="#4A3B32" stroke-width="5" stroke-dasharray="12 8"/>
+    <path d="M532 34 a28 9 0 1 0 56 0" fill="none" stroke="#4A3B32" stroke-width="3.5" marker-end="url(#ar)"/>
+    <circle cx="536" cy="78" r="9" fill="#FF6A6A" stroke="#4A3B32" stroke-width="3"/>
+  </g>
+  <!-- 标注 -->
+  <text x="606" y="300" font-size="24" fill="#4A3B32">夜晚</text>
+  <text x="430" y="300" font-size="24" fill="#4A3B32">白天</text>
+  <path d="M520 90 Q470 70 430 88" stroke="#FF6A6A" stroke-width="3" fill="none"/>
+  <text x="186" y="34" font-size="25" fill="#4A3B32">黄色 = 北极圈：地球转一整圈，</text>
+  <text x="186" y="64" font-size="25" fill="#4A3B32">这里一直晒得到太阳 ☀️</text>
+  <text x="186" y="94" font-size="25" fill="#FF6A6A">● 挪威北角就在这里</text>
+  <path d="M640 40 Q700 30 720 60" stroke="#4A3B32" stroke-width="3" fill="none"/>
+  <text x="700" y="96" font-size="25" fill="#4A3B32">地轴斜</text>
+  <text x="700" y="126" font-size="25" fill="#4A3B32">23.5°</text>
+</svg>
