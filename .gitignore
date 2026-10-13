@@ -2,3 +2,6 @@
 data/
 output/
 .DS_Store
+examples/demo/issues/*/40-cards/
+examples/demo/issues/*/60-audio/
+examples/demo/issues/*/70-final/

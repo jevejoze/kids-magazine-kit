@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "stage": "11-comic",
+    "by": "示例",
+    "at": "2026-10-14T06:00:00+08:00"
+  },
+  "fact": "挪威斯瓦尔巴群岛一年有4个月极昼。当地不许养猫，怕猫咪伤害北极的鸟；北极熊比人还多，出门要带枪！",
+  "panels": [
+    {
+      "bubbles": [
+        {
+          "lang": "zh",
+          "text": "听说挪威的夏天，半夜12点太阳还在天上？那小朋友几点睡觉啊！"
+        }
+      ],
+      "chars": [
+        "dog:surprise:120:eyemask"
+      ]
+    },
+    {
+      "bubbles": [
+        {
+          "lang": "zh",
+          "text": "地球是斜着转的！夏天北极歪向太阳，整天都晒得到。"
+        }
+      ],
+      "chars": [
+        "owl:talk:120"
+      ]
+    },
+    {
+      "bubbles": [
+        {
+          "lang": "zh",
+          "text": "冬天为啥整天黑？"
+        },
+        {
+          "lang": "zh",
+          "text": "歪到另一边就照不到了，北角76天不见日落！"
+        }
+      ],
+      "chars": [
+        "dog:think:110",
+        "owl:happy:110"
+      ]
+    },
+    {
+      "bubbles": [
+        {
+          "lang": "en",
+          "text": "Sun can't sleep!"
+        },
+        {
+          "lang": "zh",
+          "text": "太阳在转圈圈不睡觉！暑假去挪威！"
+        }
+      ],
+      "chars": [
+        "mouse:happy:110",
+        "dog:happy:110"
+      ]
+    }
+  ],
+  "theme_icon": "🌍",
+  "title_en": "Why doesn't the sun set at midnight?",
+  "title_zh": "半夜12点，太阳为什么不下班？",
+  "diagram": "11-diagram.svg",
+  "sources": [
+    "https://en.wikipedia.org/wiki/Svalbard"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "stage": "15-english",
+    "by": "示例",
+    "at": "2026-10-14T06:00:00+08:00"
+  },
+  "taunt_zh": "哼，奶茶的事我还没完！先过我这关！",
+  "taunt_en": "Not so fast! Beat me first!",
+  "prop": "sweat",
+  "english": [
+    {
+      "cn": "选一个词填进去",
+      "en": "At ___ the sun is still up in Norway. (midnight / noon)",
+      "stars": 1
+    },
+    {
+      "cn": "读一读，为什么拉窗帘？",
+      "en": "In summer, the sun never sets in northern Norway. People play football at midnight. They close the curtains when they sleep. Why do they close the curtains?",
+      "stars": 2
+    },
+    {
+      "cn": "用英文写 2 句，要用到 because",
+      "en": "Would you like to see the midnight sun? Write 2 sentences with because.",
+      "stars": 3
+    }
+  ],
+  "answers": [
+    "midnight",
+    "Because it is too bright. / Because the sun never sets.",
+    "开放题"
+  ]
+}

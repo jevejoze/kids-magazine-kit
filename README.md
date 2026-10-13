@@ -13,9 +13,10 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 **家长掌握对孩子的了解，AI 负责干活。**
 
 1. 家长填一份问卷 `MY_CHILD.md`：孩子是谁、喜欢什么、想让孩子吸收什么、杂志用什么语气
-2. agent（Claude Code / Codex 等）按 `SKILL.md` 的规则每天出一期：找封面照片、核实科学事实、挑本周适合孩子的新闻、写漫画和连载、画原理图解，然后渲染成图片
-3. 信箱页的"今日打卡"让孩子圈出最喜欢哪页、难不难、还想问什么；家长拍照发给 agent
-4. 每周日"做本周策展"：agent 汇总反馈，给出下周的调整建议，家长确认后才改
+2. 每一期拆成一条 17 步的**流水线**：任务书 → 封面选题、今日一问、单词、小剧场、谜题、英文、信箱、新闻 → 下载图片 → 合并 → 审稿 → 渲染 → 讲读稿 → 语音 → 视频。每步写一个中间文件，放在 Google Drive 的期刊文件夹里
+3. 家长把不同的步骤交给不同的 agent：难的交给强模型，简单的交给便宜的模型，互不干扰；任何一步不满意，单独重做那一步
+4. 需要跑脚本的几步（合并、渲染、语音、视频）在 Colab 笔记本「制作间」里一键完成
+5. 信箱页的"今日打卡"把孩子的反馈带回来，每周"做本周策展"调整下一周的方向
 
 ## 每期内容
 
@@ -28,63 +29,53 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 | 挑战 | 逻辑谜题 + 英文三关（填空 / 阅读 / 写作）|
 | 信箱 | 回信、开放题、今日打卡、集章 |
 | 环球小报 | 本周 3 条适合孩子的真实新闻，交叉核实来源 |
-| 讲读版（可选）| 7 张图配分角色朗读，英文单词和故事带慢速跟读；讲读脚本的规则见 `SKILL.md`「讲读版」，用什么工具合成由 agent 自己决定 |
+| 讲读视频（可选）| 7 张图配分角色朗读，英文单词和故事带慢速跟读；语音用什么服务由你决定，制作间里以 IndexTTS 为例 |
 
 ## 快速开始
 
-需要：Node 22+、Chrome（或 Chromium），以及一个能读写文件的 AI agent。
+需要：一个各 agent 都能访问的文件夹（推荐 Google Drive），以及能读写文件的 AI agent。
+
+1. 把 `templates/data/` 复制到 Drive，改名为你的刊名（如 `小满早知道/`），这就是**数据目录**
+2. 填好 `MY_CHILD.md`
+3. 对 agent 说：**"按问卷给孩子建刊"**，再说 **"做第 00 步"**
+4. 之后每一步交给你指定的 agent：**"做第 10 步，数据目录在 ……"**。agent 会读 `pipeline/stages/10-cover.md` 照做
+5. 内容步骤做完后，在 Colab 打开 `pipeline/colab/制作间.ipynb`，改好路径和期号，全部运行，成品出现在 `issues/NNN/70-final/`
+
+本地预览示例期：
 
 ```bash
-git clone https://github.com/jevejoze/kids-magazine-kit
-cd kids-magazine-kit
-
-# 渲染示例期刊，看看效果
-node scripts/render.mjs examples/demo/issues/003.json output
-# → output/issue-003/card-1..7.png 和 PDF
+git clone https://github.com/jevejoze/kids-magazine-kit && cd kids-magazine-kit
+node scripts/pipeline.mjs status   examples/demo/issues/003
+node scripts/pipeline.mjs assemble examples/demo/issues/003
+node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/issues/003/40-cards --flat
 ```
-
-给自己的孩子用：
-
-```bash
-cp -r templates/data data        # data/ 已在 .gitignore 里
-```
-
-1. 打开 `data/MY_CHILD.md` 填问卷。越具体越好：「喜欢猫，尤其是橘猫，问过猫为什么会呼噜」比「喜欢动物」好用得多
-2. 在本目录打开 agent，说：**"按问卷给孩子建刊"**
-3. 之后每天说：**"出下一期"**
 
 常用指令：
 
 | 说 | agent 会 |
 |---|---|
-| 出下一期 / 做第 N 期 | 读资料、找素材、写内容、渲染、自检 |
+| 做第 N 步 | 按 `pipeline/stages/` 里那一步的说明，写出这一步的文件 |
+| 出下一期 | 从第 00 步开始，能做几步做几步 |
 | 记一笔：她今天盯着封面看了很久 | 原话记进 `curation-log.md` |
 | 做本周策展 | 汇总本周反馈，出调整建议，等你确认 |
-| 孩子问卷更新了，做一次策展 | 按新问卷重新校准 |
 
 ## 保护孩子的隐私
 
 孩子的名字、照片、来信、反馈都只放在**数据目录** `data/` 里，它已被 `.gitignore` 排除。
 
-推荐把数据目录做成一个**私有仓库**：
-
-```bash
-cd data && git init && git add -A && git commit -m "init"
-# 推到 GitHub 上的私有仓库
-```
-
-如果用云端 agent（如 Claude Code on the web），可以反过来在私有数据仓库里工作：仓库根目录放数据，用 SessionStart hook 把本引擎 clone 到 `.engine/`，再在数据仓库的 `CLAUDE.md` 里引用 `.engine/SKILL.md`。
+数据目录放在你自己的 Google Drive 里，只分享给你用的 agent。引擎仓库只放代码和规则。
 
 **关于新闻图片**：新闻原图有版权。只在自家看的期刊可以用原图并署名，这些图片只能存在私有数据目录里；要公开分享的期刊只用自由授权的照片（Wikimedia Commons、NASA 等）。
 
 ## 目录
 
 ```
-SKILL.md              给 agent 的完整编辑规则（AGENTS.md、CLAUDE.md 是它的软链接）
+SKILL.md              给 agent 的总规则（AGENTS.md、CLAUDE.md 是它的软链接）
+pipeline/             流水线：stages.json 步骤表、stages/ 每步说明、colab/制作间.ipynb
+scripts/              pipeline.mjs（进度、检查、合并）、render.mjs（渲染）、make_video.py（视频）
 assets/               页面模板、样式、角色 SVG
-scripts/render.mjs    JSON → PNG + PDF
-templates/data/       空白的数据目录（问卷、画像、策展记录……）
-examples/demo/        虚构孩子「小满」的示例数据和一期样刊
+templates/data/       空白的数据目录（问卷、画像、策展记录、参考音说明……）
+examples/demo/        虚构孩子「小满」的数据目录，issues/003/ 是一期完整的流水线文件
 ```
 
 ## 自定义

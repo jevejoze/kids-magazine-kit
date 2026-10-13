@@ -1,0 +1,13 @@
+{
+  "_meta": {
+    "stage": "20-assets",
+    "by": "示例",
+    "at": "2026-10-14T06:30:00+08:00"
+  },
+  "cover": "cover.jpg",
+  "news": [
+    "news-1.jpg",
+    "news-2.jpg",
+    "news-3.jpg"
+  ]
+}

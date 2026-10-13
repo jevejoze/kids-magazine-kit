@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// 用法: node render.mjs <issue.json> [输出目录]
-// 产出: 输出目录/issue-NNN/{issue.html, card-1..N.png, <刊名>-第NNN期.pdf}
+// 用法: node render.mjs <issue.json> [输出目录] [--flat]
+// 产出: 输出目录/issue-NNN/{issue.html, card-1..N.png, <刊名>-第NNN期.pdf}；加 --flat 直接写进输出目录
 // JSON 里以 .jpg/.jpeg/.png/.webp 结尾、且相对 JSON 所在目录存在的路径，会内嵌进 HTML；.svg 文件按原文内联。
 // 截图走 Chrome DevTools 协议，按每张卡片的实际位置裁切，需要 Node 22+（内置 WebSocket）。
 import { readFileSync, writeFileSync, mkdirSync, existsSync, mkdtempSync, rmSync } from "node:fs";
@@ -9,8 +9,10 @@ import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { spawn } from "node:child_process";
 
-const [, , jsonPath, outRoot = "."] = process.argv;
-if (!jsonPath) { console.error("用法: node render.mjs <issue.json> [输出目录]"); process.exit(1); }
+const args = process.argv.slice(2);
+const flat = args.includes("--flat");
+const [jsonPath, outRoot = "."] = args.filter(x => x !== "--flat");
+if (!jsonPath) { console.error("用法: node render.mjs <issue.json> [输出目录] [--flat]"); process.exit(1); }
 
 const here = dirname(fileURLToPath(import.meta.url));
 const assets = join(here, "..", "assets");
@@ -28,7 +30,7 @@ const embed = v => {
 };
 const data = embed(JSON.parse(readFileSync(jsonPath, "utf8")));
 const N = String(data.issue).padStart(3, "0");
-const outDir = resolve(outRoot, `issue-${N}`);
+const outDir = flat ? resolve(outRoot) : resolve(outRoot, `issue-${N}`);
 mkdirSync(outDir, { recursive: true });
 
 const html = readFileSync(join(assets, "template.html"), "utf8")

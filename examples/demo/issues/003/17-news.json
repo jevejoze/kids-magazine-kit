@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "stage": "17-news",
+    "by": "示例",
+    "at": "2026-10-14T06:00:00+08:00"
+  },
+  "week": "10.06–10.12",
+  "items": [
+    {
+      "flag": "🇬🇧",
+      "place": "英国 · 伦敦",
+      "title": "11 岁女孩成为最年轻的“女子特级大师”",
+      "text": "伦敦女孩 Bodhana 打破了 12 岁的旧纪录。她 2020 年才开始学棋，老师是网上视频！",
+      "word": {
+        "en": "record",
+        "zh": "纪录"
+      },
+      "photo_url": "见 credits",
+      "photo_credit": "见 credits",
+      "photo_pos": "center 60%",
+      "sources": [
+        "https://newsforkids.net/articles/2026/10/08/british-girl-11-is-worlds-youngest-woman-grandmaster/",
+        "https://www.ctvnews.ca/lifestyle/article/british-schoolgirl-becomes-chess-youngest-ever-woman-grandmaster/"
+      ]
+    },
+    {
+      "flag": "🇺🇸",
+      "place": "美国 · 佛罗里达",
+      "title": "鹈鹕敲门求救",
+      "text": "一只鹈鹕用嘴“咚咚”敲实验室的门，翅膀扎着鱼钩。科学家花 10 分钟取下，它飞走了。",
+      "word": {
+        "en": "help",
+        "zh": "帮助"
+      },
+      "photo_url": "见 credits",
+      "photo_credit": "见 credits",
+      "photo_pos": "center 40%",
+      "sources": [
+        "https://newsforkids.net/articles/2026/10/01/injured-pelican-knocks-noaa-scientists-answer/",
+        "https://www.adn.com/alaska-news/wildlife/2026/09/20/scientists-heard-a-knock-at-the-door-it-was-a-pelican-in-need-of-help/"
+      ]
+    },
+    {
+      "flag": "🇦🇹",
+      "place": "奥地利 · 维也纳",
+      "title": "狗狗看得出你在害怕",
+      "text": "狗狗躺进扫描仪看人脸照片，害怕的脸让它大脑的反应和生气、难过都不一样。",
+      "word": {
+        "en": "face",
+        "zh": "脸"
+      },
+      "photo_url": "见 credits",
+      "photo_credit": "见 credits",
+      "photo_pos": "center 30%",
+      "sources": [
+        "https://www.snexplores.org/article/dogs-read-anger-fear-emotion-human-faces",
+        "https://www.sciencenews.org/article/dogs-understand-emotions-humans-face"
+      ]
+    }
+  ],
+  "ask_zh": "你怎么看？鹈鹕为什么会去敲人类的门？",
+  "ask_en": "Why do you think the pelican knocked on the door?",
+  "credits": "来源：News for Kids · CTV · Science News Explores · ADN　照片：Wilfredor (CC0，示意) · F. Schulenburg · Slyronit (CC BY-SA) / Wikimedia Commons",
+  "foot": "新闻来源已交叉核实 · 头条照片为示意"
+}

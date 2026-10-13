@@ -1,0 +1,32 @@
+# 12 单词屋
+
+**目标**：3 个和本期主题相关的英文单词，例句练一个语法点。
+
+**读**：`issue/00-brief.json`（主题、`english_level`）、`data/vocab.json`（已学单词，避免重复）
+
+**写**：`issue/12-words.json`
+
+```json
+{
+  "_meta": {"stage": "12-words", "by": "", "at": ""},
+  "intro": "Hi, it's Boba Mouse! 🐝 Today we count sides with the bees. Buzz buzz! 嗡嗡！",
+  "grammar": "比较级 more / less / better",
+  "items": [
+    {"word": "hexagon", "cn": "六边形", "icon": "🐝", "example": "A hexagon has more sides than a square.", "new": true},
+    {"word": "wax", "cn": "蜂蜡、蜡", "icon": "🕯️", "example": "Bees use less wax when they build hexagons."},
+    {"word": "shape", "cn": "形状", "icon": "🔷", "example": "Which shape is better for bees, a circle or a hexagon?"}
+  ],
+  "task": "用比较级写一句：比一比正方形和三角形，谁的边更多？（more sides）",
+  "lines": 2
+}
+```
+
+**规则**
+- 3 个词，至少 1 个 `"new": true`（孩子大概率没学过的）；3 个词都不在 `vocab.json` 里
+- 例句 8–12 个词，3 句都用到 `grammar` 写的语法点；例句里要出现单词本身（模板会自动高亮）
+- 档位：L1 一般过去时、比较级，句子 ≤ 9 个词；L2 可用 because / when / if 从句；L3 可用现在完成时、情态动词
+- `intro` 是波波鼠的开场白，英文为主，可夹一个中文词，≤ 18 个英文单词
+- `task` 让孩子自己造句或改写句子（跟读不算），≤ 40 字
+- `icon` 用一个 emoji
+
+**自检**：数每句例句的词数；查 `vocab.json` 无重复

@@ -1,0 +1,312 @@
+{
+  "_meta": {
+    "stage": "50-narration",
+    "by": "示例",
+    "at": "2026-10-14T07:00:00+08:00"
+  },
+  "narration": [
+    {
+      "card": 1,
+      "lines": [
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "小满早上好！欢迎收看今天的小满早知道。"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "这张照片，是在半夜十二点四十四分拍的。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "挪威夏天半夜十二点，太阳为啥还在天上？"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "A，挪威的太阳特别大、特别亮。B，地球斜着转，夏天北边一直朝着太阳。C，挪威人把钟表调错了。"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "你选哪个？先暂停想一想！",
+          "pause": 5,
+          "hold": "⏸ 先暂停猜一猜"
+        }
+      ]
+    },
+    {
+      "card": 2,
+      "lines": [
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "听说挪威的夏天，半夜十二点太阳还在天上？那小朋友几点睡觉啊！"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "地球是斜着转的！夏天北极歪向太阳，整天都晒得到。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "冬天为啥整天黑？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "歪到另一边就照不到了。在挪威北角，夏天有七十六天太阳不落山！"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Sun can't sleep!"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "看下面这张图：地轴斜着二十三点五度，黄色的北极圈，转一整圈都在阳光里。"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "冷知识：斯瓦尔巴群岛一年有四个月极昼，那里不许养猫，北极熊比人还多！"
+        }
+      ]
+    },
+    {
+      "card": 3,
+      "lines": [
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Hi! I'm Boba Mouse. Pack your bags, today we are going to Norway!"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "midnight",
+          "repeat": 2,
+          "pause": 2
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "In Norway, the sun is still up at midnight in summer.",
+          "rate": "slow",
+          "pause": 1
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "In Norway, the sun is still up at midnight in summer.",
+          "pause": 3,
+          "hold": "🗣 跟着读"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "circle",
+          "repeat": 2,
+          "pause": 2
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "The sun moves in a circle and never goes down.",
+          "rate": "slow",
+          "pause": 3,
+          "hold": "🗣 跟着读"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "curtain",
+          "repeat": 2,
+          "pause": 2
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "People close the curtains because it is too bright.",
+          "rate": "slow",
+          "pause": 3,
+          "hold": "🗣 跟着读"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "轮到你啦：用 because，把两句话合成一句！"
+        }
+      ]
+    },
+    {
+      "card": 4,
+      "lines": [
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "编辑部小剧场，第三集，珍珠的真相。"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "早上，大家围着四个空杯子。"
+        },
+        {
+          "who": "raccoon",
+          "lang": "zh",
+          "text": "昨晚我可没出门！窗户开着，你们自己看！"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "窗台上没有脚印，窗外也没有。真有人爬窗进来，一定会留下痕迹。"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Look! Pearl!"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "一颗珍珠，正粘在团子狗的尾巴尖上！"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "我就一直睡在沙发上啊……"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "门是从里面锁上的。只有本来就在屋里的人，才喝得到奶茶。"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "当天晚上，阁楼里又传来吸溜吸溜的声音……"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "侦探笔记：哪条线索证明不是有人爬窗进来？",
+          "pause": 5,
+          "hold": "🔍 回头找一找线索"
+        }
+      ]
+    },
+    {
+      "card": 5,
+      "lines": [
+        {
+          "who": "raccoon",
+          "lang": "zh",
+          "text": "哼，奶茶的事我还没完！先过我这关！"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "艾莎、健太、卢卡、阿米尔排队领奶茶。艾莎不在第一个，也不在最后一个。",
+          "pause": 2
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "健太紧跟在阿米尔后面。卢卡是最后一个。他们是怎么排的？",
+          "pause": 3,
+          "hold": "✏️ 写下你的答案"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Level one. At blank, the sun is still up in Norway. Midnight, or noon?",
+          "pause": 2
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Level two. Why do people in Norway close the curtains?",
+          "pause": 2
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Level three. Would you like to see the midnight sun? Write two sentences with because."
+        }
+      ]
+    },
+    {
+      "card": 6,
+      "lines": [
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "亲爱的小满，上期答案：金字塔搭六层剩九块，七层还差四十块。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "我梦见喝奶茶，醒来枕头边真有吸管！梦游的人记得自己做过什么吗？"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "开放题：如果在挪威过一个没有黑夜的夏天，你最想做什么？说出理由！"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "别忘了做今日打卡，拍照发给妈妈哦！"
+        }
+      ]
+    },
+    {
+      "card": 7,
+      "lines": [
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "环球小报！英国伦敦：十一岁女孩成为最年轻的女子特级大师。"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "record",
+          "repeat": 2
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "美国佛罗里达：一只鹈鹕用嘴敲实验室的门求救，科学家花十分钟帮它取下鱼钩。"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "help",
+          "repeat": 2
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "奥地利维也纳：科学家发现，狗狗看得出你在害怕。"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "face",
+          "repeat": 2
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "你怎么看？鹈鹕为什么会去敲人类的门？明天见！"
+        }
+      ]
+    }
+  ]
+}
