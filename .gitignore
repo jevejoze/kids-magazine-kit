@@ -1,5 +1,5 @@
 # 孩子的数据放在私有的数据目录，不进公开仓库
-data/
+/data/
 output/
 .DS_Store
 examples/demo/issues/*/40-cards/
