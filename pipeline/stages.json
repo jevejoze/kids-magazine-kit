@@ -1,5 +1,5 @@
 {
-  "about": "一期杂志的流水线。每步读 inputs、写 outputs；depends 里的步骤全部完成后才能开始。kind=agent 的步骤由任意 agent 按 stages/<id>.md 完成；kind=script 的步骤在制作间（Colab 笔记本或任意有 Node/ffmpeg 的环境）运行。路径：data/ 是数据目录，issue/ 是 data/issues/NNN/。",
+  "about": "一期杂志的流水线。每步读 inputs、写 outputs；depends 里的步骤全部完成后才能开始。kind=agent 的步骤由任意 agent 按 stages/<id>.md 完成；kind=script 的步骤在任意有 Node、Chrome、ffmpeg 的环境里运行。路径：data/ 是数据目录，issue/ 是 data/issues/NNN/。",
   "stages": [
     {"id": "00-brief",     "title": "本期任务书",   "kind": "agent",  "depends": [],
      "inputs": ["data/MY_CHILD.md", "data/profile.md", "data/curation-log.md", "data/child-questions.md", "data/story-bible.md", "上一期 issue/30-issue.json"],
@@ -19,7 +19,8 @@
     {"id": "40-render",    "title": "渲染图片和 PDF", "kind": "script", "depends": ["31-review"],
      "run": "node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat", "outputs": ["issue/40-cards/"]},
     {"id": "50-narration", "title": "讲读稿",       "kind": "agent",  "depends": ["31-review"], "outputs": ["issue/50-narration.json"]},
-    {"id": "60-audio",     "title": "语音",         "kind": "script", "depends": ["50-narration"], "outputs": ["issue/60-audio/"]},
+    {"id": "60-audio",     "title": "语音",         "kind": "script", "depends": ["50-narration"],
+     "run": "node scripts/tts_azure.mjs <issue>", "outputs": ["issue/60-audio/"]},
     {"id": "70-video",     "title": "讲读视频",     "kind": "script", "depends": ["40-render", "60-audio"],
      "run": "python3 scripts/make_video.py <issue>", "outputs": ["issue/70-final/"]},
     {"id": "90-archive",   "title": "更新档案",     "kind": "agent",  "depends": ["40-render"],

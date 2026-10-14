@@ -10,7 +10,8 @@
 data/
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
   story-bible.md  vocab.json  feedback.jsonl
-  voices/                    讲读版各角色的参考音（可选）
+  voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
+  sfx/                       讲读版音效（可选）
   issues/
     004/                     本期工作区，下文写作 issue/
       00-brief.json
@@ -65,16 +66,17 @@ data/
 
 重做某一步：直接覆盖它的输出，再把依赖它的下游步骤重做一遍。
 
-## 脚本步骤（制作间）
+## 脚本步骤
 
-30、40、60、70 需要运行脚本，在任意有 Node 22+、Chrome、Python、ffmpeg 的环境里跑，推荐用 `pipeline/colab/制作间.ipynb`（挂载 Google Drive 后一键运行）：
+30、40、60、70 需要运行脚本，在任意有 Node 22+、Chrome、Python 3、ffmpeg 的环境里跑（Claude Code 云端会话、自己的电脑都可以）：
 
 ```bash
 node scripts/pipeline.mjs status   <issue>   # 看每步做了没有、下一步能做什么
 node scripts/pipeline.mjs check    <issue>   # 检查已完成步骤的字段和字数
 node scripts/pipeline.mjs assemble <issue>   # 第 30 步
 node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40 步
+node scripts/tts_azure.mjs <issue>           # 第 60 步（Azure 语音）
 python3 scripts/make_video.py <issue>        # 第 70 步
 ```
 
-第 60 步（语音）用什么服务由执行者决定，只要按 `stages/60-audio.md` 的约定把音频放好。
+第 60 步默认用 Azure 语音（`scripts/tts_azure.mjs`），需要环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`；换别的语音服务也行，按 `stages/60-audio.md` 的约定把音频放好即可。
