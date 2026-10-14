@@ -5,15 +5,10 @@
     "at": "2026-10-14T06:00:00+08:00"
   },
   "question": {
-    "en": "Why is the sun up at midnight in Norway?",
-    "zh": "挪威夏天半夜12点，太阳为啥还在天上？",
-    "options": [
-      "挪威的太阳特别大、特别亮",
-      "地球斜着转，夏天北边一直朝着太阳",
-      "挪威人把钟表调错了"
-    ]
+    "zh": "挪威夏天半夜 12 点，<br>太阳为啥还在天上？",
+    "en": "Why is the sun up at midnight in Norway?"
   },
-  "answer": "B（地球斜着转，夏天北极圈一直朝着太阳）",
+  "answer": "答案要点：地球斜着转，夏天北极圈一直朝着太阳（今日一问照此讲）",
   "photo": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Midnight_sun.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Midnight_sun.jpg",
@@ -23,11 +18,11 @@
   },
   "photo_pos": "32% center",
   "stamp": "📷 00:44 · 挪威北角",
-  "kicker": "🤔 这张照片拍于半夜 00:44，先猜一猜：",
+  "asked_by": "",
+  "strip": "",
   "crew": [
-    "owl:happy:160:sunglasses",
     "dog:sleepy:200:eyemask",
-    "mouse:wave:160"
+    "owl:happy:160:sunglasses"
   ],
   "crew_say": "太亮啦，睡不着……",
   "credit": "© Yan Zhang · CC BY-SA 3.0",

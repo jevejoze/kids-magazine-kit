@@ -35,9 +35,11 @@ const checks = {
     need(b.story && (b.story.ep % 2 ? "zh" : "en") === b.story.lang, "00", "小剧场单数集中文、双数集英文");
   },
   "10-cover.json": c => {
-    fields(c, "10", ["question", "answer", "photo", "stamp", "kicker", "crew", "crew_say", "credit"]);
-    need(c.question?.options?.length === 3, "10", "选项要 3 个");
-    need(len(c.question?.zh) <= 22, "10", `问题 ${len(c.question?.zh)} 字，超过 22 字`);
+    fields(c, "10", ["question", "answer", "photo", "stamp", "crew", "crew_say", "credit"]);
+    need(!c.question?.options, "10", "封面只放一个问题，去掉 options（答案由今日一问讲）");
+    need(len(c.question?.zh) <= 24, "10", `问题 ${len(c.question?.zh)} 字，超过 24 字`);
+    need(len(c.stamp) <= 14, "10", `stamp ${len(c.stamp)} 字，超过 14 字`);
+    need((c.crew ?? []).length <= 2, "10", "封面角色最多 2 个");
     need(len(c.crew_say) <= 12, "10", `crew_say ${len(c.crew_say)} 字，超过 12 字`);
     need(c.photo?.license, "10", "照片缺少协议");
   },
@@ -131,13 +133,13 @@ function assemble() {
   const issueJson = {
     issue: b.issue, date: b.date, weather: b.weather, masthead: b.masthead,
     question: c.question,
-    cover: { photo: asset(a.cover), photo_pos: c.photo_pos, stamp: c.stamp, kicker: c.kicker, crew: c.crew, crew_say: c.crew_say, credit: c.credit },
+    cover: { photo: asset(a.cover), photo_pos: c.photo_pos, strip: c.strip, stamp: c.stamp, asked_by: c.asked_by, crew: c.crew, crew_say: c.crew_say, credit: c.credit },
     comic: { ...strip(m), theme_icon: m.theme_icon || c.theme_icon, sources: undefined },
     words: strip(w),
     story: { ep: s.ep, lang: s.lang, night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
     challenge: { taunt_zh: e.taunt_zh, taunt_en: e.taunt_en, prop: e.prop || "", puzzle: { title: p.title, body: p.body, slots: p.slots }, english: e.english },
     mailbox: strip(mb),
-    _answers: { cover: c.answer, puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret },
+    _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret },
   };
   if (nw) {
     issueJson.news = {

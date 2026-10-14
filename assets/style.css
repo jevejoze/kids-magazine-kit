@@ -132,30 +132,29 @@ svg.ch{display:block}
 @page{size:1080px 1440px;margin:0}
 @media print{body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0;break-after:page}.card:last-of-type{break-after:auto}}
 
-/* card 1 photo cover：照片铺满整张卡，文字压在上下两端的暗色渐变上 */
-#c1.photo-cover{background:#222;color:#fff}
-#c1.photo-cover .photo,#c1.photo-cover .shade{position:absolute;inset:0}
-#c1.photo-cover .photo{background-size:cover}
-#c1.photo-cover .shade{background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0) 24%,rgba(0,0,0,0) 48%,rgba(0,0,0,.78) 80%,rgba(0,0,0,.85))}
-#c1.photo-cover .top{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.5)}
-#c1.photo-cover .mast{text-align:center;margin-top:6px;position:relative}
-#c1.photo-cover .mast .zh{font-size:120px;letter-spacing:6px;color:#fff;text-shadow:5px 5px 0 var(--ink)}
-#c1.photo-cover .mast .en{font-size:40px;letter-spacing:3px;text-shadow:0 2px 6px rgba(0,0,0,.6)}
-#c1.photo-cover .stamp{position:absolute;left:64px;top:410px;font-size:36px;font-weight:800;color:#FFB054;letter-spacing:2px;background:rgba(20,14,8,.55);border-radius:14px;padding:4px 16px}
-#c1.photo-cover .q{margin-top:auto;position:relative;text-shadow:0 2px 8px rgba(0,0,0,.6)}
-#c1.photo-cover .q .lb{display:inline-block;font-size:30px;background:var(--butter);color:var(--ink);border-radius:999px;padding:4px 20px;text-shadow:none}
-#c1.photo-cover .q .t{font-size:48px;line-height:1.25;margin-top:14px}
-#c1.photo-cover .q .en{font-size:32px;color:#fff;opacity:.85;margin-top:4px}
-#c1.photo-cover .opts{display:flex;flex-direction:column;gap:12px;margin-top:22px;font-size:32px}
-#c1.photo-cover .opts div{background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.55);border-radius:20px;padding:8px 18px;backdrop-filter:blur(6px)}
-#c1.photo-cover .q .opts i{opacity:1;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:#fff;color:var(--ink);border-radius:50%;font-style:normal;font-size:25px;margin-right:14px;vertical-align:middle;text-shadow:none}
-#c1.photo-cover .mast .by{display:inline-block;margin-top:10px;font-size:26px;background:rgba(255,255,255,.9);color:var(--ink);border-radius:999px;padding:2px 18px}
-#c1.photo-cover .q{margin-bottom:200px}
-#c1.photo-cover .crew{position:absolute;left:24px;bottom:-4px;display:flex;align-items:flex-end;gap:0}
-#c1.photo-cover .crew .ch{margin-right:-18px}
-#c1.photo-cover .crew .bub{color:var(--ink);text-shadow:none;width:auto;margin:0 0 110px 34px;font-size:30px;padding:10px 22px;white-space:nowrap;box-shadow:0 5px 0 var(--ink)}
-#c1.photo-cover .crew .bub:after{left:-26px;bottom:14px;margin-left:0;border-top-color:transparent;border-right-color:var(--ink)}
-#c1.photo-cover .credit{position:absolute;right:24px;bottom:14px;margin:0;font-size:15px}
+/* card 1 photo cover：顶部刊名条 + 照片。刊名条颜色 --strip 由模板从照片顶部取色，照片顶端渐隐进刊名条，刊名不压照片主体 */
+#c1.photo-cover{--strip:#FFF8EE;background:var(--strip);color:#fff}
+#c1.photo-cover .photo,#c1.photo-cover .shade{position:absolute;left:0;right:0;bottom:0;top:190px}
+#c1.photo-cover .photo{background-size:cover;-webkit-mask-image:linear-gradient(transparent,#000 170px);mask-image:linear-gradient(transparent,#000 170px)}
+#c1.photo-cover .shade{background:linear-gradient(rgba(0,0,0,0) 62%,rgba(0,0,0,.72))}
+#c1.photo-cover .top{margin-top:-30px;font-size:28px;color:var(--mast-sub)}
+#c1.photo-cover .mast{text-align:center;margin-top:-4px;position:relative}
+#c1.photo-cover .mast .zh{font-size:96px;letter-spacing:6px;color:var(--mast-ink);text-shadow:4px 4px 0 var(--mast-shadow)}
+#c1.photo-cover .mast .en{font-size:28px;letter-spacing:3px;margin-top:-6px;color:var(--mast-sub)}
+#c1.photo-cover,#c1.photo-cover.light{--mast-ink:var(--ink);--mast-sub:rgba(74,59,50,.72);--mast-shadow:rgba(255,255,255,.65)}
+#c1.photo-cover.dark{--mast-ink:#fff;--mast-sub:rgba(255,255,255,.88);--mast-shadow:var(--ink)}
+#c1.photo-cover .q{position:absolute;left:56px;bottom:56px;max-width:720px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+#c1.photo-cover .q .stamp,#c1.photo-cover .q .asked{display:inline-block;font-size:26px;font-weight:800;letter-spacing:1px;border-radius:12px;padding:2px 14px;margin:0 10px 12px 0;text-shadow:none}
+#c1.photo-cover .q .stamp{color:#FFB054;background:rgba(20,14,8,.6)}
+#c1.photo-cover .q .asked{color:var(--ink);background:var(--butter)}
+#c1.photo-cover .q .t{font-size:62px;line-height:1.22;text-shadow:3px 3px 0 var(--ink),0 0 18px rgba(0,0,0,.5)}
+#c1.photo-cover .q .en{font-size:28px;color:#fff;opacity:.9;margin-top:8px}
+#c1.photo-cover .crew{position:absolute;right:16px;bottom:-4px;display:flex;flex-direction:column;align-items:flex-end}
+#c1.photo-cover .crew .chs{display:flex;align-items:flex-end}
+#c1.photo-cover .crew .ch{margin-right:-14px}
+#c1.photo-cover .crew .bub{color:var(--ink);text-shadow:none;width:auto;margin:0 30px 6px 0;font-size:28px;padding:8px 20px;white-space:nowrap;box-shadow:0 5px 0 var(--ink)}
+#c1.photo-cover .crew .bub:after{display:none}
+#c1.photo-cover .credit{position:absolute;left:24px;bottom:12px;margin:0;font-size:15px}
 
 /* news card */
 #cnews{background:#E8F1FF}
