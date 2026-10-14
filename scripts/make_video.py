@@ -103,12 +103,13 @@ def main(issue):
         wav = os.path.join(tmp, f"card{card}.wav")
         run("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", wav)
 
+        # hold 提示放在顶部刊名/标题区，避开封面问题和页面正文
         vf = ["scale=1080:1440,format=yuv420p"]
         if font:
             for a, b, txt in holds:
                 safe = txt.replace("\\", "\\\\").replace(":", "\\:").replace("'", "’")
                 vf.append(f"drawtext=fontfile='{font}':text='{safe}':fontsize=56:fontcolor=white:box=1:boxcolor=0x4A3B32CC:"
-                          f"boxborderw=24:x=(w-text_w)/2:y=h-260:enable='between(t,{a:.2f},{b:.2f})'")
+                          f"boxborderw=24:x=(w-text_w)/2:y=170:enable='between(t,{a:.2f},{b:.2f})'")
         mp4 = os.path.join(tmp, f"card{card}.mp4")
         run("ffmpeg", "-y", "-loop", "1", "-framerate", "10", "-i", os.path.join(cards_dir, f"card-{card}.png"), "-i", wav,
             "-vf", ",".join(vf), "-c:v", "libx264", "-tune", "stillimage", "-preset", "veryfast", "-r", "10",
