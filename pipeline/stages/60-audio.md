@@ -13,6 +13,7 @@ node scripts/tts_azure.mjs <issue>         # 合成；已经合成过、内容�
 - 计费：免费档每月 50 万计费字符，汉字算 2 个，SSML 标签也算（`<speak>` `<voice>` 除外）。脚本只给有情绪的句子加风格标签，慢速、停顿、重复都交给第 70 步，一期约 1.1 万计费字符
 - 免费资源每分钟最多 20 次请求，脚本会自动放慢，一期大约 10 分钟
 - 声音：`data/voices/azure.json` 写每个角色每种语言用哪个声音，没写的用脚本里的默认值；换声音前先 `node scripts/tts_azure.mjs --audition <数据目录>` 试听，试听文件在 `data/voices/试听/`
+- 音色：`azure.json` 里写 `{"voice": "声音名", "pitch": 3}` 可以在合成后升降几个半音，让声音更卡通，不占计费字符（需要 ffmpeg）
 - `emotion` 对应 Azure 的说话风格：开心、惊讶 → cheerful，兴奋 → excited，委屈 → sad，紧张 → fearful，温柔 → gentle，神秘 → whispering；平静、困倦、得意不加。声音不支持的风格按普通语气念
 
 换别的语音服务也可以，产出按下面的约定放好即可。

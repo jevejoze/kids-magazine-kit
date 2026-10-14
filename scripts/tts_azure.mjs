@@ -6,7 +6,11 @@
 // 环境变量：AZURE_SPEECH_KEY、AZURE_SPEECH_REGION（免费 F0 资源）
 //           AZURE_SPEECH_KEY_PAID、AZURE_SPEECH_REGION_PAID（可选，付费 S0 资源，免费额度用完或被限流时接着用）
 // 声音：数据目录 voices/azure.json 写每个角色每种语言用哪个声音，没写的用下面的 DEFAULT_VOICES。
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+//       值可以是声音名，也可以是 {"voice": "声音名", "pitch": 3}：pitch 是合成后用 ffmpeg 升（负数为降）几个半音，
+//       语速不变、不占计费字符，用来让声音更卡通
+import { readFileSync, writeFileSync, mkdirSync, existsSync, mkdtempSync, rmSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createHash } from "node:crypto";
 
@@ -14,7 +18,7 @@ const DEFAULT_VOICES = {
   "narrator/zh": "zh-CN-XiaoxiaoNeural", "narrator/en": "en-GB-SoniaNeural",
   "dog/zh": "zh-CN-YunxiaNeural",
   "mouse/zh": "en-GB-AdaMultilingualNeural", "mouse/en": "en-GB-MaisieNeural",
-  "owl/zh": "zh-CN-YunyeNeural", "owl/en": "en-GB-RyanNeural",
+  "owl/zh": { voice: "zh-CN-YunfengNeural", pitch: 3 }, "owl/en": "en-GB-RyanNeural",
   "raccoon/zh": "zh-CN-YunxiNeural", "raccoon/en": "en-GB-ElliotNeural",
 };
 // 讲读稿的 emotion → Azure 说话风格。声音不支持的风格 Azure 会按普通语气念；平静、困倦、得意不加标签，省计费字符
@@ -36,12 +40,13 @@ delete voices._comment;
 const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const plain = s => s.replace(/<[^>]+>/g, "");
 // SSML：<speak> 和 <voice> 标签不计费，其余标签和正文都计费，汉字按 2 个字符算
+const voiceOf = role => { const v = voices[role]; return typeof v === "string" ? { voice: v, pitch: 0 } : v ? { pitch: 0, ...v } : null; };
 function ssml(line) {
-  const voice = voices[`${line.who}/${line.lang}`] || voices[`narrator/${line.lang}`];
+  const { voice, pitch } = voiceOf(`${line.who}/${line.lang}`) || voiceOf(`narrator/${line.lang}`);
   const style = STYLE[line.emotion];
   const body = style ? `<mstts:express-as style="${style}">${esc(plain(line.text))}</mstts:express-as>` : esc(plain(line.text));
   return {
-    voice, body,
+    voice, pitch, body,
     xml: `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${LOCALE[line.lang]}"><voice name="${voice}">${body}</voice></speak>`,
   };
 }
@@ -76,6 +81,16 @@ async function synth(xml) {
 }
 
 const seconds = wav => (wav.length - 44) / (24000 * 2);
+// 升降调：改采样率抬高音高，再用 atempo 把语速拉回原样
+function shift(wav, semitones) {
+  if (!semitones) return wav;
+  const r = 2 ** (semitones / 12), dir = mkdtempSync(join(tmpdir(), "pitch-"));
+  try {
+    writeFileSync(join(dir, "a.wav"), wav);
+    execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", join(dir, "a.wav"), "-af", `asetrate=${24000 * r},aresample=24000,atempo=${1 / r}`, join(dir, "b.wav")]);
+    return readFileSync(join(dir, "b.wav"));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+}
 if (!dry && !keys.length) { console.error("没有 Azure 密钥：设置环境变量 AZURE_SPEECH_KEY 和 AZURE_SPEECH_REGION（如 eastasia）"); process.exit(1); }
 
 if (audition) {
@@ -84,12 +99,12 @@ if (audition) {
   let total = 0;
   for (const role of Object.keys(voices)) {
     const [who, lang] = role.split("/");
-    const { xml, body } = ssml({ who, lang, text: SAMPLE[lang], emotion: "开心" });
+    const { xml, body, voice, pitch } = ssml({ who, lang, text: SAMPLE[lang], emotion: "开心" });
     total += billable(body);
     if (dry) continue;
     const { wav } = await synth(xml);
-    writeFileSync(join(out, `${who}-${lang}.wav`), wav);
-    console.log(`${role}  ${voices[role]}`);
+    writeFileSync(join(out, `${who}-${lang}.wav`), shift(wav, pitch));
+    console.log(`${role}  ${voice}${pitch ? `（${pitch > 0 ? "升" : "降"} ${Math.abs(pitch)} 个半音）` : ""}`);
   }
   console.log(`试听共 ${total} 计费字符${dry ? "（未调用）" : `，文件在 ${out}`}`);
   process.exit(0);
@@ -108,9 +123,9 @@ let spent = 0, planned = 0, skipped = 0, paid = 0;
 for (const page of nar) {
   for (const [i, line] of page.lines.entries()) {
     const file = `c${page.card}_${String(i).padStart(2, "0")}.wav`;
-    const { voice, body, xml } = ssml(line);
-    used[`${line.who}/${line.lang}`] = voice;
-    const hash = createHash("sha1").update(xml).digest("hex").slice(0, 12);
+    const { voice, pitch, body, xml } = ssml(line);
+    used[`${line.who}/${line.lang}`] = pitch ? `${voice} ${pitch > 0 ? "+" : ""}${pitch} 半音` : voice;
+    const hash = createHash("sha1").update(xml + pitch).digest("hex").slice(0, 12);
     const cost = billable(body);
     planned += cost;
     const prev = oldByFile[file];
@@ -118,7 +133,8 @@ for (const page of nar) {
       files.push(prev); skipped++; continue;
     }
     if (dry) continue;
-    const { wav, by } = await synth(xml);
+    const { wav: raw, by } = await synth(xml);
+    const wav = shift(raw, pitch);
     writeFileSync(join(outDir, file), wav);
     spent += cost; if (by === "付费") paid++;
     files.push({ card: page.card, index: i, file, seconds: +seconds(wav).toFixed(2), hash, by });

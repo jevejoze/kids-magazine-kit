@@ -6,8 +6,10 @@
 {"narrator/zh": "zh-CN-XiaoxiaoNeural", "narrator/en": "en-GB-SoniaNeural",
  "dog/zh": "zh-CN-YunxiaNeural",
  "mouse/zh": "en-GB-AdaMultilingualNeural", "mouse/en": "en-GB-MaisieNeural",
- "owl/zh": "zh-CN-YunyeNeural", "owl/en": "en-GB-RyanNeural",
+ "owl/zh": {"voice": "zh-CN-YunfengNeural", "pitch": 3}, "owl/en": "en-GB-RyanNeural",
  "raccoon/zh": "zh-CN-YunxiNeural", "raccoon/en": "en-GB-ElliotNeural"}
 ```
+
+想更卡通可以写成 `{"voice": "声音名", "pitch": 3}`：合成后升 3 个半音，语速不变，不占计费字符（负数为降调）。
 
 换声音前先试听：`node scripts/tts_azure.mjs --audition <数据目录>`，每个角色合成一句，放在 `voices/试听/`。定下来后记进 `profile.md`。
