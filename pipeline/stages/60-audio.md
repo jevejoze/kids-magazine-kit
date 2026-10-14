@@ -1,21 +1,35 @@
 # 60 语音
 
-**目标**：把 `50-narration.json` 里每一句合成成音频。用什么语音服务由执行者决定。
+**目标**：把 `50-narration.json` 里每一句合成成音频。
 
-**读**：`issue/50-narration.json`、`data/voices/voices.json`（角色和参考音，可选）
+**默认做法**：Azure 语音
+
+```bash
+node scripts/tts_azure.mjs <issue> --dry   # 先看这期要用多少计费字符
+node scripts/tts_azure.mjs <issue>         # 合成；已经合成过、内容没变的句子会跳过
+```
+
+- 环境变量：`AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`（免费 F0 资源）；可选 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`（同一订阅下的付费 S0 资源，免费额度用完或被限流时自动接着用）
+- 计费：免费档每月 50 万计费字符，汉字算 2 个，SSML 标签也算（`<speak>` `<voice>` 除外）。脚本只给有情绪的句子加风格标签，慢速、停顿、重复都交给第 70 步，一期约 1.1 万计费字符
+- 免费资源每分钟最多 20 次请求，脚本会自动放慢，一期大约 10 分钟
+- 声音：`data/voices/azure.json` 写每个角色每种语言用哪个声音，没写的用脚本里的默认值；换声音前先 `node scripts/tts_azure.mjs --audition <数据目录>` 试听，试听文件在 `data/voices/试听/`
+- `emotion` 对应 Azure 的说话风格：开心、惊讶 → cheerful，兴奋 → excited，委屈 → sad，紧张 → fearful，温柔 → gentle，神秘 → whispering；平静、困倦、得意不加。声音不支持的风格按普通语气念
+
+换别的语音服务也可以，产出按下面的约定放好即可。
+
+**读**：`issue/50-narration.json`、`data/voices/azure.json`（可选）
 
 **写**：`issue/60-audio/` 下每句一个文件，命名 `c{card}_{序号}.wav`（序号是这句在该页 `lines` 里的位置，从 0 开始，两位数，如 `c3_04.wav`），外加 `issue/60-audio/manifest.json`：
 
 ```json
 {"_meta": {"stage": "60-audio", "by": "", "at": ""},
- "voices": {"dog/zh": "所用的声音或参考音", "mouse/en": "……"},
+ "voices": {"dog/zh": "所用的声音", "mouse/en": "……"},
  "files": [{"card": 1, "index": 0, "file": "c1_00.wav", "seconds": 3.2}]}
 ```
 
 **规则**
 - 每句按正常语速合成一遍即可；`repeat`、`rate`、`pause`、`hold`、`sfx` 由第 70 步处理
-- 语音合成支持情绪控制时，按每句的 `emotion` 念（IndexTTS2 可以用情绪描述文字控制）；不支持就忽略
 - 同一个角色、同一种语言，整期用同一个声音；选定后记进 `data/profile.md`，以后沿用
-- 克隆声音只用本人同意的参考音
+- 用克隆声音时，只用本人同意的参考音
 
 **自检**：文件数 = 句数；抽听几句，没有吞字、读错

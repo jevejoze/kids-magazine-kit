@@ -15,21 +15,21 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 1. 家长填一份问卷 `MY_CHILD.md`：孩子是谁、喜欢什么、想让孩子吸收什么、杂志用什么语气
 2. 每一期拆成一条 17 步的**流水线**：任务书 → 封面选题、今日一问、单词、小剧场、谜题、英文、信箱、新闻 → 下载图片 → 合并 → 审稿 → 渲染 → 讲读稿 → 语音 → 视频。每步写一个中间文件，放在 Google Drive 的期刊文件夹里
 3. 家长把不同的步骤交给不同的 agent：难的交给强模型，简单的交给便宜的模型，互不干扰；任何一步不满意，单独重做那一步
-4. 需要跑脚本的几步（合并、渲染、语音、视频）在 Colab 笔记本「制作间」里一键完成
+4. 需要跑脚本的几步（合并、渲染、语音、视频）由 agent 在有 Node、Chrome、ffmpeg 的环境里直接运行；语音默认用 Azure，免费额度每月够出 40 多期
 5. 信箱页的"今日打卡"把孩子的反馈带回来，每周"做本周策展"调整下一周的方向
 
 ## 每期内容
 
 | 页 | 内容 |
 |---|---|
-| 封面 | 满版真实照片 + 反直觉问题 + 三选一"先猜一猜"，编辑部成员按主题换表情和道具 |
+| 封面 | 顶部刊名条 + 大幅真实照片（刊名条取照片的颜色）+ 一个反直觉问题，编辑部成员按主题换表情和道具 |
 | 今日一问 | 4 格漫画讲清一个机制 + agent 画的原理图解 + 冷知识便利贴 |
 | 单词屋 | 3 张单词卡，按孩子的英文档位选词，例句带语法点，留写字格 |
 | 小剧场 | 编辑部推理连载，单集中文、双集英文，带"侦探笔记"提问 |
 | 挑战 | 逻辑谜题 + 英文三关（填空 / 阅读 / 写作）|
 | 信箱 | 回信、开放题、今日打卡、集章 |
 | 环球小报 | 本周 3 条适合孩子的真实新闻，交叉核实来源 |
-| 讲读视频（可选）| 12–15 分钟的儿童电台节目：编辑部分角色、带情绪和音效把整期讲一遍，小剧场完整演出来，英文单词和例句带慢速跟读；语音用什么服务由你决定，制作间里以 IndexTTS2 为例 |
+| 讲读视频（可选）| 12–15 分钟的儿童电台节目：编辑部分角色、带情绪和音效把整期讲一遍，小剧场完整演出来，英文单词和例句带慢速跟读；语音默认用 Azure，也可以换成别的服务 |
 
 ## 快速开始
 
@@ -39,7 +39,7 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 2. 填好 `MY_CHILD.md`
 3. 对 agent 说：**"按问卷给孩子建刊"**，再说 **"做第 00 步"**
 4. 之后每一步交给你指定的 agent：**"做第 10 步，数据目录在 ……"**。agent 会读 `pipeline/stages/10-cover.md` 照做
-5. 内容步骤做完后，在 Colab 打开 `pipeline/colab/制作间.ipynb`，改好路径和期号，全部运行，成品出现在 `issues/NNN/70-final/`
+5. 内容步骤做完后，让一个能跑脚本的 agent（如 Claude Code 云端会话）做 30、40、60、70 步，成品出现在 `issues/NNN/70-final/`。第 60 步默认用 Azure 语音，先在环境里设好 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`
 
 本地预览示例期：
 
@@ -71,7 +71,7 @@ node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/iss
 
 ```
 SKILL.md              给 agent 的总规则（AGENTS.md、CLAUDE.md 是它的软链接）
-pipeline/             流水线：stages.json 步骤表、stages/ 每步说明、colab/制作间.ipynb
+pipeline/             流水线：stages.json 步骤表、stages/ 每步说明
 scripts/              pipeline.mjs（进度、检查、合并）、render.mjs（渲染）、make_video.py（视频）
 assets/               页面模板、样式、角色 SVG
 templates/data/       空白的数据目录（问卷、画像、策展记录、参考音说明……）
