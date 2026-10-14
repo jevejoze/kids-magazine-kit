@@ -90,6 +90,23 @@ const checks = {
       need((x.sources ?? []).length >= 2, "17", `第 ${i + 1} 条要 2 个来源`);
     });
   },
+  "50-narration.json": n => {
+    const EMO = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
+    const WHO = ["narrator", "dog", "mouse", "owl", "raccoon"];
+    const pages = n.narration ?? [];
+    need([1, 2, 3, 4, 5, 6, 7].every(c => pages.some(p => p.card === c)), "50", "7 页都要有讲读");
+    let total = 0;
+    pages.forEach(p => p.lines.forEach((l, i) => {
+      const at = `第 ${p.card} 页第 ${i + 1} 句`;
+      need(WHO.includes(l.who), "50", `${at} who 不对：${l.who}`);
+      need(["zh", "en"].includes(l.lang), "50", `${at} lang 不对：${l.lang}`);
+      need(!l.emotion || EMO.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);
+      if (l.lang === "en") need(words(l.text) <= 15, "50", `${at} ${words(l.text)} 个英文单词，超过 15`);
+      else need(len(l.text) <= 40, "50", `${at} ${len(l.text)} 字，超过 40`);
+      total += len(l.text) * (l.repeat || 1);
+    }));
+    need(total >= 2000 && total <= 4500, "50", `讲读稿共 ${total} 字，建议 2800–4000`);
+  },
   "20-assets/assets.json": a => {
     [a.cover, ...(a.news ?? [])].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
   },

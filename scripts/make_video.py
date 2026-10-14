@@ -2,7 +2,7 @@
 """第 70 步：把 40-cards 的图片和 60-audio 的语音合成讲读视频。
 
 用法: python3 make_video.py <issue 目录>
-读:   50-narration.json、60-audio/c{card}_{序号}.wav、40-cards/card-N.png
+读:   50-narration.json、60-audio/c{card}_{序号}.wav、40-cards/card-N.png、数据目录 sfx/<名字>.wav|mp3（可选音效）
 写:   70-final/讲读版.mp4，并把 40-cards 里的 PDF 复制进 70-final/
 需要 ffmpeg / ffprobe；hold 提示文字需要中文字体，用环境变量 FONT 指定，默认自动找 Noto CJK。
 """
@@ -28,6 +28,18 @@ def silence(path, sec):
 def normalize(src, dst, slow):
     flt = "atempo=0.8," if slow else ""
     run("ffmpeg", "-y", "-i", src, "-af", f"{flt}aformat=sample_rates=24000:channel_layouts=mono", dst)
+
+
+def find_sfx(issue, name):
+    # 音效放在数据目录的 sfx/ 下；issue 目录是 数据目录/issues/NNN
+    if not name:
+        return None
+    base = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(issue))), "sfx")
+    for ext in (".wav", ".mp3", ".m4a", ".ogg"):
+        f = os.path.join(base, name + ext)
+        if os.path.exists(f):
+            return f
+    return None
 
 
 def find_font():
@@ -64,6 +76,10 @@ def main(issue):
         card = page["card"]
         pieces, holds, t = [], [], 0.0
         for i, line in enumerate(page["lines"]):
+            sfx = find_sfx(issue, line.get("sfx"))
+            if sfx:
+                fx = os.path.join(tmp, f"sfx_{card}_{i}.wav"); normalize(sfx, fx, False)
+                pieces.append(fx); t += seconds(fx)
             src = os.path.join(audio_dir, f"c{card}_{i:02d}.wav")
             if not os.path.exists(src):
                 sys.exit(f"缺少音频 {src}")
