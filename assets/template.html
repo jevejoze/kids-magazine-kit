@@ -28,16 +28,15 @@ const GANG = ["owl:happy:230", "dog:happy:290", "mouse:wave:260", "raccoon:smirk
 const cards = [];
 
 // 1 封面：有 cover.photo 用照片封面，否则用角色封面
+// 照片封面：顶部刊名条 + 下方照片。刊名条的颜色取自照片顶部（见文末 coverStrip），照片顶端渐隐进刊名条
 const CV = D.cover;
-if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1">
+if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.strip ? ` style="--strip:${CV.strip}"` : ""}>
   <div class="photo" style="background-image:url('${CV.photo}');background-position:${CV.photo_pos || "center"}"></div><div class="shade"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
-  <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div>${D.masthead.by ? `<div class="by fun">${D.masthead.by}</div>` : ""}</div>
-  ${CV.stamp ? `<div class="stamp en">${CV.stamp}</div>` : ""}
-  <div class="q"><div class="lb fun">${CV.kicker || "🤔 先猜一猜，再往后翻！"}</div>
-    <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div>
-    ${D.question.options ? `<div class="opts fun">${D.question.options.map((o, i) => `<div><i class="en">${"ABC"[i]}</i>${o}</div>`).join("")}</div>` : ""}</div>
-  ${CV.crew ? `<div class="crew">${CV.crew.map(ch).join("")}${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}</div>` : ""}
+  <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
+  <div class="q">${CV.stamp ? `<div class="stamp en">${CV.stamp}</div>` : ""}${CV.asked_by ? `<div class="asked fun">💡 本期问题由${CV.asked_by}提出</div>` : ""}
+    <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div></div>
+  ${CV.crew ? `<div class="crew">${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}<div class="chs">${CV.crew.map(ch).join("")}</div></div>` : ""}
   <div class="credit en">${CV.credit}</div></section>`);
 else cards.push(`<section class="card" id="c1"><div class="dots"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
@@ -124,6 +123,34 @@ if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报
 
 document.getElementById("root").outerHTML = cards.join("\n").replaceAll("{{TOTAL}}", pg);
 if (location.hash) { document.body.classList.add("single"); document.querySelector(location.hash).classList.add("on"); }
+
+// 刊名条取色：照片可见区域最上面 5% 的平均色；太灰就提一点亮度。JSON 写了 cover.strip 就用它。
+// 刊名用深字还是白字，按刊名条的亮度定。render.mjs 截图前会等 window.READY
+async function coverStrip() {
+  const card = document.querySelector("#c1.photo-cover");
+  if (!card) return;
+  let rgb;
+  if (CV.strip) {
+    const c = document.createElement("canvas").getContext("2d");
+    c.fillStyle = CV.strip; c.fillRect(0, 0, 1, 1); rgb = [...c.getImageData(0, 0, 1, 1).data].slice(0, 3);
+  } else {
+    const box = card.querySelector(".photo"), img = new Image();
+    img.src = CV.photo; await img.decode();
+    const W = box.clientWidth, H = box.clientHeight, s = Math.max(W / img.width, H / img.height);
+    const pos = getComputedStyle(box).backgroundPosition.split(" ").map(v => v.endsWith("%") ? parseFloat(v) / 100 : 0.5);
+    const vw = W / s, vh = H / s, x0 = (img.width - vw) * pos[0], y0 = (img.height - vh) * (pos[1] ?? 0.5);
+    const cv = document.createElement("canvas"); cv.width = 32; cv.height = 2;
+    const c = cv.getContext("2d"); c.drawImage(img, x0, y0, vw, vh * 0.05, 0, 0, 32, 2);
+    const px = c.getImageData(0, 0, 32, 2).data; rgb = [0, 0, 0];
+    for (let i = 0; i < px.length; i += 4) for (let k = 0; k < 3; k++) rgb[k] += px[i + k] / 64;
+    const [mx, mn] = [Math.max(...rgb), Math.min(...rgb)];
+    if (mx - mn < 30 && mx < 200) rgb = rgb.map(v => Math.min(255, v + 24)); // 灰蒙蒙的天：提亮一点
+    card.style.setProperty("--strip", `rgb(${rgb.map(Math.round).join(",")})`);
+  }
+  const lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
+  card.classList.add(lum > 0.6 ? "light" : "dark");
+}
+window.READY = coverStrip();
 </script>
 </body>
 </html>

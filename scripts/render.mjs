@@ -82,7 +82,7 @@ try {
   const loaded = once("Page.loadEventFired");
   await send("Page.navigate", { url: pathToFileURL(htmlPath).href }, s);
   await loaded;
-  await send("Runtime.evaluate", { expression: "document.fonts.ready.then(() => 1)", awaitPromise: true }, s);
+  await send("Runtime.evaluate", { expression: "Promise.all([document.fonts.ready, window.READY]).then(() => 1)", awaitPromise: true }, s);
   const { result } = await send("Runtime.evaluate", {
     expression: "JSON.stringify([...document.querySelectorAll('.card')].map(c => { const r = c.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }))",
     returnByValue: true,

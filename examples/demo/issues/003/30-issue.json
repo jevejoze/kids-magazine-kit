@@ -8,23 +8,18 @@
     "by": "🐶🐭🦉🦝 团子编辑部 出品"
   },
   "question": {
-    "en": "Why is the sun up at midnight in Norway?",
-    "zh": "挪威夏天半夜12点，太阳为啥还在天上？",
-    "options": [
-      "挪威的太阳特别大、特别亮",
-      "地球斜着转，夏天北边一直朝着太阳",
-      "挪威人把钟表调错了"
-    ]
+    "zh": "挪威夏天半夜 12 点，<br>太阳为啥还在天上？",
+    "en": "Why is the sun up at midnight in Norway?"
   },
   "cover": {
     "photo": "20-assets/cover.jpg",
     "photo_pos": "32% center",
+    "strip": "",
     "stamp": "📷 00:44 · 挪威北角",
-    "kicker": "🤔 这张照片拍于半夜 00:44，先猜一猜：",
+    "asked_by": "",
     "crew": [
-      "owl:happy:160:sunglasses",
       "dog:sleepy:200:eyemask",
-      "mouse:wave:160"
+      "owl:happy:160:sunglasses"
     ],
     "crew_say": "太亮啦，睡不着……",
     "credit": "© Yan Zhang · CC BY-SA 3.0"
@@ -181,7 +176,6 @@
     "send_note": "拍照发给妈妈"
   },
   "_answers": {
-    "cover": "B（地球斜着转，夏天北极圈一直朝着太阳）",
     "puzzle": "阿米尔 → 健太 → 艾莎 → 卢卡",
     "puzzle_solution": "卢卡是第 4（线索③）；艾莎不在 1、4，只能在 2 或 3；健太紧跟阿米尔，两人占相邻两位。艾莎在 2 时阿米尔、健太只能占 3、4，与卢卡冲突；所以艾莎在 3，阿米尔 1、健太 2。唯一解。",
     "english": [
