@@ -49,6 +49,11 @@ data/
 
 00 完成后，10、12、13、14、16、17 可以同时开工。完整定义见 `stages.json`。
 
+## 两种用法
+
+- **指定一步**：家长说"做第 10 步"，agent 只做这一步（见下文"接手一步的做法"）
+- **走完全程**：家长只说"出下一期"，当前 agent 从 00 一直做到 90，已经存在的输出视为完成、从缺的那步接着做；做法见 SKILL.md「没有指定步骤时：一个 agent 走完全程」
+
 ## 接手一步的做法
 
 1. 读 `pipeline/stages/<步骤>.md`（公开地址：`https://raw.githubusercontent.com/jevejoze/kids-magazine-kit/main/pipeline/stages/<步骤>.md`）

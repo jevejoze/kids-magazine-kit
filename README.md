@@ -55,7 +55,7 @@ node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/iss
 | 说 | agent 会 |
 |---|---|
 | 做第 N 步 | 按 `pipeline/stages/` 里那一步的说明，写出这一步的文件 |
-| 出下一期 | 从第 00 步开始，能做几步做几步 |
+| 出下一期 | 一个 agent 从第 00 步做到第 90 步；已有的步骤跳过，审稿不通过就回去改，没有语音合成时出家长讲读稿 |
 | 记一笔：她今天盯着封面看了很久 | 原话记进 `curation-log.md` |
 | 做本周策展 | 汇总本周反馈，出调整建议，等你确认 |
 
