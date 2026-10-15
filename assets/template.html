@@ -52,7 +52,7 @@ else cards.push(`<section class="card" id="c1"><div class="dots"></div>
 const C = D.comic;
 const hl = (text, word) => word ? text.replace(new RegExp(`\\b(${word}\\w*)`, "i"), "<b>$1</b>") : text;
 const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
-cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} 今日一问 · Big Question`)}
+cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} 今日一问 · Big Question`, C.tool ? `<span class="toolpill fun">🧰 ${C.tool}</span>` : undefined)}
   <div class="h1 fun">${C.title_zh || D.question.zh}<span class="en">${C.title_en || D.question.en}</span></div>
   <div class="grid">${C.panels.map((p, i) => `<div class="box panel p${i}"><span class="n en">${i + 1}</span>
     <div class="bubs">${p.bubbles.map(bub).join("")}</div>
@@ -61,9 +61,23 @@ cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} �
   <div class="fact fun"><b>💡 冷知识</b>${C.fact}</div>
   ${foot(C.host || "主持：团子狗 × 咕咕博士")}</section>`);
 
-// 3 单词屋：单词卡 + 写字格
+// 3 深海图鉴（有 creature 时）：一张可收集的生物卡；否则是单词屋
+const CR = D.creature;
+const meter = (n, icon) => `<span class="meter">${icon.repeat(n)}<i>${icon.repeat(5 - n)}</i></span>`;
+if (CR) cards.push(`<section class="card" id="cdeep">${topBar("🦑 深海图鉴 · Deep Sea Files", `No.${String(CR.no).padStart(3, "0")}`)}
+  <div class="box card-photo"><div class="pic" style="background-image:url('${CR.photo}');background-position:${CR.photo_pos || "center"}"></div>
+    <div class="depth en">⬇ ${CR.depth}</div><div class="credit3 en">${CR.credit}</div></div>
+  <div class="name"><div class="zh fun">${CR.name_zh}</div>
+    <div class="en">${CR.parts.map(p => `<span><b>${p.en}</b><small class="fun">${p.zh}</small></span>`).join("<em>+</em>")}</div></div>
+  <div class="stats">${CR.stats.map(s => `<div class="box st"><small class="fun">${s.k}</small><b class="fun">${s.v}</b></div>`).join("")}</div>
+  <div class="box meters fun"><div>看起来吓人 ${meter(CR.scary, "😱")}</div><div>其实很温柔 ${meter(CR.gentle, "💗")}</div></div>
+  <div class="box power fun"><b>⚡ 超能力</b>${CR.power}</div>
+  <div class="brains">
+    <div class="br">${ch("dog:surprise:120")}<div class="bub fun"><small>快脑袋：</small>${CR.fast}</div></div>
+    <div class="br slow">${ch("owl:think:120:magnifier")}<div class="bub fun"><small>慢脑袋：</small>${CR.slow}</div></div></div>
+  ${foot("收集深海卡，凑齐一本图鉴！")}</section>`);
 const W = D.words;
-cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
+if (W && !CR) cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
   <div class="intro">${ch("mouse:wave:190")}<div class="bub en">${W.intro}</div></div>
   ${W.items.map((w, i) => `<div class="box w c${i}"><div class="ico">${w.icon}</div><div class="wd">
     <div class="word en">${w.word}${w.new ? `<em class="fun">新词</em>` : ""}</div>
@@ -87,9 +101,17 @@ cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · S
   <div class="tbc fun"><span>${ST.tbc}</span>${ST.clue ? `<span class="clue">🔍 ${ST.clue}</span>` : ""}</div>
   ${foot("单日中文 · 双日英文")}</section>`);
 
-// 5 挑战：浣熊出题 + 三关闯关路线
+// 5 真的假的 + 游戏（有 check 时）；否则是挑战卡
+const CK = D.check, G = D.games;
+if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
+  <div class="box post"><div class="ph fun">📱 ${CK.where}</div><div class="claim fun">${CK.claim}</div><div class="likes en">👍 ${CK.likes || "10万+"}　💬 ${CK.comments || "2,333"}</div></div>
+  <div class="vote fun">你的快脑袋说：<span>✅ 真的</span><span>❌ 假的</span><span>🤔 说不清</span></div>
+  <div class="box clues fun"><h3>🦉 慢脑袋查一查</h3>${CK.clues.map((c, i) => `<p><b>${i + 1}</b>${c}</p>`).join("")}</div>
+  <div class="games">${G.map(g => `<div class="box game fun"><h3>${g.title}</h3><div class="body ${g.lang === "en" ? "en" : ""}">${g.body}</div></div>`).join("")}</div>
+  <div class="upside fun"><span>👀 倒过来看答案：</span>${CK.verdict}　${G.map(g => g.answer).join("　")}</div>
+  ${foot("看完再翻过来对答案")}</section>`);
 const P = D.challenge;
-cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
+if (P && !CK) cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
   <div class="taunt">${ch("raccoon:smirk:160:" + (P.prop || ""))}<div class="bub fun">${P.taunt_zh}<br><span class="en">${P.taunt_en}</span></div></div>
   <div class="box puz fun"><h3>${P.puzzle.title}</h3><div class="body">${P.puzzle.body}</div>
     ${P.puzzle.slots ? `<div class="slots">${P.puzzle.slots.map(x => `<span>${x}</span>`).join("")}</div>` : ""}</div>
@@ -97,14 +119,23 @@ cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的挑战 �
     <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div>${e.stars === 3 ? lines(2) : ""}</div></div>`).join("")}</div>
   ${foot("答案明天公布！")}</section>`);
 
-// 6 信箱：回信 + 开放题 + 今日打卡（给编辑部的反馈）+ 集章
-const M = D.mailbox, done = M.stamps_done;
-const pages = TOC.map(([e, t], i) => `<span>${e}${t}</span>`).join("");
+// 6 妮妮的地盘（有 corner 时）：回信、投票、如果你是……、心情天气、悄悄话；否则是信箱
+const K = D.corner;
+const MOODS = [["☀️", "晴"], ["⛅", "多云"], ["🌧️", "下雨"], ["⛈️", "打雷"], ["🌈", "雨过天晴"]];
+if (K) cards.push(`<section class="card" id="ccorner">${topBar(`🏠 ${K.title || "我的地盘"}`)}
+  <div class="box letter fun">${K.letter}</div>
+  <div class="box vote2 fun"><h3>🗳️ ${K.vote.q}</h3><div class="ab"><span><b>A</b>${K.vote.a}</span><span><b>B</b>${K.vote.b}</span></div><small>圈一个，说说为什么也行</small></div>
+  <div class="box ifyou fun"><h3>🎭 ${K.ifyou}</h3><div class="space"></div></div>
+  <div class="row2"><div class="box mood fun"><h3>今天的心情天气</h3><div class="w">${MOODS.map(([e, t]) => `<span>${e}<small>${t}</small></span>`).join("")}</div><p>${K.mood_tip}</p></div>
+    <div class="box whisper fun"><h3>🤫 悄悄话</h3><p>${K.whisper}</p><div class="space"></div></div></div>
+  ${foot((K.send_note || "拍照发给家长") + (D.news ? " · 翻到最后一页看世界新闻 →" : ""))}</section>`);
+const M = D.mailbox, done = M?.stamps_done;
+if (M && !K)
 cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
   <div class="box letter fun">${M.letter}</div>
   <div class="box ask"><div class="fun">${M.ask_zh}</div><div class="en">${M.ask_en}</div>${lines(2)}</div>
   <div class="box checkin fun"><h3>📝 今日打卡 · 告诉编辑部</h3>
-    <div class="row"><b>最喜欢哪一页？</b><div class="pick">${pages}</div></div>
+    <div class="row"><b>最喜欢哪一页？</b><div class="pick">${TOC.map(([e, t]) => `<span>${e}${t}</span>`).join("")}</div></div>
     <div class="row"><b>今天难不难？</b><div class="pick"><span>😴 太简单</span><span>🤔 刚刚好</span><span>🤯 有点难</span></div></div>
     <div class="row"><b>我也想问一个问题：</b>${lines(1)}</div></div>
   <div class="stamps fun">${[1,2,3,4,5,6,7].map(i => i <= done ? `<div class="ok">第${i}天<br>✓</div>` : `<div>${i}</div>`).join("")}<p>${M.reward}</p></div>
