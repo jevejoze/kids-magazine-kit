@@ -248,3 +248,13 @@ svg.ch{display:block}
 #ccorner .mood p{font-size:22px;line-height:1.4;margin-top:8px;color:var(--soft)}
 #ccorner .whisper{padding:12px 22px;display:flex;flex-direction:column}
 #ccorner .whisper p{font-size:22px;line-height:1.4;color:var(--soft)}
+#ccheck .post .claim{font-size:50px}
+#ccheck .clues{font-size:30px;padding:18px 30px 20px}
+#ccheck .games{flex:1;min-height:0}
+#ccheck .game{font-size:30px;line-height:1.5;padding:18px 26px;display:flex;flex-direction:column}
+#ccheck .game h3{font-size:34px}
+#ccheck .game .body.en{font-size:31px}
+#ccheck .game small{display:block;font-size:24px;color:var(--soft);margin-top:8px}
+#ccheck .upside{font-size:24px;margin-bottom:6px}
+#cdeep .card-photo{height:520px}
+#cdeep .br .bub{font-size:26px}
