@@ -258,3 +258,16 @@ svg.ch{display:block}
 #ccheck .upside{font-size:24px;margin-bottom:6px}
 #cdeep .card-photo{height:520px}
 #cdeep .br .bub{font-size:26px}
+#cdeep .power.b1{background:#E9FFF6}
+#cdeep .power.b1 b{color:#2E8C72}
+#cdeep .power{font-size:26px;padding:10px 24px}
+#cdeep .card-photo{height:400px}
+#cdeep .name{margin-top:14px;display:flex;align-items:baseline;gap:24px}
+#cdeep .name .zh{font-size:60px}
+#cdeep .name .en{margin-top:0}
+#cdeep .stats{margin-top:12px}
+#cdeep .meters{margin-top:14px}
+#cdeep .power{margin-top:12px;font-size:25px;line-height:1.4}
+#cdeep .brains{margin-top:8px}
+#cdeep .br .bub{font-size:24px;margin-bottom:14px}
+#cdeep .card-photo{height:470px}
