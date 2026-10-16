@@ -9,7 +9,7 @@
 
 **上传核对**：对照网盘检查，缺的补传
 - `issues/NNN/`：00–50 步的 JSON、`11-diagram.svg`、`31-review.md`、`20-assets/` 全部图片和 `assets.json`、`60-audio/` 的音频和 `manifest.json`
-- `成品/NNN/`：card-1..7.png、`<刊名>-第NNN期.pdf`、`<刊名>-第NNN期-讲读版.mp4`
+- `成品/NNN/`：card-1..7.png、`<刊名>-第NNN期.pdf`、`<刊名>-第NNN期-讲读版.mp4`（文件名照抄，旧名字的文件改成这个名字）
 - 本步更新的 `vocab.json`、`story-bible.md`、`profile.md`
 
 **规则**：只追加，不删除已有记录
