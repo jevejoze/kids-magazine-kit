@@ -6,29 +6,34 @@
 
 **数据目录**（下文写作 `data/`）放孩子的全部资料，推荐放在 Google Drive 这类各个 agent 都能访问的地方：
 
+**目录固定**：网盘上的数据目录固定为 `我的云端硬盘/<刊名>/`（如 `我的云端硬盘/小满早知道/`），下面的文件夹名和文件名都照抄。不新建别的文件夹、不改名、不按日期另起目录；期号一律三位数（`007`）。
+
 ```
-data/
+我的云端硬盘/<刊名>/          数据目录，下文写作 data/
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
   story-bible.md  vocab.json  feedback.jsonl
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
   sfx/                       讲读版音效（可选）
   issues/
-    004/                     本期工作区，下文写作 issue/
+    007/                     本期工作区，下文写作 issue/
       00-brief.json
       10-cover.json  11-comic.json  11-diagram.svg  12-words.json  13-story.json
       14-puzzle.json  15-english.json  16-mailbox.json  17-news.json
-      20-assets/             图片和 assets.json
+      20-assets/             cover.jpg、news-1..3.jpg、assets.json
       30-issue.json          合并后的整期
       31-review.md
-      40-cards/              card-1..7.png 和 PDF
+      40-cards/              card-1..7.png、<刊名>-第007期.pdf
       50-narration.json
-      60-audio/
-      70-final/              最终 PDF 和讲读视频
+      60-audio/              c{card}_{序号}.wav、manifest.json
+      70-final/              <刊名>-第007期.pdf、讲读版.mp4
   成品/
-    004/                     发给孩子的成品：card-1..7.png、<刊名>-第004期.pdf、<刊名>-第004期-讲读版.mp4
+    007/                     发给孩子的成品，文件名固定：
+                             card-1.png … card-7.png
+                             <刊名>-第007期.pdf
+                             <刊名>-第007期-讲读版.mp4
 ```
 
-**素材和成品都要上传到网盘**：数据目录以网盘上的为准。在本地或云端会话里做的步骤，做完就把输出文件（包括 `20-assets/` 的图片、`60-audio/` 的音频）传到网盘 `issues/NNN/` 的同一位置；第 40、70 步出了成品，再复制一份到网盘 `成品/NNN/`。
+**素材和成品都要上传到网盘**：数据目录以网盘上的为准。在本地或云端会话里做的步骤，做完就把输出文件（包括 `20-assets/` 的图片、`60-audio/` 的音频）传到网盘 `issues/NNN/` 的同一位置；第 40、70 步出了成品，再按上面的文件名复制一份到网盘 `成品/NNN/`。
 
 ## 步骤
 
