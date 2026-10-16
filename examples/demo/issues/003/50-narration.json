@@ -11,70 +11,43 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "叮咚！小满早上好，今天是十月十四号，星期三。",
+          "text": "叮咚！小满早上好，今天是世界各地日。",
           "emotion": "开心",
           "sfx": "chime"
         },
         {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "欢迎收听《小满早知道》，今天是世界各地日，我们要去一个很远很远的地方。",
-          "emotion": "开心"
-        },
-        {
           "who": "dog",
           "lang": "zh",
-          "text": "大家好，我是团子狗。我昨晚睡得特别香！",
+          "text": "哈——欠……我昨晚睡得可香了。",
           "emotion": "困倦"
-        },
-        {
-          "who": "mouse",
-          "lang": "en",
-          "text": "Hello! I'm Boba Mouse. Today we are going to Norway!",
-          "emotion": "兴奋"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "我是咕咕博士。今天这张照片，我研究了一整晚。",
-          "emotion": "平静"
-        },
-        {
-          "who": "raccoon",
-          "lang": "zh",
-          "text": "哼，我是捣蛋浣熊，今天的题，保证难倒你！",
-          "emotion": "得意"
+          "text": "团子狗，看看封面，这张照片会让你睡不着。",
+          "emotion": "神秘"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "先看封面这张照片。海面金灿灿的，太阳挂在天边。",
-          "emotion": "温柔",
-          "sfx": "page"
+          "text": "这是挪威最北边的北角，海面金灿灿的，太阳挂在天边。"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "这是在挪威最北边的北角拍的。你猜，是几点钟拍的？",
-          "emotion": "神秘",
-          "pause": 2
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "问题上面的小标签写着：零点四十四分。也就是半夜十二点多！",
+          "text": "照片上写着拍摄时间：零点四十四分。",
           "emotion": "惊讶"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "等等！半夜十二点，太阳怎么还挂在天上？太阳不用下班吗？",
+          "text": "半夜十二点多？太阳怎么还不下班！",
           "emotion": "惊讶"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "你觉得是为什么？先按暂停，自己猜一猜。答案在下一页！",
+          "text": "你觉得是为什么？先暂停猜一猜，答案在下一页。",
           "emotion": "温柔",
           "pause": 5,
           "hold": "⏸ 先猜一猜，答案在下一页"
@@ -87,109 +60,92 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "翻到下一页，今日一问。",
-          "sfx": "page"
+          "text": "答案揭晓时间！咕咕博士，太阳为什么不下班？",
+          "emotion": "开心"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "秘密就一句话：地球是歪着身子转的。"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "听说挪威的夏天，半夜十二点太阳还在天上？那小朋友几点睡觉啊！",
+          "text": "歪着转？那不会晕吗？",
           "emotion": "惊讶"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "这个问题问得好。秘密就在于，地球是斜着转的。",
-          "emotion": "平静"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "你玩过陀螺吗？陀螺转起来的时候，常常是歪着身子转的。",
+          "text": "你玩过陀螺吧？转起来常常是斜的，地球也一样。",
           "emotion": "温柔"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "地球也一样。它一边绕着太阳跑，一边歪着身子转圈。"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "歪了多少呢？二十三点五度。",
-          "rate": "slow",
-          "pause": 1
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "看下面这张图。左边是太阳，右边是地球。地球的轴是斜的。"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "夏天的时候，地球的北边正好歪向太阳。"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "你看黄色那一圈，叫北极圈。地球转一整圈，它都待在阳光里，一直照得到太阳。"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "挪威北角就在这一圈里，所以夏天的半夜，太阳也不落山。"
+          "text": "它歪了二十三点五度。",
+          "rate": "slow"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "那冬天呢？冬天为啥整天黑乎乎的？",
-          "emotion": "委屈"
+          "text": "就歪这么一点点，有什么关系？"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "冬天地球转到太阳另一边，北边就歪到背着太阳的方向了。"
+          "text": "看图。夏天，地球的北边正好歪向太阳。"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "在北角，夏天有七十六天太阳不落山；冬天呢，又有一段时间整天见不到太阳。"
+          "text": "黄色这一圈叫北极圈。地球转一整圈，它都照得到太阳。"
         },
         {
           "who": "mouse",
           "lang": "en",
-          "text": "Sun can't sleep!",
+          "text": "So the sun never goes to bed!",
           "emotion": "开心"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "太阳在转圈圈不睡觉！我暑假也要去挪威，玩一整天不睡觉！",
+          "text": "北角就在圈里面？所以半夜太阳也不落山！",
           "emotion": "兴奋"
         },
         {
+          "who": "owl",
+          "lang": "zh",
+          "text": "对。那里夏天有七十六天，太阳一直不落。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "那冬天呢？",
+          "emotion": "委屈"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "冬天正好反过来：北边背着太阳，整天黑乎乎的。"
+        },
+        {
           "who": "narrator",
           "lang": "zh",
-          "text": "再告诉你一个冷知识。",
+          "text": "冷知识：斯瓦尔巴群岛不许养猫，怕猫伤害北极的鸟。",
           "emotion": "神秘"
         },
         {
-          "who": "narrator",
+          "who": "dog",
           "lang": "zh",
-          "text": "挪威的斯瓦尔巴群岛，一年有四个月是极昼。那里不许养猫，因为怕猫咪伤害北极的鸟。"
+          "text": "听说那里的北极熊，比人还多！",
+          "emotion": "惊讶"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "那里的北极熊比人还多，出门要特别小心！"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "你也可以试试：拿一个手电筒当太阳，把一个橙子歪着转一转，看看哪一块一直照得到光。",
-          "emotion": "温柔",
-          "pause": 2
+          "text": "你也可以试试：拿手电筒当太阳，歪着转一个橙子。",
+          "emotion": "温柔"
         }
       ]
     },
@@ -199,132 +155,84 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "下一页，波波鼠单词屋！",
-          "sfx": "page"
-        },
-        {
-          "who": "mouse",
-          "lang": "en",
-          "text": "Hi! I'm Boba Mouse. Pack your bags, today we are going to Norway!",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "波波鼠说什么？我只听懂了挪威……",
-          "emotion": "委屈"
-        },
-        {
-          "who": "mouse",
-          "lang": "zh",
-          "text": "第一个词。",
+          "text": "弄懂了太阳的秘密，我们来看看今天的单词屋！",
           "emotion": "开心"
         },
         {
           "who": "mouse",
           "lang": "en",
+          "text": "Pack your bags! Today we go to Norway!",
+          "emotion": "兴奋"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "我只听懂了“挪威”……",
+          "emotion": "委屈"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
           "text": "midnight",
-          "repeat": 2,
-          "pause": 1
+          "repeat": 2
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "midnight，午夜，就是半夜十二点。"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "mid 是中间，night 是夜晚，合起来就是夜晚的正中间。"
+          "text": "午夜，半夜十二点。mid 是中间，night 是夜晚。"
         },
         {
           "who": "mouse",
           "lang": "en",
           "text": "In Norway, the sun is still up at midnight in summer.",
-          "rate": "slow",
-          "pause": 1
-        },
-        {
-          "who": "mouse",
-          "lang": "en",
-          "text": "In Norway, the sun is still up at midnight in summer.",
-          "pause": 3,
-          "hold": "🗣 跟着读"
-        },
-        {
-          "who": "mouse",
-          "lang": "zh",
-          "text": "第二个词。"
+          "rate": "slow"
         },
         {
           "who": "mouse",
           "lang": "en",
           "text": "circle",
-          "repeat": 2,
-          "pause": 1
+          "repeat": 2
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "circle，圆圈。上一期我们学过它，你还记得吗？"
+          "text": "圆圈。上一期学过，还记得吗？"
         },
         {
           "who": "mouse",
           "lang": "en",
           "text": "The sun moves in a circle and never goes down.",
-          "rate": "slow",
-          "pause": 1
-        },
-        {
-          "who": "mouse",
-          "lang": "en",
-          "text": "The sun moves in a circle and never goes down.",
-          "pause": 3,
-          "hold": "🗣 跟着读"
+          "rate": "slow"
         },
         {
           "who": "mouse",
           "lang": "zh",
-          "text": "第三个词，新词哦！",
+          "text": "第三个，新词哦！",
           "emotion": "兴奋"
         },
         {
           "who": "mouse",
           "lang": "en",
           "text": "curtain",
-          "repeat": 2,
-          "pause": 1
+          "repeat": 2
         },
         {
-          "who": "narrator",
+          "who": "dog",
           "lang": "zh",
-          "text": "curtain，窗帘。挪威的夏天半夜还很亮，大家睡觉要拉上厚厚的窗帘。"
+          "text": "窗帘！半夜太亮，睡觉得拉上厚窗帘。"
         },
         {
           "who": "mouse",
           "lang": "en",
           "text": "People close the curtains because it is too bright.",
           "rate": "slow",
-          "pause": 1
-        },
-        {
-          "who": "mouse",
-          "lang": "en",
-          "text": "People close the curtains because it is too bright.",
           "pause": 3,
           "hold": "🗣 跟着读"
         },
         {
-          "who": "mouse",
-          "lang": "en",
-          "text": "Xiaoman, do you close the curtains at night?",
-          "emotion": "温柔",
-          "pause": 2
-        },
-        {
           "who": "narrator",
           "lang": "zh",
-          "text": "轮到你啦：用 because，把两句话合成一句，写在下面的格子里。",
+          "text": "轮到你啦：用 because 把两句话合成一句，写在格子里。",
           "emotion": "温柔"
         }
       ]
@@ -335,66 +243,36 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "接下来，是编辑部小剧场，第三集，珍珠的真相。",
-          "emotion": "神秘",
-          "sfx": "page"
+          "text": "单词学会了，小剧场开演！第三集：珍珠的真相。",
+          "emotion": "神秘"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "还记得上一集吗？冰箱里的四杯奶茶，一夜之间全空了。"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "门是锁着的，只有窗户开了一条小缝。"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "第二天一早，阳光照进小阁楼。大家围着桌上四个空杯子，谁也不说话。",
+          "text": "一大早，阳光照进阁楼。桌上四个空杯子，谁也不说话。",
           "emotion": "紧张"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "干嘛都看着我？昨晚我可没出门！",
-          "emotion": "委屈"
-        },
-        {
-          "who": "raccoon",
-          "lang": "zh",
-          "text": "窗户开着呢，你们自己看！说不定是外面的人爬进来的！",
+          "text": "干嘛都看着我？窗户开着，说不定是外面的人爬进来的！",
           "emotion": "得意"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "咕咕博士推了推眼镜，慢慢走到窗边。",
-          "emotion": "神秘",
+          "text": "咕咕博士推推眼镜，走到窗边。",
           "sfx": "footsteps"
         },
         {
-          "who": "narrator",
+          "who": "owl",
           "lang": "zh",
-          "text": "他低下头，仔仔细细地看着窗台。"
+          "text": "窗台上没有脚印，窗外的泥地上也没有。"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "窗台上没有脚印，窗外的泥地上也没有。",
-          "emotion": "平静"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "真有人从窗户爬进来，一定会留下痕迹。",
-          "pause": 1
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "就在这时，波波鼠突然尖叫起来。"
+          "text": "真有人爬进来，一定会留下痕迹。"
         },
         {
           "who": "mouse",
@@ -405,14 +283,14 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "大家顺着她的手指看过去。一颗圆溜溜的珍珠，正粘在团子狗的尾巴尖上！",
+          "text": "一颗珍珠，正粘在团子狗的尾巴尖上！",
           "emotion": "惊讶",
           "sfx": "drum"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "我？我就一直睡在沙发上啊……",
+          "text": "我？我一直睡在沙发上啊……",
           "emotion": "委屈"
         },
         {
@@ -424,62 +302,44 @@
         {
           "who": "owl",
           "lang": "zh",
-          "text": "只有本来就在屋里的人，才喝得到冰箱里的奶茶。",
-          "rate": "slow",
-          "pause": 1
+          "text": "只有本来就在屋里的，才喝得到奶茶。",
+          "rate": "slow"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "大家一起喊："
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "是你梦游啦！",
+          "text": "大家一起喊：是你梦游啦！",
           "emotion": "兴奋"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "团子狗挠挠头，不好意思地笑了。"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "嘿嘿……我梦见喝奶茶，原来是真的喝了。",
+          "text": "嘿嘿……我梦见喝奶茶，原来是真喝了。",
           "emotion": "委屈"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "浣熊又去买了四杯奶茶，这一次，每杯都写上了名字。"
+          "text": "浣熊又买了四杯奶茶，每杯都写上了名字。"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "可是，到了半夜……",
-          "emotion": "神秘",
-          "pause": 1
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "阁楼里又传来了：吸溜，吸溜……",
+          "text": "可是到了半夜，阁楼里又传来：吸溜，吸溜……",
           "emotion": "神秘",
           "sfx": "slurp",
           "pause": 1.5
         },
         {
-          "who": "narrator",
+          "who": "raccoon",
           "lang": "zh",
-          "text": "这次又是谁呢？明天揭晓！",
-          "emotion": "神秘"
+          "text": "这次可不是我！",
+          "emotion": "委屈"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "侦探笔记：哪一条线索，证明不是有人从窗户爬进来的？回头找一找。",
+          "text": "侦探笔记：哪条线索证明，不是有人从窗户爬进来的？",
           "pause": 5,
           "hold": "🔍 回头找一找线索"
         }
@@ -491,94 +351,76 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "下一页，捣蛋浣熊的挑战！",
-          "sfx": "page"
+          "text": "奶茶案破了，捣蛋浣熊又来出难题啦！",
+          "emotion": "紧张"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "哼，奶茶的事我还没完！想过我这关？没那么容易！",
+          "text": "哼，奶茶的事还没完！想过我这关？",
           "emotion": "得意"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "今天，编辑部来了四位小客人，排队领奶茶。"
+          "text": "四位小客人排队领奶茶：艾莎、健太、卢卡和阿米尔。"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "挪威的艾莎、日本的健太、巴西的卢卡，还有埃及的阿米尔。"
+          "text": "线索一：艾莎不在第一个，也不在最后一个。",
+          "pause": 1.5
+        },
+        {
+          "who": "raccoon",
+          "lang": "zh",
+          "text": "线索二：健太紧跟在阿米尔后面。",
+          "pause": 1.5
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第一条线索：艾莎不在第一个，也不在最后一个。",
-          "pause": 2
+          "text": "线索三：卢卡是最后一个。",
+          "pause": 1.5
         },
         {
-          "who": "narrator",
+          "who": "owl",
           "lang": "zh",
-          "text": "第二条线索：健太紧跟在阿米尔后面。",
-          "pause": 2
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "第三条线索：卢卡是最后一个。",
-          "pause": 2
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "他们是怎么排的呢？",
-          "emotion": "温柔"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "小提示：先把最确定的那个人放好，再看剩下的位置。",
+          "text": "小提示：先把最确定的那个人放好。",
+          "emotion": "温柔",
           "pause": 5,
           "hold": "✏️ 写下你的答案"
         },
         {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Level one. Midnight or noon? Fill in the blank."
+        },
+        {
           "who": "narrator",
           "lang": "zh",
-          "text": "再来闯英文三关。"
+          "text": "第一关，两个词里选一个。"
         },
         {
           "who": "mouse",
           "lang": "en",
-          "text": "Level one. At blank, the sun is still up in Norway. Midnight, or noon?"
+          "text": "Level two. Why do they close the curtains?"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第一关：两个词选一个，填进空格。",
-          "pause": 2
+          "text": "第二关，答案藏在小短文里。"
         },
         {
           "who": "mouse",
           "lang": "en",
-          "text": "Level two. Read the story, and tell me: why do they close the curtains?"
+          "text": "Level three. Would you like to see the midnight sun?"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第二关：读一读小短文，找找原因。",
-          "pause": 2
-        },
-        {
-          "who": "mouse",
-          "lang": "en",
-          "text": "Level three. Would you like to see the midnight sun? Write two sentences with because."
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "第三关：用英文写两句你自己的想法，记得用上 because。",
-          "emotion": "温柔",
-          "pause": 2
+          "text": "第三关，写两句，记得用上 because。",
+          "emotion": "温柔"
         }
       ]
     },
@@ -588,43 +430,43 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "下一页，编辑部信箱。",
-          "sfx": "page"
+          "text": "做完挑战，来拆今天的信箱！",
+          "emotion": "开心"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "亲爱的小满，先公布上期答案。",
+          "text": "小满，先公布上期答案！",
           "emotion": "温柔"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "金字塔搭六层，还剩九块；想搭七层，还差四十块。你算对了吗？",
+          "text": "金字塔搭六层剩九块，搭七层还差四十块。",
           "sfx": "ding"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "我要爆料！我梦见喝奶茶，醒来枕头边真有一根吸管！",
+          "text": "我要爆料！我梦见喝奶茶，醒来枕边真有根吸管！",
           "emotion": "兴奋"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "小满，梦游的人，会记得自己做过什么吗？",
+          "text": "小满，梦游的人，记得自己做过什么吗？",
           "emotion": "委屈"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "今天的开放题：如果让你在挪威过一个没有黑夜的夏天，你最想做什么？说说理由。",
+          "text": "开放题：在挪威过一个没有黑夜的夏天，你最想做什么？",
           "pause": 3
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "别忘了做今日打卡：最喜欢哪一页、难不难、还想问什么，拍照发给妈妈哦！",
+          "text": "别忘了今日打卡，拍照发给妈妈！",
           "emotion": "温柔"
         }
       ]
@@ -635,78 +477,61 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "最后一页，环球小报！看看这个星期，世界上发生了什么有意思的事。",
-          "emotion": "开心",
-          "sfx": "page"
+          "text": "最后一页，环球小报！第一条，来自英国伦敦。",
+          "emotion": "开心"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第一条，来自英国伦敦。"
+          "text": "十一岁的 Bodhana 拿到女子特级大师称号，破了纪录！"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "十一岁！她是怎么学的？",
+          "emotion": "惊讶"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "有个叫 Bodhana 的女孩，今年才十一岁，下国际象棋特别厉害。"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "她拿到了女子特级大师的称号，打破了十二岁的旧纪录！"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "她二零二零年才开始学棋，老师呢，是网上的视频。"
+          "text": "她二零二零年才开始学棋，老师是网上的视频。"
         },
         {
           "who": "mouse",
           "lang": "en",
-          "text": "record",
-          "repeat": 2
+          "text": "record"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "record，纪录。如果是你，你想打破什么纪录呢？",
-          "pause": 2
+          "text": "如果是你，想打破什么纪录？",
+          "emotion": "温柔"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第二条，来自美国佛罗里达。"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "实验室的玻璃门，突然传来咚咚咚的声音。",
+          "text": "第二条，美国佛罗里达：实验室的门被敲响了。",
           "sfx": "door"
         },
         {
-          "who": "narrator",
+          "who": "owl",
           "lang": "zh",
-          "text": "打开一看，是一只鹈鹕！它的翅膀上，扎着一个鱼钩。"
+          "text": "门外是一只鹈鹕，翅膀上扎着鱼钩。"
         },
         {
-          "who": "narrator",
+          "who": "owl",
           "lang": "zh",
-          "text": "科学家们花了十分钟，帮它取下鱼钩。它伸伸翅膀，飞走了。"
+          "text": "科学家花了十分钟取下鱼钩，它就飞走了。"
         },
         {
           "who": "mouse",
           "lang": "en",
-          "text": "help",
-          "repeat": 2
+          "text": "help"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第三条，来自奥地利维也纳。"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "科学家发现，狗狗看到害怕的人脸，大脑的反应和看到生气、难过的脸都不一样。"
+          "text": "第三条，奥地利维也纳：狗狗分得清人脸上的害怕和生气。"
         },
         {
           "who": "dog",
@@ -717,25 +542,18 @@
         {
           "who": "mouse",
           "lang": "en",
-          "text": "face",
-          "repeat": 2
+          "text": "face"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "你怎么看？那只鹈鹕，为什么会去敲人类的门呢？",
+          "text": "你怎么看？鹈鹕为什么会去敲人类的门？",
           "pause": 3
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "今天的《小满早知道》就到这里啦。",
-          "emotion": "温柔"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "明天是艺术日。我们要去看一种会转圈圈的花。",
+          "text": "明天是艺术日，我们去看一种会转圈圈的花。",
           "emotion": "神秘"
         },
         {
@@ -747,14 +565,8 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "拜拜！我要去补觉了……",
+          "text": "拜拜！我去补觉了……",
           "emotion": "困倦"
-        },
-        {
-          "who": "raccoon",
-          "lang": "zh",
-          "text": "明天的题更难，等着瞧！",
-          "emotion": "得意"
         }
       ]
     }

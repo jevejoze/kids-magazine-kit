@@ -97,17 +97,26 @@ const checks = {
     const WHO = ["narrator", "dog", "mouse", "owl", "raccoon"];
     const pages = n.narration ?? [];
     need([1, 2, 3, 4, 5, 6, 7].every(c => pages.some(p => p.card === c)), "50", "7 页都要有讲读");
+    // 每页最多几句：封面、今日一问、单词屋、小剧场、挑战、信箱、环球小报
+    const MAX_LINES = { 1: 12, 2: 26, 3: 22, 4: 30, 5: 14, 6: 12, 7: 18 };
     let total = 0;
-    pages.forEach(p => p.lines.forEach((l, i) => {
-      const at = `第 ${p.card} 页第 ${i + 1} 句`;
-      need(WHO.includes(l.who), "50", `${at} who 不对：${l.who}`);
-      need(["zh", "en"].includes(l.lang), "50", `${at} lang 不对：${l.lang}`);
-      need(!l.emotion || EMO.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);
-      if (l.lang === "en") need(words(l.text) <= 15, "50", `${at} ${words(l.text)} 个英文单词，超过 15`);
-      else need(len(l.text) <= 40, "50", `${at} ${len(l.text)} 字，超过 40`);
-      total += len(l.text) * (l.repeat || 1);
-    }));
-    need(total >= 2000 && total <= 4500, "50", `讲读稿共 ${total} 字，建议 2800–4000`);
+    pages.forEach(p => {
+      need(p.lines.length <= (MAX_LINES[p.card] ?? 30), "50", `第 ${p.card} 页 ${p.lines.length} 句，最多 ${MAX_LINES[p.card]} 句`);
+      need(p.lines.filter(l => (l.pause ?? 0) >= 3).length <= 1, "50", `第 ${p.card} 页停顿 ≥ 3 秒的地方超过 1 处`);
+      let run = 0;
+      p.lines.forEach((l, i) => {
+        const at = `第 ${p.card} 页第 ${i + 1} 句`;
+        need(WHO.includes(l.who), "50", `${at} who 不对：${l.who}`);
+        need(["zh", "en"].includes(l.lang), "50", `${at} lang 不对：${l.lang}`);
+        need(!l.emotion || EMO.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);
+        if (l.lang === "en") need(words(l.text) <= 12, "50", `${at} ${words(l.text)} 个英文单词，超过 12`);
+        else need(len(l.text) <= 30, "50", `${at} ${len(l.text)} 字，超过 30`);
+        run = i && p.lines[i - 1].who === l.who ? run + 1 : 1;
+        if (run === 4) problems.push(`[50] ${at} 起同一个角色连说超过 3 句，拆给别的角色接话`);
+        total += len(l.text) * (l.repeat || 1);
+      });
+    });
+    need(total >= 1300 && total <= 2800, "50", `讲读稿共 ${total} 字，建议 1600–2400`);
   },
   "20-assets/assets.json": a => {
     [a.cover, ...(a.news ?? [])].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));

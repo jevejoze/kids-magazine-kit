@@ -10,7 +10,7 @@ node scripts/tts_azure.mjs <issue>         # 合成；已经合成过、内容�
 ```
 
 - 环境变量：`AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`（免费 F0 资源）；可选 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`（同一订阅下的付费 S0 资源，免费额度用完或被限流时自动接着用）
-- 计费：免费档每月 50 万计费字符，汉字算 2 个，SSML 标签也算（`<speak>` `<voice>` 除外）。脚本只给有情绪的句子加风格标签，慢速、停顿、重复都交给第 70 步，一期约 1.1 万计费字符
+- 计费：免费档每月 50 万计费字符，汉字算 2 个，SSML 标签也算（`<speak>` `<voice>` 除外）。脚本只给有情绪的句子加风格标签，慢速、停顿、重复都交给第 70 步，一期约 0.7 万计费字符
 - 免费资源每分钟最多 20 次请求，脚本会自动放慢，一期大约 10 分钟
 - 声音：`data/voices/azure.json` 写每个角色每种语言用哪个声音，没写的用脚本里的默认值；换声音前先 `node scripts/tts_azure.mjs --audition <数据目录>` 试听，试听文件在 `data/voices/试听/`
 - 音色：`azure.json` 里写 `{"voice": "声音名", "pitch": 3}` 可以在合成后升降几个半音，让声音更卡通，不占计费字符（需要 ffmpeg）
