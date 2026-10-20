@@ -98,9 +98,17 @@ try {
   const pdfLoaded = once("Page.loadEventFired");
   await send("Page.navigate", { url: pathToFileURL(pdfHtml).href }, s);
   await pdfLoaded;
-  const pdf = await send("Page.printToPDF", { printBackground: true, preferCSSPageSize: true }, s);
+  // PDF 按流分块读回：单条 DevTools 消息超过约 4MB 就收不到回复，整本 PDF 一次返回会卡住
+  const { stream } = await send("Page.printToPDF", { printBackground: true, preferCSSPageSize: true, transferMode: "ReturnAsStream" }, s);
+  const chunks = [];
+  for (let eof = false; !eof;) {
+    const r = await send("IO.read", { handle: stream, size: 1 << 20 }, s);
+    chunks.push(Buffer.from(r.data, r.base64Encoded ? "base64" : "binary"));
+    eof = r.eof;
+  }
+  await send("IO.close", { handle: stream }, s);
   rmSync(pdfHtml);
-  writeFileSync(join(outDir, `${data.masthead.zh}-第${N}期.pdf`), Buffer.from(pdf.data, "base64"));
+  writeFileSync(join(outDir, `${data.masthead.zh}-第${N}期.pdf`), Buffer.concat(chunks));
 } finally {
   ws.close(); proc.kill();
   await new Promise(ok => proc.once("exit", ok));
