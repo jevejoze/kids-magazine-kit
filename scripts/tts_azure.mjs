@@ -3,11 +3,14 @@
 //   node scripts/tts_azure.mjs <issue 目录>            合成整期（已经合成过、内容没变的句子跳过）
 //   node scripts/tts_azure.mjs <issue 目录> --dry      只算计费字符，不调用 Azure
 //   node scripts/tts_azure.mjs --audition <数据目录>   每个角色每种语言合成一句试听，写到 <数据目录>/voices/试听/
+//   node scripts/tts_azure.mjs <issue 目录> --pinyin    列出讲读稿里还没注音的多音字，合成前逐条确认
 // 环境变量：AZURE_SPEECH_KEY、AZURE_SPEECH_REGION（免费 F0 资源）
 //           AZURE_SPEECH_KEY_PAID、AZURE_SPEECH_REGION_PAID（可选，付费 S0 资源，免费额度用完或被限流时接着用）
 // 声音：数据目录 voices/azure.json 写每个角色每种语言用哪个声音，没写的用下面的 DEFAULT_VOICES。
 //       值可以是声音名，也可以是 {"voice": "声音名", "pitch": 3}：pitch 是合成后用 ffmpeg 升（负数为降）几个半音，
 //       语速不变、不占计费字符，用来让声音更卡通
+// 多音字：scripts/polyphones.json 是通用词典，数据目录 voices/polyphones.json 补充或覆盖，讲读稿单句的 pron 字段优先级最高；
+//       写法都是 {"在行": "zai4 hang2"}，合成时自动包成 <phoneme alphabet="sapi" ph="zai 4 hang 2">在行</phoneme>
 import { readFileSync, writeFileSync, mkdirSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
@@ -28,6 +31,7 @@ const SAMPLE = { zh: "妮妮早上好，今天我们一起来猜一个问题！"
 
 const args = process.argv.slice(2);
 const dry = args.includes("--dry");
+const pinyinCheck = args.includes("--pinyin");
 const audition = args.includes("--audition");
 const target = args.find(a => !a.startsWith("--"));
 if (!target) { console.error("用法: node tts_azure.mjs <issue 目录> [--dry] | --audition <数据目录>"); process.exit(1); }
@@ -37,6 +41,39 @@ const voiceFile = join(dataDir, "voices", "azure.json");
 const voices = { ...DEFAULT_VOICES, ...(existsSync(voiceFile) ? JSON.parse(readFileSync(voiceFile, "utf8")) : {}) };
 delete voices._comment;
 
+const here = new URL(".", import.meta.url).pathname;
+const OK = new Set();
+const loadDict = f => {
+  if (!existsSync(f)) return {};
+  const d = JSON.parse(readFileSync(f, "utf8"));
+  (d._ok || []).forEach(w => OK.add(w)); // _ok：默认就读对的词，不注音，只让 --pinyin 不再提醒
+  delete d._comment; delete d._ok;
+  return d;
+};
+const PRON = { ...loadDict(join(decodeURIComponent(here), "polyphones.json")), ...loadDict(join(dataDir, "voices", "polyphones.json")) };
+// 容易读错的多音字：句子里有它、又没被词典里的词盖住，--pinyin 会把这句列出来
+const RISKY = "行长重还乐数便差传调处藏种量角朝曾系露载模倒降钻弹卷晕参称尽薄奇";
+const sapi = py => py.trim().split(/\s+/).map(x => x.replace(/^([a-zv]+)([1-5])$/i, "$1 $2")).join(" ");
+function pronOf(line) {
+  const dict = { ...PRON, ...(line.pron || {}) };
+  const words = Object.keys(dict).sort((a, b) => b.length - a.length);
+  return { dict, re: words.length ? new RegExp(words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "g") : null };
+}
+// 给中文句子里的多音字词加注音；正文先转义，词典里的词都是汉字，转义不影响匹配
+function annotate(text, line) {
+  if (line.lang !== "zh") return esc(text);
+  const { dict, re } = pronOf(line);
+  return re ? esc(text).replace(re, w => `<phoneme alphabet="sapi" ph="${sapi(dict[w])}">${w}</phoneme>`) : esc(text);
+}
+function uncovered(line) {
+  if (line.lang !== "zh") return [];
+  const text = plain(line.text), { re } = pronOf(line), covered = new Set();
+  const mark = r => { for (const m of text.matchAll(r)) for (let i = m.index; i < m.index + m[0].length; i++) covered.add(i); };
+  if (re) mark(re);
+  if (OK.size) mark(new RegExp([...OK].join("|"), "g"));
+  return [...text].flatMap((c, i) => RISKY.includes(c) && !covered.has(i) ? [`${text.slice(Math.max(0, i - 2), i)}【${c}】${text.slice(i + 1, i + 3)}`] : []);
+}
+
 const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const plain = s => s.replace(/<[^>]+>/g, "");
 // SSML：<speak> 和 <voice> 标签不计费，其余标签和正文都计费，汉字按 2 个字符算
@@ -44,7 +81,8 @@ const voiceOf = role => { const v = voices[role]; return typeof v === "string" ?
 function ssml(line) {
   const { voice, pitch } = voiceOf(`${line.who}/${line.lang}`) || voiceOf(`narrator/${line.lang}`);
   const style = STYLE[line.emotion];
-  const body = style ? `<mstts:express-as style="${style}">${esc(plain(line.text))}</mstts:express-as>` : esc(plain(line.text));
+  const said = annotate(plain(line.text), line);
+  const body = style ? `<mstts:express-as style="${style}">${said}</mstts:express-as>` : said;
   return {
     voice, pitch, body,
     xml: `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${LOCALE[line.lang]}"><voice name="${voice}">${body}</voice></speak>`,
@@ -91,6 +129,18 @@ function shift(wav, semitones) {
     return readFileSync(join(dir, "b.wav"));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 }
+if (pinyinCheck) {
+  const nar = JSON.parse(readFileSync(join(resolve(target), "50-narration.json"), "utf8")).narration;
+  let n = 0;
+  for (const page of nar) page.lines.forEach((line, i) => {
+    const hits = uncovered(line);
+    if (!hits.length) return;
+    n++;
+    console.log(`c${page.card}_${String(i).padStart(2, "0")}  ${plain(line.text)}\n        待确认：${hits.map(h => `「${h}」`).join(" ")}`);
+  });
+  console.log(n ? `\n${n} 句有没注音的多音字。读音可能错的，在这一句加 "pron": {"词": "拼音"}，常用的词加进数据目录 voices/polyphones.json` : "没有待确认的多音字");
+  process.exit(0);
+}
 if (!dry && !keys.length) { console.error("没有 Azure 密钥：设置环境变量 AZURE_SPEECH_KEY 和 AZURE_SPEECH_REGION（如 eastasia）"); process.exit(1); }
 
 if (audition) {
@@ -119,7 +169,7 @@ const old = existsSync(manPath) ? JSON.parse(readFileSync(manPath, "utf8")) : { 
 const oldByFile = Object.fromEntries((old.files ?? []).map(f => [f.file, f]));
 
 const files = [], used = {};
-let spent = 0, planned = 0, skipped = 0, paid = 0;
+let spent = 0, planned = 0, skipped = 0, paid = 0, phonemes = 0, sample = "";
 for (const page of nar) {
   for (const [i, line] of page.lines.entries()) {
     const file = `c${page.card}_${String(i).padStart(2, "0")}.wav`;
@@ -128,6 +178,8 @@ for (const page of nar) {
     const hash = createHash("sha1").update(xml + pitch).digest("hex").slice(0, 12);
     const cost = billable(body);
     planned += cost;
+    const ph = (body.match(/<phoneme /g) || []).length;
+    phonemes += ph; if (ph && !sample) sample = body;
     const prev = oldByFile[file];
     if (prev?.hash === hash && existsSync(join(outDir, file))) {
       files.push(prev); skipped++; continue;
@@ -141,7 +193,7 @@ for (const page of nar) {
     process.stdout.write(`\r已合成 ${files.length} 句`);
   }
 }
-if (dry) { console.log(`整期 ${planned} 计费字符；已合成可跳过 ${skipped} 句`); process.exit(0); }
+if (dry) { console.log(`整期 ${planned} 计费字符（含多音字注音 ${phonemes} 处）；已合成可跳过 ${skipped} 句${sample ? `\n注音示例：${sample}` : ""}`); process.exit(0); }
 writeFileSync(manPath, JSON.stringify({
   _meta: { stage: "60-audio", by: "Azure 语音", at: new Date().toISOString() },
   voices: used, billable_chars: { this_run: spent, whole_issue: planned }, paid_lines: paid, files,
