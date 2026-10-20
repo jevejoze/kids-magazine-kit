@@ -2,7 +2,7 @@
   "about": "一期杂志的流水线。每步读 inputs、写 outputs；depends 里的步骤全部完成后才能开始。kind=agent 的步骤由任意 agent 按 stages/<id>.md 完成；kind=script 的步骤在任意有 Node、Chrome、ffmpeg 的环境里运行。路径：data/ 是数据目录，issue/ 是 data/issues/NNN/。",
   "stages": [
     {"id": "00-brief",     "title": "本期任务书",   "kind": "agent",  "depends": [],
-     "inputs": ["data/MY_CHILD.md", "data/profile.md", "data/curation-log.md", "data/child-questions.md", "data/story-bible.md", "上一期 issue/30-issue.json"],
+     "inputs": ["data/MY_CHILD.md", "data/profile.md", "data/curation-log.md", "data/child-questions.md", "data/story-bible.md", "data/serial-bible.md", "上一期 issue/30-issue.json"],
      "outputs": ["issue/00-brief.json"]},
     {"id": "10-cover",     "title": "封面选题",     "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/10-cover.json"]},
     {"id": "11-comic",     "title": "今日一问",     "kind": "agent",  "depends": ["10-cover"],  "outputs": ["issue/11-comic.json", "issue/11-diagram.svg"]},
@@ -12,8 +12,9 @@
     {"id": "15-english",   "title": "英文三关",     "kind": "agent",  "depends": ["12-words"],  "outputs": ["issue/15-english.json"]},
     {"id": "16-mailbox",   "title": "信箱",         "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/16-mailbox.json"]},
     {"id": "17-news",      "title": "环球小报",     "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/17-news.json"]},
-    {"id": "20-assets",    "title": "下载图片",     "kind": "agent",  "depends": ["10-cover", "17-news"], "outputs": ["issue/20-assets/assets.json"]},
-    {"id": "30-assemble",  "title": "合并整期",     "kind": "script", "depends": ["11-comic", "12-words", "13-story", "14-puzzle", "15-english", "16-mailbox", "20-assets"],
+    {"id": "18-serial",    "title": "经典连载",     "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/18-serial.json"]},
+    {"id": "20-assets",    "title": "下载图片",     "kind": "agent",  "depends": ["10-cover", "17-news", "18-serial"], "outputs": ["issue/20-assets/assets.json"]},
+    {"id": "30-assemble",  "title": "合并整期",     "kind": "script", "depends": ["11-comic", "12-words", "13-story", "14-puzzle", "15-english", "16-mailbox", "18-serial", "20-assets"],
      "run": "node scripts/pipeline.mjs assemble <issue>", "outputs": ["issue/30-issue.json"]},
     {"id": "31-review",    "title": "审稿",         "kind": "agent",  "depends": ["30-assemble"], "outputs": ["issue/31-review.md"]},
     {"id": "40-render",    "title": "渲染图片和 PDF", "kind": "script", "depends": ["31-review"],
@@ -24,6 +25,6 @@
     {"id": "70-video",     "title": "讲读视频",     "kind": "script", "depends": ["40-render", "60-audio"],
      "run": "python3 scripts/make_video.py <issue>", "outputs": ["issue/70-final/"]},
     {"id": "90-archive",   "title": "更新档案",     "kind": "agent",  "depends": ["40-render"],
-     "outputs": ["data/vocab.json", "data/story-bible.md", "data/profile.md"]}
+     "outputs": ["data/vocab.json", "data/story-bible.md", "data/serial-bible.md", "data/profile.md"]}
   ]
 }

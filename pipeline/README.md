@@ -1,6 +1,6 @@
 # 流水线：一期杂志怎么分步做
 
-一期杂志拆成 17 步，每步只读上游文件、写自己的输出。任何能读写数据目录的 agent 都能接手其中一步：家长说"做第 10 步"，agent 读对应的说明，写出文件就结束。
+一期杂志拆成 18 步，每步只读上游文件、写自己的输出。任何能读写数据目录的 agent 都能接手其中一步：家长说"做第 10 步"，agent 读对应的说明，写出文件就结束。
 
 ## 目录
 
@@ -11,7 +11,7 @@
 ```
 我的云端硬盘/<刊名>/          数据目录，下文写作 data/
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
-  story-bible.md  vocab.json  feedback.jsonl
+  story-bible.md  serial-bible.md  vocab.json  feedback.jsonl
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
   voices/polyphones.json    这个孩子常用词的多音字读音（可选，补充引擎的通用词典）
   sfx/                       讲读版音效（可选）
@@ -19,17 +19,17 @@
     007/                     本期工作区，下文写作 issue/
       00-brief.json
       10-cover.json  11-comic.json  11-diagram.svg  12-words.json  13-story.json
-      14-puzzle.json  15-english.json  16-mailbox.json  17-news.json
-      20-assets/             cover.jpg、news-1..3.jpg、assets.json
+      14-puzzle.json  15-english.json  16-mailbox.json  17-news.json  18-serial.json
+      20-assets/             cover.jpg、news-1..3.jpg、serial.jpg、assets.json
       30-issue.json          合并后的整期
       31-review.md
-      40-cards/              card-1..7.png、<刊名>-第007期.pdf
+      40-cards/              card-1..8.png、<刊名>-第007期.pdf
       50-narration.json
       60-audio/              c{card}_{序号}.wav、manifest.json
       70-final/              <刊名>-第007期.pdf、讲读版.mp4
   成品/
     007/                     发给孩子的成品，文件名固定：
-                             card-1.png … card-7.png
+                             card-1.png … card-8.png
                              <刊名>-第007期.pdf
                              <刊名>-第007期-讲读版.mp4
 ```
@@ -49,8 +49,9 @@
 | 15 | 英文三关 | 12 | agent |
 | 16 | 信箱 | 00 | agent |
 | 17 | 环球小报 | 00 | agent |
-| 20 | 下载图片 | 10、17 | agent |
-| 30 | 合并整期 | 11–17、20 | 脚本 |
+| 18 | 经典连载 | 00 | agent |
+| 20 | 下载图片 | 10、17、18 | agent |
+| 30 | 合并整期 | 11–18、20 | 脚本 |
 | 31 | 审稿 | 30 | agent |
 | 40 | 渲染图片和 PDF | 31 | 脚本 |
 | 50 | 讲读稿 | 31 | agent |
@@ -58,7 +59,7 @@
 | 70 | 讲读视频 | 40、60 | 脚本 |
 | 90 | 更新档案 | 40 | agent |
 
-00 完成后，10、12、13、14、16、17 可以同时开工。完整定义见 `stages.json`。
+00 完成后，10、12、13、14、16、17、18 可以同时开工。完整定义见 `stages.json`。
 
 ## 两种用法
 

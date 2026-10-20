@@ -92,13 +92,28 @@ const checks = {
       need((x.sources ?? []).length >= 2, "17", `第 ${i + 1} 条要 2 个来源`);
     });
   },
+  "18-serial.json": r => {
+    const text = len((r.paragraphs ?? []).join("").replace(/\s/g, ""));
+    if (r.kind === "book") {
+      fields(r, "18", ["ep", "book_zh", "book_en", "chapter", "title_zh", "paragraphs", "quote", "crew", "guess", "tbc", "photo_url", "photo_credit"]);
+      need(text <= 280, "18", `连载 ${text} 字，超过 280`);
+      need(words(r.quote?.en) <= 25, "18", `原著金句 ${words(r.quote?.en)} 个词，超过 25`);
+    } else {
+      need(["music", "film"].includes(r.kind), "18", `kind 要写 book、music 或 film：${r.kind}`);
+      fields(r, "18", ["title_zh", "title_en", "by", "paragraphs", "tasks", "crew", "where", "photo_url", "photo_credit"]);
+      need(text <= 180, "18", `介绍 ${text} 字，超过 180`);
+      need(r.tasks?.length === 3, "18", "任务要 3 个");
+    }
+    need(len(r.crew?.say) <= 20, "18", `crew.say ${len(r.crew?.say)} 字，超过 20`);
+  },
   "50-narration.json": n => {
     const EMO = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
     const WHO = ["narrator", "dog", "mouse", "owl", "raccoon"];
     const pages = n.narration ?? [];
-    need([1, 2, 3, 4, 5, 6, 7].every(c => pages.some(p => p.card === c)), "50", "7 页都要有讲读");
-    // 每页最多几句：封面、今日一问、单词屋、小剧场、挑战、信箱、环球小报
-    const MAX_LINES = { 1: 12, 2: 26, 3: 22, 4: 30, 5: 14, 6: 12, 7: 18 };
+    const serial = has("18-serial.json"), cards = serial ? 8 : 7;
+    need([...Array(cards)].every((_, i) => pages.some(p => p.card === i + 1)), "50", `${cards} 页都要有讲读`);
+    // 每页最多几句：封面、今日一问、单词屋、小剧场、挑战、信箱、环球小报、经典连载
+    const MAX_LINES = { 1: 12, 2: 26, 3: 22, 4: 30, 5: 14, 6: 12, 7: 18, 8: 20 };
     let total = 0;
     pages.forEach(p => {
       need(p.lines.length <= (MAX_LINES[p.card] ?? 30), "50", `第 ${p.card} 页 ${p.lines.length} 句，最多 ${MAX_LINES[p.card]} 句`);
@@ -116,10 +131,12 @@ const checks = {
         total += len(l.text) * (l.repeat || 1);
       });
     });
-    need(total >= 1300 && total <= 2800, "50", `讲读稿共 ${total} 字，建议 1600–2400`);
+    const [lo, hi] = serial ? [1900, 2800] : [1600, 2400];
+    need(total >= lo - 300 && total <= hi + 400, "50", `讲读稿共 ${total} 字，建议 ${lo}–${hi}`);
   },
   "20-assets/assets.json": a => {
-    [a.cover, ...(a.news ?? [])].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
+    if (has("18-serial.json")) need(a.serial, "20", "assets.json 缺少连载插画 serial");
+    [a.cover, ...(a.news ?? []), ...(a.serial ? [a.serial] : [])].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
   },
 };
 
@@ -156,6 +173,10 @@ function assemble() {
       items: nw.items.map((x, i) => ({ flag: x.flag, place: x.place, title: x.title, text: x.text, word: x.word, photo: asset(a.news?.[i]), photo_pos: x.photo_pos })),
     };
     issueJson._answers.news_sources = nw.items.flatMap(x => x.sources ?? []);
+  }
+  if (has("18-serial.json")) {
+    const r = read("18-serial.json");
+    issueJson.serial = { ...strip(r), photo: asset(a.serial), photo_url: undefined, bible_update: undefined };
   }
   writeFileSync(join(issue, "30-issue.json"), JSON.stringify(issueJson, null, 2));
   console.log(join(issue, "30-issue.json"));
