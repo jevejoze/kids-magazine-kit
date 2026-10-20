@@ -13,6 +13,7 @@
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
   story-bible.md  vocab.json  feedback.jsonl
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
+  voices/polyphones.json    这个孩子常用词的多音字读音（可选，补充引擎的通用词典）
   sfx/                       讲读版音效（可选）
   issues/
     007/                     本期工作区，下文写作 issue/
@@ -85,6 +86,7 @@ node scripts/pipeline.mjs status   <issue>   # 看每步做了没有、下一步
 node scripts/pipeline.mjs check    <issue>   # 检查已完成步骤的字段和字数
 node scripts/pipeline.mjs assemble <issue>   # 第 30 步
 node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40 步
+node scripts/tts_azure.mjs <issue> --pinyin  # 第 60 步之前：列出没注音的多音字
 node scripts/tts_azure.mjs <issue>           # 第 60 步（Azure 语音）
 python3 scripts/make_video.py <issue>        # 第 70 步
 ```

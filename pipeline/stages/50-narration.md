@@ -13,7 +13,7 @@
  ]}]}
 ```
 
-每句的字段（`who` `lang` `text` `emotion` `sfx` `pause` `repeat` `rate` `hold`）和每页讲法见 SKILL.md「讲读版」。
+每句的字段（`who` `lang` `text` `emotion` `sfx` `pause` `repeat` `rate` `hold` `pron`）和每页讲法见 SKILL.md「讲读版」。
 
 **写法要点**
 - 开头：开场铃、一句问好（叫孩子的名字、今天什么主题日），封面上的成员抢一句俏皮话，不挨个点名
