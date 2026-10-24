@@ -112,6 +112,9 @@ svg.ch{display:block}
 #c5 .lv .q{flex:1}
 #c5 .lv .cn{font-size:26px;color:var(--soft)}
 #c5 .lv .en{font-size:29px;line-height:1.35}
+#c5 .draft{flex:1;margin:16px 0 64px;padding:14px 30px;background:#fff repeating-linear-gradient(0deg,transparent 0 47px,#E6DDF7 47px 49px)}
+#c5 .draft h3{font-size:28px;font-weight:400;color:var(--soft)}
+#c5 .mine{margin-top:14px;padding:12px 30px;font-size:30px;flex:none}
 
 /* card 6 信箱 */
 #c6{background:#FFEFD9}
@@ -125,6 +128,8 @@ svg.ch{display:block}
 #c6 .pick{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 #c6 .pick span{border:3px solid var(--ink);border-radius:999px;padding:2px 16px;font-size:25px;background:#fff}
 #c6 .checkin .lines i{height:44px}
+#c6 .answers{margin-top:20px;padding:16px 30px;background:#FFF4C9;font-size:27px;line-height:1.5;flex:none}
+#c6 .answers b{display:block;font-weight:400;color:var(--tomato);font-size:30px}
 #c6 .stamps{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-top:22px;position:relative}
 #c6 .stamps div{aspect-ratio:1;border:4px dashed var(--soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--soft)}
 #c6 .stamps div.ok{border:5px solid var(--tomato);color:var(--tomato);background:#fff;transform:rotate(-12deg);font-size:22px;text-align:center;line-height:1.1}
@@ -229,7 +234,7 @@ svg.ch{display:block}
 #ccheck .game .body.en{font-size:27px}
 #ccheck .upside{margin-top:18px;transform:rotate(180deg);font-size:22px;color:var(--soft);line-height:1.4;position:relative;text-align:center}
 
-/* 妮妮的地盘 */
+/* 孩子的地盘 */
 #ccorner{background:#FFEFF3}
 #ccorner .letter{margin-top:22px;padding:18px 30px;font-size:28px;line-height:1.5;flex:none}
 #ccorner h3{font-size:30px;font-weight:400}

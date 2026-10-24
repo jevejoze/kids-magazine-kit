@@ -20,11 +20,12 @@ const bub = b => `<div class="bub ${b.lang === "en" ? "en" : "fun"}">${b.text}</
 const topBar = (tag, right) => `<div class="dots"></div><div class="top"><span class="tag fun">${tag}</span><span class="en">${right ?? N}</span></div>`;
 let pg = 0;
 const foot = left => `<div class="foot"><span class="fun">${left}</span><span class="page en">${++pg} / {{TOTAL}}</span></div>`;
+// 页脚的"往后翻"提示：指向下一页；后面没有页了就是空串
+const NEXT = name => { const t = TOC.map(x => x[1]), nx = t[t.indexOf(name) + 1]; return nx ? ` · 往后翻：${nx} →` : ""; };
 const coverFoot = left => `<div class="foot"><span class="fun">${left}</span></div>`;
-const TOC = [["🤔", "今日一问"], ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], ["💌", "信箱"]];
-if (D.news) TOC.push(["🌏", "环球小报"]);
+// 目录 = 本期实际有的页，顺序和页序一致：今日一问 → (单词屋) → 小剧场 → 挑战 → 环球小报 → 连载 → 信箱
 const SERIAL = { book: ["📚", "经典连载", "Story Classics"], music: ["🎵", "音乐盒", "Music Box"], film: ["🎬", "放映室", "Movie Time"] }[D.serial?.kind];
-if (SERIAL) TOC.push(SERIAL.slice(0, 2));
+const TOC = [["🤔", "今日一问"], D.words && ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], D.news && ["🌏", "环球小报"], SERIAL?.slice(0, 2), D.mailbox && ["💌", "信箱"]].filter(Boolean);
 const GANG = ["owl:happy:230", "dog:happy:290", "mouse:wave:260", "raccoon:smirk:220"];
 
 const cards = [];
@@ -117,11 +118,13 @@ if (P && !CK) cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣
   <div class="taunt">${ch("raccoon:smirk:160:" + (P.prop || ""))}<div class="bub fun">${P.taunt_zh}<br><span class="en">${P.taunt_en}</span></div></div>
   <div class="box puz fun"><h3>${P.puzzle.title}</h3><div class="body">${P.puzzle.body}</div>
     ${P.puzzle.slots ? `<div class="slots">${P.puzzle.slots.map(x => `<span>${x}</span>`).join("")}</div>` : ""}</div>
-  <div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
-    <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div>${e.stars === 3 ? lines(2) : ""}</div></div>`).join("")}</div>
+  ${P.english?.length ? `<div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
+    <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div>${e.stars === 3 ? lines(2) : ""}</div></div>`).join("")}</div>`
+    : `<div class="box draft fun"><h3>✏️ 草稿区 · 画一画、算一算</h3></div>
+  ${P.puzzle.slots ? "" : `<div class="box mine fun"><b>我的答案：</b>${lines(1)}</div>`}`}
   ${foot("答案明天公布！")}</section>`);
 
-// 6 妮妮的地盘（有 corner 时）：回信、投票、如果你是……、心情天气、悄悄话；否则是信箱
+// 6 孩子的地盘（有 corner 时）：回信、投票、如果你是……、心情天气、悄悄话；否则是信箱
 const K = D.corner;
 const MOODS = [["☀️", "晴"], ["⛅", "多云"], ["🌧️", "下雨"], ["⛈️", "打雷"], ["🌈", "雨过天晴"]];
 if (K) cards.push(`<section class="card" id="ccorner">${topBar(`🏠 ${K.title || "我的地盘"}`)}
@@ -130,20 +133,8 @@ if (K) cards.push(`<section class="card" id="ccorner">${topBar(`🏠 ${K.title |
   <div class="box ifyou fun"><h3>🎭 ${K.ifyou}</h3><div class="space"></div></div>
   <div class="row2"><div class="box mood fun"><h3>今天的心情天气</h3><div class="w">${MOODS.map(([e, t]) => `<span>${e}<small>${t}</small></span>`).join("")}</div><p>${K.mood_tip}</p></div>
     <div class="box whisper fun"><h3>🤫 悄悄话</h3><p>${K.whisper}</p><div class="space"></div></div></div>
-  ${foot((K.send_note || "拍照发给家长") + (D.news ? " · 翻到最后一页看世界新闻 →" : ""))}</section>`);
-const M = D.mailbox, done = M?.stamps_done;
-if (M && !K)
-cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
-  <div class="box letter fun">${M.letter}</div>
-  <div class="box ask"><div class="fun">${M.ask_zh}</div><div class="en">${M.ask_en}</div>${lines(2)}</div>
-  <div class="box checkin fun"><h3>📝 今日打卡 · 告诉编辑部</h3>
-    <div class="row"><b>最喜欢哪一页？</b><div class="pick${TOC.length > 6 ? " many" : ""}">${TOC.map(([e, t]) => `<span>${e}${t}</span>`).join("")}</div></div>
-    <div class="row"><b>今天难不难？</b><div class="pick"><span>😴 太简单</span><span>🤔 刚刚好</span><span>🤯 有点难</span></div></div>
-    <div class="row"><b>我也想问一个问题：</b>${lines(1)}</div></div>
-  <div class="stamps fun">${[1,2,3,4,5,6,7].map(i => i <= done ? `<div class="ok">第${i}天<br>✓</div>` : `<div>${i}</div>`).join("")}<p>${M.reward}</p></div>
-  ${foot((M.send_note || "拍照发给家长") + (D.news ? " · 往后翻看世界新闻 →" : D.serial ? " · 往后翻看连载 →" : " · 明天见！See you tomorrow!"))}</section>`);
-
-// 环球小报（可选，放最后一页）：1 条头条 + 2 条小新闻
+  ${foot((K.send_note || "拍照发给家长") + (D.news ? " · 往后翻看世界新闻 →" : ""))}</section>`);
+// 环球小报（可选）：1 条头条 + 2 条小新闻
 const NW = D.news;
 const story = (n, cls) => `<div class="box nw ${cls}"><div class="pic" style="background-image:url('${n.photo}');background-position:${n.photo_pos || "center"}"></div>
   <div class="txt"><div class="loc fun">${n.flag} ${n.place}</div><h3 class="fun">${n.title}</h3><p class="fun">${n.text}${n.word ? `<span class="kw en">🔑 ${n.word.en} <small class="fun">${n.word.zh}</small></span>` : ""}</p></div></div>`;
@@ -152,9 +143,9 @@ if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报
   <div class="pair">${NW.items.slice(1, 3).map(n => story(n, "")).join("")}</div>
   <div class="box ask2 fun">💬 ${NW.ask_zh}<br><span class="en">${NW.ask_en}</span></div>
   <div class="credit2 en">${NW.credits}</div>
-  ${foot(NW.foot || (D.serial ? `新闻来源已交叉核实 · 最后一页：${SERIAL[1]} →` : "新闻来源已交叉核实 · 明天见！See you tomorrow!"))}</section>`);
+  ${foot(NW.foot || `新闻来源已交叉核实${NEXT("环球小报")}`)}</section>`);
 
-// 经典连载（可选，放最后一页）：书一期一回；周五换成音乐盒 / 放映室
+// 经典连载（可选）：书一期一回；周五换成音乐盒 / 放映室
 const SR = D.serial;
 if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SERIAL[0]} ${SERIAL[1]} · ${SERIAL[2]}`, SR.kind === "book" ? `第 ${SR.ep} 回` : undefined)}
   <div class="h1 fun">${SR.kind === "book" ? `《${SR.book_zh}》` : ""}${SR.title_zh}<span class="en">${SR.kind === "book" ? `${SR.book_en} · ${SR.title_en}` : SR.title_en}</span></div>
@@ -166,7 +157,23 @@ if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SE
     : `<div class="box tasks fun"><div class="lb">${SR.kind === "music" ? "🎧 边听边找" : "🍿 看完考考你"}</div>${SR.tasks.map((t, i) => `<p><b>${i + 1}</b>${t}</p>`).join("")}${SR.where ? `<small>${SR.where}</small>` : ""}</div>`}
   <div class="end"><div class="crew">${ch(SR.crew.who)}<div class="bub fun">${SR.crew.say}</div></div>
     <div class="next fun">${SR.guess ? `<span class="guess">🔮 猜一猜：${SR.guess}</span>` : ""}<span>${SR.tbc}</span></div></div>
-  ${foot(SR.foot || "明天见！See you tomorrow!")}</section>`);
+  ${foot(SR.foot || NEXT(SERIAL[1]).replace(/^ · /, "") || "明天见！See you tomorrow!")}</section>`);
+
+// 信箱（最后一页）：几句关于本期的问题，孩子口头答、家长拍照或转述都行
+const M = D.mailbox;
+const picks = (items, many) => `<div class="pick${many ? " many" : ""}">${items.map(x => `<span>${x}</span>`).join("")}</div>`;
+const PAGES = TOC.filter(([, t]) => t !== "信箱").map(([e, t]) => e + t);
+if (M) cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
+  <div class="box letter fun">${M.hello || M.letter}</div>
+  ${M.answers ? `<div class="box answers fun"><b>🔓 上期答案</b>${M.answers}</div>` : ""}
+  <div class="box checkin fun"><h3>📝 今天这期，告诉编辑部</h3>
+    <div class="row"><b>👍 最喜欢哪一页？</b>${picks(PAGES, PAGES.length > 5)}</div>
+    <div class="row"><b>👎 哪一页不太喜欢？</b>${picks(PAGES, PAGES.length > 5)}</div>
+    <div class="row"><b>今天难不难？</b>${picks(["😴 太简单", "🤔 刚刚好", "🤯 有点难"])}</div>
+    <div class="row"><b>💡 今天想到了什么有趣的问题？</b>${lines(2)}</div>
+    <div class="row"><b>👀 今天看到了什么有意思的事？</b>${lines(2)}</div>
+    ${M.ask_zh ? `<div class="row"><b>❓ ${M.ask_zh}</b>${lines(1)}</div>` : ""}</div>
+  ${foot((M.send_note || "说给家长听") + " · 明天见！See you tomorrow!")}</section>`);
 
 document.getElementById("root").outerHTML = cards.join("\n").replaceAll("{{TOTAL}}", pg);
 if (location.hash) { document.body.classList.add("single"); document.querySelector(location.hash).classList.add("on"); }

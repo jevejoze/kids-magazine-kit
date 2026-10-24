@@ -22,6 +22,10 @@ const done = s => s.id === "90-archive" ? false : s.outputs.every(p => {
 const read = name => JSON.parse(readFileSync(join(issue, name), "utf8"));
 const has = name => existsSync(join(issue, name));
 
+// 渲染出来的页面顺序（card-1..N），和 template.html 一致；单词屋、新闻、连载有才出
+const pageOrder = () => ["cover", "comic", has("12-words.json") && "words", "story", "challenge",
+  has("17-news.json") && "news", has("18-serial.json") && "serial", "mailbox"].filter(Boolean);
+
 // ---------- check ----------
 const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
 const words = s => String(s ?? "").replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
@@ -31,8 +35,7 @@ const fields = (obj, where, keys) => keys.forEach(k => need(obj[k] !== undefined
 
 const checks = {
   "00-brief.json": b => {
-    fields(b, "00", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level", "stamps_done", "story"]);
-    need(b.story && (b.story.ep % 2 ? "zh" : "en") === b.story.lang, "00", "小剧场单数集中文、双数集英文");
+    fields(b, "00", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level", "story"]);
   },
   "10-cover.json": c => {
     fields(c, "10", ["question", "answer", "photo", "stamp", "crew", "crew_say", "credit"]);
@@ -65,24 +68,24 @@ const checks = {
     });
   },
   "13-story.json": s => {
-    fields(s, "13", ["ep", "lang", "title_zh", "title_en", "paragraphs", "scene", "clue", "tbc", "secret"]);
+    fields(s, "13", ["ep", "title_zh", "title_en", "paragraphs", "scene", "clue", "tbc", "secret"]);
     const text = (s.paragraphs ?? []).join(" ");
-    if (s.lang === "en") need(words(text) <= 110, "13", `故事 ${words(text)} 个单词，超过 110`);
-    else need(len(text.replace(/\s/g, "")) <= 300, "13", `故事 ${len(text.replace(/\s/g, ""))} 字，超过 300`);
-    need((s.ep % 2 ? "zh" : "en") === s.lang, "13", "单数集中文、双数集英文");
+    need(len(text.replace(/\s/g, "")) <= 300, "13", `故事 ${len(text.replace(/\s/g, ""))} 字，超过 300`);
   },
   "14-puzzle.json": p => {
-    fields(p, "14", ["title", "body", "answer", "solution"]);
+    fields(p, "14", ["title", "body", "answer", "solution", "taunt_zh", "taunt_en"]);
     need(len(p.body) <= 120, "14", `题干 ${len(p.body)} 字，超过 120`);
   },
   "15-english.json": e => {
-    fields(e, "15", ["taunt_zh", "taunt_en", "english", "answers"]);
+    fields(e, "15", ["english", "answers"]);
     need(e.english?.length === 3, "15", "英文要 3 关");
     e.english?.forEach((x, i) => need(words(x.en) <= 45, "15", `第 ${i + 1} 关 ${words(x.en)} 个单词，超过 45`));
   },
   "16-mailbox.json": m => {
-    fields(m, "16", ["letter", "ask_zh", "ask_en", "stamps_done", "reward", "send_note"]);
-    need(len(m.letter) <= 130, "16", `回信 ${len(m.letter)} 字，偏长`);
+    fields(m, "16", ["hello", "send_note"]);
+    need(len(m.hello) <= 60, "16", `开头问候 ${len(m.hello)} 字，超过 60`);
+    need(len(m.answers) <= 100, "16", `上期答案 ${len(m.answers)} 字，超过 100`);
+    need(len(m.ask_zh) <= 30, "16", `本期问题 ${len(m.ask_zh)} 字，超过 30`);
   },
   "17-news.json": n => {
     fields(n, "17", ["week", "items", "ask_zh", "ask_en", "credits"]);
@@ -90,6 +93,8 @@ const checks = {
     n.items?.forEach((x, i) => {
       need(len(x.text) <= 50, "17", `第 ${i + 1} 条 ${len(x.text)} 字，超过 50`);
       need((x.sources ?? []).length >= 2, "17", `第 ${i + 1} 条要 2 个来源`);
+      fields(x.talk ?? {}, "17", ["background", "scale", "follow_up"]);
+      need(x.photo_shows, "17", `第 ${i + 1} 条缺少 photo_shows（照片里实际拍到了什么）`);
     });
   },
   "18-serial.json": r => {
@@ -110,13 +115,14 @@ const checks = {
     const EMO = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
     const WHO = ["narrator", "dog", "mouse", "owl", "raccoon"];
     const pages = n.narration ?? [];
-    const serial = has("18-serial.json"), cards = serial ? 8 : 7;
+    const order = pageOrder(), cards = order.length;
     need([...Array(cards)].every((_, i) => pages.some(p => p.card === i + 1)), "50", `${cards} 页都要有讲读`);
-    // 每页最多几句：封面、今日一问、单词屋、小剧场、挑战、信箱、环球小报、经典连载
-    const MAX_LINES = { 1: 12, 2: 26, 3: 22, 4: 30, 5: 14, 6: 12, 7: 18, 8: 20 };
+    // 每页最多几句，按页的种类定；card 编号和渲染出来的 card-N.png 顺序一致
+    const MAX = { cover: 12, comic: 26, words: 22, story: 30, challenge: 12, news: 24, serial: 20, mailbox: 10 };
+    const max = c => MAX[order[c - 1]] ?? 30;
     let total = 0;
     pages.forEach(p => {
-      need(p.lines.length <= (MAX_LINES[p.card] ?? 30), "50", `第 ${p.card} 页 ${p.lines.length} 句，最多 ${MAX_LINES[p.card]} 句`);
+      need(p.lines.length <= max(p.card), "50", `第 ${p.card} 页（${order[p.card - 1]}）${p.lines.length} 句，最多 ${max(p.card)} 句`);
       need(p.lines.filter(l => (l.pause ?? 0) >= 3).length <= 1, "50", `第 ${p.card} 页停顿 ≥ 3 秒的地方超过 1 处`);
       let run = 0;
       p.lines.forEach((l, i) => {
@@ -131,7 +137,7 @@ const checks = {
         total += len(l.text) * (l.repeat || 1);
       });
     });
-    const [lo, hi] = serial ? [1900, 2800] : [1600, 2400];
+    const [lo, hi] = [1800, 2800];
     need(total >= lo - 300 && total <= hi + 400, "50", `讲读稿共 ${total} 字，建议 ${lo}–${hi}`);
   },
   "20-assets/assets.json": a => {
@@ -150,9 +156,11 @@ function check() {
 
 // ---------- assemble ----------
 function assemble() {
-  const b = read("00-brief.json"), c = read("10-cover.json"), m = read("11-comic.json"), w = read("12-words.json"),
-    s = read("13-story.json"), p = read("14-puzzle.json"), e = read("15-english.json"), mb = read("16-mailbox.json"),
+  const b = read("00-brief.json"), c = read("10-cover.json"), m = read("11-comic.json"),
+    s = read("13-story.json"), p = read("14-puzzle.json"), mb = read("16-mailbox.json"),
     a = read("20-assets/assets.json");
+  // 单词屋、英文三关是可选栏目，有文件才合并
+  const w = has("12-words.json") ? read("12-words.json") : null, e = has("15-english.json") ? read("15-english.json") : {};
   const nw = has("17-news.json") ? read("17-news.json") : null;
   const asset = f => f ? `20-assets/${f}` : f;
   const strip = o => Object.fromEntries(Object.entries(o).filter(([k]) => !k.startsWith("_")));
@@ -161,9 +169,9 @@ function assemble() {
     question: c.question,
     cover: { photo: asset(a.cover), photo_pos: c.photo_pos, strip: c.strip, stamp: c.stamp, asked_by: c.asked_by, crew: c.crew, crew_say: c.crew_say, credit: c.credit },
     comic: { ...strip(m), theme_icon: m.theme_icon || c.theme_icon, sources: undefined },
-    words: strip(w),
-    story: { ep: s.ep, lang: s.lang, night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
-    challenge: { taunt_zh: e.taunt_zh, taunt_en: e.taunt_en, prop: e.prop || "", puzzle: { title: p.title, body: p.body, slots: p.slots }, english: e.english },
+    words: w ? strip(w) : undefined,
+    story: { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
+    challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, slots: p.slots }, english: e.english },
     mailbox: strip(mb),
     _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret },
   };
@@ -187,10 +195,10 @@ function status() {
   const state = Object.fromEntries(stages.map(s => [s.id, done(s)]));
   for (const s of stages) {
     const ready = !state[s.id] && s.depends.every(d => state[d]);
-    const mark = state[s.id] ? "✅" : ready ? "👉" : "⏳";
-    console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}`);
+    const mark = state[s.id] ? "✅" : s.optional ? "➖" : ready ? "👉" : "⏳";
+    console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}${s.optional && !state[s.id] ? "（可选，默认不做）" : ""}`);
   }
-  const next = stages.filter(s => !state[s.id] && s.depends.every(d => state[d])).map(s => s.id);
+  const next = stages.filter(s => !s.optional && !state[s.id] && s.depends.every(d => state[d])).map(s => s.id);
   console.log(`\n现在可以做：${next.join("、") || "（无）"}`);
 }
 

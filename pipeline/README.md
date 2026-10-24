@@ -23,13 +23,13 @@
       20-assets/             cover.jpg、news-1..3.jpg、serial.jpg、assets.json
       30-issue.json          合并后的整期
       31-review.md
-      40-cards/              card-1..8.png、<刊名>-第007期.pdf
+      40-cards/              card-1..N.png（默认 7 张）、<刊名>-第007期.pdf
       50-narration.json
       60-audio/              c{card}_{序号}.wav、manifest.json
       70-final/              <刊名>-第007期.pdf、讲读版.mp4
   成品/
     007/                     发给孩子的成品，文件名固定：
-                             card-1.png … card-8.png
+                             card-1.png … card-7.png
                              <刊名>-第007期.pdf
                              <刊名>-第007期-讲读版.mp4
 ```
@@ -43,15 +43,15 @@
 | 00 | 本期任务书 | — | agent |
 | 10 | 封面选题 | 00 | agent |
 | 11 | 今日一问（漫画 + 图解） | 10 | agent |
-| 12 | 单词屋 | 00 | agent |
+| 12 | 单词屋（可选，暂停） | 00 | agent |
 | 13 | 小剧场 | 00 | agent |
 | 14 | 谜题 | 00 | agent |
-| 15 | 英文三关 | 12 | agent |
+| 15 | 英文三关（可选，暂停） | 00 | agent |
 | 16 | 信箱 | 00 | agent |
 | 17 | 环球小报 | 00 | agent |
 | 18 | 经典连载 | 00 | agent |
 | 20 | 下载图片 | 10、17、18 | agent |
-| 30 | 合并整期 | 11–18、20 | 脚本 |
+| 30 | 合并整期 | 11、13、14、16、18、20（做了 12、15 也一起合并） | 脚本 |
 | 31 | 审稿 | 30 | agent |
 | 40 | 渲染图片和 PDF | 31 | 脚本 |
 | 50 | 讲读稿 | 31 | agent |
@@ -71,7 +71,7 @@
 1. 读 `pipeline/stages/<步骤>.md`（公开地址：`https://raw.githubusercontent.com/jevejoze/kids-magazine-kit/main/pipeline/stages/<步骤>.md`）
 2. 确认依赖步骤的输出文件都在 `issue/` 里；缺了就停下，告诉家长先做哪一步
 3. 读说明里列出的输入，写出说明里规定的输出文件，字段名照抄
-4. 每个输出 JSON 顶层写 `"_meta": {"stage": "12-words", "by": "<agent 名称>", "at": "<ISO 时间>"}`
+4. 每个输出 JSON 顶层写 `"_meta": {"stage": "13-story", "by": "<agent 名称>", "at": "<ISO 时间>"}`
 5. 按说明里的"自检"逐条检查
 6. 数据目录不在网盘上时（在本地或云端会话里干活），把这一步的输出文件传到网盘 `issues/NNN/` 的同一位置，再交付
 7. 只写自己这一步的输出；发现上游有错，写进自己输出的 `_meta.issues`，交给家长决定

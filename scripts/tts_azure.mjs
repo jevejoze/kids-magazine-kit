@@ -27,7 +27,7 @@ const DEFAULT_VOICES = {
 // 讲读稿的 emotion → Azure 说话风格。声音不支持的风格 Azure 会按普通语气念；平静、困倦、得意不加标签，省计费字符
 const STYLE = { 开心: "cheerful", 兴奋: "excited", 惊讶: "cheerful", 委屈: "sad", 紧张: "fearful", 温柔: "gentle", 神秘: "whispering" };
 const LOCALE = { zh: "zh-CN", en: "en-GB" };
-const SAMPLE = { zh: "妮妮早上好，今天我们一起来猜一个问题！", en: "Good morning! Shall we guess today's question together?" };
+const SAMPLE = { zh: "早上好，今天我们一起来猜一个问题！", en: "Good morning! Shall we guess today's question together?" };
 
 const args = process.argv.slice(2);
 const dry = args.includes("--dry");
