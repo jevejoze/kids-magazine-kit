@@ -32,7 +32,7 @@
 - `topic_hint` 只给方向，具体选题由第 10 步决定；孩子提过的问题优先，放进 `child_question`（含原话和日期）
 - `focus` 和 `avoid` 来自问卷第七部分和最近一次策展结论
 - `story`：每集都是中文；`resolve` 写上一集留下要揭晓的伏笔
-- `serial`：周五按 `serial-bible.md`「周五片单」排下一个（`kind` 写 `music` 或 `film`，`plan` 写作品名）；其他日子 `kind` 写 `book`，`ep` = 上一回 + 1，`plan` 抄分集计划里这一回的内容
+- `serial`：周五按 `serial-bible.md`「周五片单」排下一个（`kind` 写 `music`、`film` 或 `make`，`plan` 写作品名）；其他日子 `kind` 写 `book`，`ep` = 上一回 + 1，`plan` 抄分集计划里这一回的内容
 - `last_answers` 从上一期 `30-issue.json` 的 `_answers` 抄（封面答案和谜题答案），供信箱公布
 - `last_feedback` 从 `data/feedback.jsonl` 和 `data/letters.md` 取孩子上一期的打卡（最喜欢、不喜欢、难度、她想到的问题、她看到的事），没收到就写"没有收到"。她想到的问题同时记进 `child-questions.md`
 

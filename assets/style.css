@@ -277,10 +277,11 @@ svg.ch{display:block}
 #cdeep .br .bub{font-size:24px;margin-bottom:14px}
 #cdeep .card-photo{height:470px}
 
-/* 经典连载：书 / 音乐盒 / 放映室 */
+/* 经典连载：书 / 音乐盒 / 放映室 / 动手做 */
 #cserial{background:#F4EBDD}
 #cserial.music{background:#E9E6FF}
 #cserial.film{background:#FFE9DC}
+#cserial.make{background:#E2F3E4}
 #cserial .h1{font-size:60px}
 #cserial .h1 .en{font-size:32px}
 #cserial .meta{font-size:26px;color:var(--soft);margin-top:6px;position:relative}
@@ -298,6 +299,9 @@ svg.ch{display:block}
 #cserial .tasks p{display:flex;gap:12px;margin-top:8px}
 #cserial .tasks p b{flex:0 0 38px;height:38px;border-radius:50%;background:var(--lav);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:400;font-size:22px;margin-top:2px}
 #cserial .tasks small{display:block;font-size:22px;color:var(--soft);margin-top:10px}
+/* 动手做：成品照片矮一点，给 4–8 步做法留位置 */
+#cserial.make .pic{width:340px;height:340px}
+#cserial.make .tasks p{margin-top:5px}
 #cserial .end{display:flex;align-items:flex-end;gap:20px;margin-top:14px;position:relative}
 #cserial .end .crew{display:flex;align-items:center;gap:10px;flex:0 0 470px}
 #cserial .end .crew .bub{font-size:26px;width:auto;flex:1;margin:0;padding:10px 16px}

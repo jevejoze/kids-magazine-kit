@@ -24,7 +24,7 @@ const foot = left => `<div class="foot"><span class="fun">${left}</span><span cl
 const NEXT = name => { const t = TOC.map(x => x[1]), nx = t[t.indexOf(name) + 1]; return nx ? ` · 往后翻：${nx} →` : ""; };
 const coverFoot = left => `<div class="foot"><span class="fun">${left}</span></div>`;
 // 目录 = 本期实际有的页，顺序和页序一致：今日一问 → (单词屋) → 小剧场 → 挑战 → 环球小报 → 连载 → 信箱
-const SERIAL = { book: ["📚", "经典连载", "Story Classics"], music: ["🎵", "音乐盒", "Music Box"], film: ["🎬", "放映室", "Movie Time"] }[D.serial?.kind];
+const SERIAL = { book: ["📚", "经典连载", "Story Classics"], music: ["🎵", "音乐盒", "Music Box"], film: ["🎬", "放映室", "Movie Time"], make: ["✂️", "动手做", "Make It"] }[D.serial?.kind];
 const TOC = [["🤔", "今日一问"], D.words && ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], D.news && ["🌏", "环球小报"], SERIAL?.slice(0, 2), D.mailbox && ["💌", "信箱"]].filter(Boolean);
 const GANG = ["owl:happy:230", "dog:happy:290", "mouse:wave:260", "raccoon:smirk:220"];
 
@@ -145,7 +145,7 @@ if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报
   <div class="credit2 en">${NW.credits}</div>
   ${foot(NW.foot || `新闻来源已交叉核实${NEXT("环球小报")}`)}</section>`);
 
-// 经典连载（可选）：书一期一回；周五换成音乐盒 / 放映室
+// 经典连载（可选）：书一期一回；周五换成音乐盒 / 放映室 / 动手做
 const SR = D.serial;
 if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SERIAL[0]} ${SERIAL[1]} · ${SERIAL[2]}`, SR.kind === "book" ? `第 ${SR.ep} 回` : undefined)}
   <div class="h1 fun">${SR.kind === "book" ? `《${SR.book_zh}》` : ""}${SR.title_zh}<span class="en">${SR.kind === "book" ? `${SR.book_en} · ${SR.title_en}` : SR.title_en}</span></div>
@@ -154,7 +154,7 @@ if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SE
     ${SR.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
   ${SR.kind === "book"
     ? `<div class="box quote"><div class="lb fun">📜 原著金句 · ${SR.quote.who}</div><div class="en">${/^[“"]/.test(SR.quote.en) ? SR.quote.en : `“${SR.quote.en}”`}</div><div class="zh fun">${SR.quote.zh}</div></div>`
-    : `<div class="box tasks fun"><div class="lb">${SR.kind === "music" ? "🎧 边听边找" : "🍿 看完考考你"}</div>${SR.tasks.map((t, i) => `<p><b>${i + 1}</b>${t}</p>`).join("")}${SR.where ? `<small>${SR.where}</small>` : ""}</div>`}
+    : `<div class="box tasks fun"><div class="lb">${{ music: "🎧 边听边找", film: "🍿 看完考考你", make: "✂️ 跟着做" }[SR.kind]}</div>${SR.tasks.map((t, i) => `<p><b>${i + 1}</b>${t}</p>`).join("")}${SR.where ? `<small>${SR.where}</small>` : ""}</div>`}
   <div class="end"><div class="crew">${ch(SR.crew.who)}<div class="bub fun">${SR.crew.say}</div></div>
     <div class="next fun">${SR.guess ? `<span class="guess">🔮 猜一猜：${SR.guess}</span>` : ""}<span>${SR.tbc}</span></div></div>
   ${foot(SR.foot || NEXT(SERIAL[1]).replace(/^ · /, "") || "明天见！See you tomorrow!")}</section>`);

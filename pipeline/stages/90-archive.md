@@ -5,7 +5,7 @@
 **写**
 - `data/vocab.json`：做了单词屋时追加本期 3 个单词 `{"word", "cn", "issue"}`；没做就跳过
 - `data/story-bible.md`：追加本集摘要和新伏笔，更新"未回收伏笔"
-- `data/serial-bible.md`：把 `18-serial.json` 的 `bible_update` 追加到「进度」（书）或「周五片单」（音乐盒、放映室）；一本书讲完，标记"已完结"，提醒家长选下一本
+- `data/serial-bible.md`：把 `18-serial.json` 的 `bible_update` 追加到「进度」（书）或「周五片单」（音乐盒、放映室、动手做）；一本书讲完，标记"已完结"，提醒家长选下一本
 - `data/profile.md`：本期调整过英文档位等设定时记一行，注明依据
 
 **上传核对**：对照网盘检查，缺的补传

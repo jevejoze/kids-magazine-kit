@@ -104,10 +104,16 @@ const checks = {
       need(text <= 280, "18", `连载 ${text} 字，超过 280`);
       need(words(r.quote?.en) <= 25, "18", `原著金句 ${words(r.quote?.en)} 个词，超过 25`);
     } else {
-      need(["music", "film"].includes(r.kind), "18", `kind 要写 book、music 或 film：${r.kind}`);
+      need(["music", "film", "make"].includes(r.kind), "18", `kind 要写 book、music、film 或 make：${r.kind}`);
       fields(r, "18", ["title_zh", "title_en", "by", "paragraphs", "tasks", "crew", "where", "photo_url", "photo_credit"]);
-      need(text <= 180, "18", `介绍 ${text} 字，超过 180`);
-      need(r.tasks?.length === 3, "18", "任务要 3 个");
+      if (r.kind === "make") {
+        need(text <= 120, "18", `介绍 ${text} 字，超过 120`);
+        need(r.tasks?.length >= 4 && r.tasks?.length <= 8, "18", "动手做的步骤要 4–8 步");
+        r.tasks?.forEach((t, i) => need(len(t) <= 24, "18", `第 ${i + 1} 步 ${len(t)} 字，超过 24`));
+      } else {
+        need(text <= 180, "18", `介绍 ${text} 字，超过 180`);
+        need(r.tasks?.length === 3, "18", "任务要 3 个");
+      }
     }
     need(len(r.crew?.say) <= 20, "18", `crew.say ${len(r.crew?.say)} 字，超过 20`);
   },
