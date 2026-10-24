@@ -150,9 +150,12 @@ const SR = D.serial;
 if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SERIAL[0]} ${SERIAL[1]} · ${SERIAL[2]}`, SR.kind === "book" ? `第 ${SR.ep} 回` : undefined)}
   <div class="h1 fun">${SR.kind === "book" ? `《${SR.book_zh}》` : ""}${SR.title_zh}<span class="en">${SR.kind === "book" ? `${SR.book_en} · ${SR.title_en}` : SR.title_en}</span></div>
   <div class="meta fun">${SR.kind === "book" ? `${SR.chapter}　·　${SR.author}` : SR.by}</div>
-  <div class="text fun"><div class="box pic"><div class="img" style="background-image:url('${SR.photo}');background-position:${SR.photo_pos || "center"}"></div><div class="credit3 en">${SR.photo_credit}</div></div>
+  <div class="text fun">${SR.diagram ? "" : `<div class="box pic"><div class="img" style="background-image:url('${SR.photo}');background-position:${SR.photo_pos || "center"}"></div><div class="credit3 en">${SR.photo_credit}</div></div>`}
     ${SR.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
-  ${SR.kind === "book"
+  ${SR.diagram
+    ? `<div class="box diagram"><div class="img" style="background-image:url('${SR.diagram}')"></div><div class="credit3 en">${SR.diagram_credit}</div></div>
+  <div class="box tasks steps fun">${SR.tasks.map((t, i) => `<p><b>${i + 1}</b>${t}</p>`).join("")}${SR.where ? `<small>${SR.where}</small>` : ""}</div>`
+    : SR.kind === "book"
     ? `<div class="box quote"><div class="lb fun">📜 原著金句 · ${SR.quote.who}</div><div class="en">${/^[“"]/.test(SR.quote.en) ? SR.quote.en : `“${SR.quote.en}”`}</div><div class="zh fun">${SR.quote.zh}</div></div>`
     : `<div class="box tasks fun"><div class="lb">${{ music: "🎧 边听边找", film: "🍿 看完考考你", make: "✂️ 跟着做" }[SR.kind]}</div>${SR.tasks.map((t, i) => `<p><b>${i + 1}</b>${t}</p>`).join("")}${SR.where ? `<small>${SR.where}</small>` : ""}</div>`}
   <div class="end"><div class="crew">${ch(SR.crew.who)}<div class="bub fun">${SR.crew.say}</div></div>

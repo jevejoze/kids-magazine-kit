@@ -20,7 +20,7 @@
       00-brief.json
       10-cover.json  11-comic.json  11-diagram.svg  12-words.json  13-story.json
       14-puzzle.json  15-english.json  16-mailbox.json  17-news.json  18-serial.json
-      20-assets/             cover.jpg、news-1..3.jpg、serial.jpg、assets.json
+      20-assets/             cover.jpg、news-1..3.jpg、serial.jpg（折纸是 serial-diagram.png）、assets.json
       30-issue.json          合并后的整期
       31-review.md
       40-cards/              card-1..N.png（默认 7 张）、<刊名>-第007期.pdf

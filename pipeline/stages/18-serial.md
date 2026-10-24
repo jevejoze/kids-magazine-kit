@@ -44,17 +44,17 @@
 }
 ```
 
-周五动手做（`kind: "make"`），折纸或 3D 打印：
+周五动手做（`kind: "make"`），折纸（`craft: "origami"`）用完整图式，3D 打印（`craft: "3d"`）用模型照片：
 
 ```json
 {
   "_meta": {"stage": "18-serial", "by": "", "at": ""},
-  "kind": "make",
+  "kind": "make", "craft": "origami",
   "title_zh": "会跳的纸青蛙", "title_en": "Jumping Paper Frog",
-  "by": "折纸 · 难度 ⭐⭐ · 约 15 分钟 · 一张名片大小的硬纸",
-  "photo_url": "成品照片直链", "photo_credit": "……", "photo_pos": "center",
-  "paragraphs": ["……"],
-  "tasks": ["纸横放，上边两个角往下折出 X 形折痕", "……"],
+  "by": "折纸 · 难度 ⭐⭐ · 约 15 分钟 · 一张名片大小的卡纸",
+  "diagram_url": "https://commons.wikimedia.org/wiki/File:Origami_frog.svg", "diagram_credit": "Ftiercel · Wikimedia Commons · Public domain", "diagram_steps": 9,
+  "paragraphs": ["按住屁股一滑就蹦起来，秘密是 Z 字折攒下的弹力。"],
+  "tasks": ["长方形对折，折出折痕", "翻面，折出 X 和横线", "……"],
   "crew": {"who": "raccoon:smirk:130", "say": "比谁的青蛙跳得远！"},
   "where": "给家长：跟做视频搜「jumping frog origami」；名片或卡纸最好跳",
   "tbc": "下周五：音乐盒",
@@ -80,9 +80,12 @@
 
 **动手做规则**
 - 一件作品，孩子自己 30 分钟内做得完（3D 打印的等待时间另算）；做好能玩、能摆或能用（会跳的青蛙、能动的关节龙），优先挑和孩子兴趣挂钩的（动物、海怪）
-- `paragraphs` ≤ 120 字：这是什么、好玩在哪，再带一个背后的小知识（青蛙为什么能跳：纸的弹力）
-- `tasks` 写 4–8 步，每步 ≤ 24 字，一步只做一个动作，用"上边""对角""折痕"这类孩子听得懂的词
-- 折纸：挑 8 步以内能折完的经典款，`photo_url` 用自由授权的成品照片；`where` 给家长一个跟做视频的搜索词和纸张建议
-- 3D 打印：只选 Printables、Thingiverse 上自由授权（CC）、允许个人打印的原创模型，不选真实 IP 角色；挑免支撑、单色 PLA、两小时内打完的；`photo_url` 用模型页的照片，`photo_credit` 写作者和协议；`by` 写打印时长；`where` 写模型链接和打印设置（材料、层高、要不要支撑），用模型页推荐的参数。打印机型号看 `profile.md`
+- 折纸：孩子看文字学不会折纸，页面靠**一张完整图式**教：从一张纸到成品，每一步都画出来、标好步骤号，用标准折纸符号（谷折虚线、山折点划线、箭头、翻面符号）
+  - 图式来源：先在 Wikimedia Commons 找自由授权的（`Category:Origami diagrams`、搜 `<作品> origami diagram`）；没有就用折纸网站或书上的图式，和新闻原图一样只放在私有数据目录，`diagram_credit` 写作者和来源。`diagram_url` 写图式页面
+  - 整套 ≤ 12 步、能排在一张图里；只有零散几步、缺步、跳步的图式不用，换一件作品。agent 不自己画图式，也不用文字步骤代替
+  - `diagram_steps` 写图式的步数；`tasks` 每一步配一句 ≤ 14 字的提示，条数和步数一样，按图式的编号对应（"翻面""对折出折痕"这种图上不好看出的地方写清楚）
+  - `paragraphs` 一句 ≤ 30 字：好玩在哪，带一个背后的小知识（青蛙为什么能跳：纸的弹力）。页面空间留给图式
+  - `where` 给家长一个跟做视频的搜索词和纸张建议
+- 3D 打印：`paragraphs` ≤ 120 字，这是什么、好玩在哪、一个小知识；`tasks` 写 4–8 步，每步 ≤ 24 字，一步只做一个动作。只选 Printables、Thingiverse 上自由授权（CC）、允许个人打印的原创模型，不选真实 IP 角色；挑免支撑、单色 PLA、两小时内打完的；`photo_url` 用模型页的照片，`photo_credit` 写作者和协议；`by` 写打印时长；`where` 写模型链接和打印设置（材料、层高、要不要支撑），用模型页推荐的参数。打印机型号看 `profile.md`
 
-**自检**：字数；`quote` 和原著逐字一致；本回情节和分集计划对得上；插画对得上情节；没有照抄中文译本
+**自检**：字数；折纸图式从第 1 步到成品连续不缺步，渲染后每一步的折线、箭头和步骤号看得清；`quote` 和原著逐字一致；本回情节和分集计划对得上；插画对得上情节；没有照抄中文译本

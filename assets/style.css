@@ -302,6 +302,14 @@ svg.ch{display:block}
 /* 动手做：成品照片矮一点，给 4–8 步做法留位置 */
 #cserial.make .pic{width:340px;height:340px}
 #cserial.make .tasks p{margin-top:5px}
+/* 折纸：完整图式占满中间，下面两列配每一步的一句话 */
+#cserial .diagram{margin-top:16px;flex:1;min-height:0;background:#fff;overflow:hidden}
+#cserial .diagram .img{position:absolute;inset:12px 12px 32px;background-size:contain;background-position:center;background-repeat:no-repeat}
+#cserial .diagram .credit3{position:absolute;right:16px;bottom:8px;font-size:15px;color:var(--soft)}
+#cserial .steps{display:grid;grid-template-columns:1fr 1fr;column-gap:24px;font-size:24px;padding:8px 24px 10px}
+#cserial .steps p{margin-top:4px}
+#cserial .steps p b{flex-basis:34px;height:34px;font-size:20px}
+#cserial .steps small{grid-column:1/-1}
 #cserial .end{display:flex;align-items:flex-end;gap:20px;margin-top:14px;position:relative}
 #cserial .end .crew{display:flex;align-items:center;gap:10px;flex:0 0 470px}
 #cserial .end .crew .bub{font-size:26px;width:auto;flex:1;margin:0;padding:10px 16px}

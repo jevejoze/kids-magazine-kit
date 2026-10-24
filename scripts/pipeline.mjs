@@ -105,11 +105,20 @@ const checks = {
       need(words(r.quote?.en) <= 25, "18", `原著金句 ${words(r.quote?.en)} 个词，超过 25`);
     } else {
       need(["music", "film", "make"].includes(r.kind), "18", `kind 要写 book、music、film 或 make：${r.kind}`);
-      fields(r, "18", ["title_zh", "title_en", "by", "paragraphs", "tasks", "crew", "where", "photo_url", "photo_credit"]);
+      const origami = r.kind === "make" && r.craft === "origami";
+      // 折纸用完整图式代替成品照片
+      fields(r, "18", ["title_zh", "title_en", "by", "paragraphs", "tasks", "crew", "where", ...(origami ? ["diagram_url", "diagram_credit", "diagram_steps"] : ["photo_url", "photo_credit"])]);
       if (r.kind === "make") {
-        need(text <= 120, "18", `介绍 ${text} 字，超过 120`);
-        need(r.tasks?.length >= 4 && r.tasks?.length <= 8, "18", "动手做的步骤要 4–8 步");
-        r.tasks?.forEach((t, i) => need(len(t) <= 24, "18", `第 ${i + 1} 步 ${len(t)} 字，超过 24`));
+        need(["origami", "3d"].includes(r.craft), "18", `动手做的 craft 要写 origami 或 3d：${r.craft}`);
+        need(text <= (origami ? 30 : 120), "18", `介绍 ${text} 字，超过 ${origami ? 30 : 120}`);
+        if (origami) {
+          need(r.diagram_steps <= 12, "18", `图式 ${r.diagram_steps} 步，超过 12`);
+          need(r.tasks?.length === r.diagram_steps, "18", `每一步图配一句话：图式 ${r.diagram_steps} 步，tasks ${r.tasks?.length} 句`);
+          r.tasks?.forEach((t, i) => need(len(t) <= 14, "18", `第 ${i + 1} 步 ${len(t)} 字，超过 14`));
+        } else {
+          need(r.tasks?.length >= 4 && r.tasks?.length <= 8, "18", "3D 打印的步骤要 4–8 步");
+          r.tasks?.forEach((t, i) => need(len(t) <= 24, "18", `第 ${i + 1} 步 ${len(t)} 字，超过 24`));
+        }
       } else {
         need(text <= 180, "18", `介绍 ${text} 字，超过 180`);
         need(r.tasks?.length === 3, "18", "任务要 3 个");
@@ -147,8 +156,12 @@ const checks = {
     need(total >= lo - 300 && total <= hi + 400, "50", `讲读稿共 ${total} 字，建议 ${lo}–${hi}`);
   },
   "20-assets/assets.json": a => {
-    if (has("18-serial.json")) need(a.serial, "20", "assets.json 缺少连载插画 serial");
-    [a.cover, ...(a.news ?? []), ...(a.serial ? [a.serial] : [])].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
+    if (has("18-serial.json")) {
+      const r = read("18-serial.json");
+      if (r.craft === "origami") need(a.serial_diagram, "20", "assets.json 缺少折纸图式 serial_diagram");
+      else need(a.serial, "20", "assets.json 缺少连载插画 serial");
+    }
+    [a.cover, ...(a.news ?? []), ...[a.serial, a.serial_diagram].filter(Boolean)].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
   },
 };
 
@@ -190,7 +203,7 @@ function assemble() {
   }
   if (has("18-serial.json")) {
     const r = read("18-serial.json");
-    issueJson.serial = { ...strip(r), photo: asset(a.serial), photo_url: undefined, bible_update: undefined };
+    issueJson.serial = { ...strip(r), photo: asset(a.serial), diagram: asset(a.serial_diagram), photo_url: undefined, diagram_url: undefined, bible_update: undefined };
   }
   writeFileSync(join(issue, "30-issue.json"), JSON.stringify(issueJson, null, 2));
   console.log(join(issue, "30-issue.json"));
