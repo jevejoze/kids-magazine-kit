@@ -158,10 +158,13 @@ const checks = {
   "20-assets/assets.json": a => {
     if (has("18-serial.json")) {
       const r = read("18-serial.json");
-      if (r.craft === "origami") need(a.serial_diagram, "20", "assets.json 缺少折纸图式 serial_diagram");
+      if (r.craft === "origami") {
+        need(a.serial_steps || a.serial_diagram, "20", "assets.json 缺少折纸图式：serial_steps（一步一张）或 serial_diagram（整张）");
+        need(!a.serial_steps || a.serial_steps.length === r.diagram_steps, "20", `serial_steps ${a.serial_steps?.length} 张，图式 ${r.diagram_steps} 步`);
+      }
       else need(a.serial, "20", "assets.json 缺少连载插画 serial");
     }
-    [a.cover, ...(a.news ?? []), ...[a.serial, a.serial_diagram].filter(Boolean)].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
+    [a.cover, ...(a.news ?? []), ...[a.serial, a.serial_diagram, ...(a.serial_steps ?? [])].filter(Boolean)].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
   },
 };
 
@@ -203,7 +206,7 @@ function assemble() {
   }
   if (has("18-serial.json")) {
     const r = read("18-serial.json");
-    issueJson.serial = { ...strip(r), photo: asset(a.serial), diagram: asset(a.serial_diagram), photo_url: undefined, diagram_url: undefined, bible_update: undefined };
+    issueJson.serial = { ...strip(r), photo: asset(a.serial), diagram: asset(a.serial_diagram), steps: a.serial_steps?.map(asset), photo_url: undefined, diagram_url: undefined, bible_update: undefined };
   }
   writeFileSync(join(issue, "30-issue.json"), JSON.stringify(issueJson, null, 2));
   console.log(join(issue, "30-issue.json"));
