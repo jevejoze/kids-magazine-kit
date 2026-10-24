@@ -20,7 +20,7 @@
       00-brief.json
       09-creature.json（周一）  10-cover.json  11-comic.json  11-diagram.svg  12-words.json  13-story.json
       14-puzzle.json  15-english.json  16-mailbox.json  17-news.json  18-serial.json  19-check.json
-      20-assets/             cover.jpg、creature.jpg（周一）、news-1..3.jpg、check.jpg（有配图时）、serial.jpg（折纸是 step-1..N.png，切不开时用 serial-diagram.png）、assets.json
+      20-assets/             cover.jpg、creature.jpg 和 creature-legend.jpg（周一）、news-1..3.jpg、check.jpg（有配图时）、serial.jpg（折纸是 step-1..N.png，切不开时用 serial-diagram.png）、assets.json
       30-issue.json          合并后的整期
       31-review.md
       40-cards/              card-1..N.png（平时 8 张，周一 9 张）、<刊名>-第007期.pdf

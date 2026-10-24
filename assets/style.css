@@ -190,8 +190,14 @@ svg.ch{display:block}
 #cdeep .dots{opacity:.15}
 #cdeep .top .en{color:#9CD3FF}
 #cdeep .card-photo{height:470px;margin-top:22px;overflow:hidden;flex:none;border-color:#9CD3FF;box-shadow:0 10px 0 #061628}
+#cdeep .card-photo{display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;box-shadow:none;overflow:visible}
+#cdeep .card-photo .half{position:relative;overflow:hidden;border-color:#9CD3FF;box-shadow:0 10px 0 #061628}
+#cdeep .card-photo .legend{background:#F3E7C9}
+#cdeep .card-photo .legend .pic{background-size:contain;background-repeat:no-repeat}
 #cdeep .card-photo .pic{position:absolute;inset:0;background-size:cover}
-#cdeep .card-photo .depth{position:absolute;left:18px;top:18px;background:rgba(6,22,40,.75);color:#9CD3FF;border-radius:14px;padding:4px 16px;font-size:28px;font-weight:800}
+#cdeep .card-photo .lab{position:absolute;left:14px;top:14px;background:rgba(6,22,40,.8);color:#FFD45C;border-radius:14px;padding:4px 14px;font-size:26px}
+#cdeep .card-photo .legend .lab{color:#FFE9A8}
+#cdeep .card-photo .depth{position:absolute;left:14px;top:66px;background:rgba(6,22,40,.75);color:#9CD3FF;border-radius:14px;padding:2px 12px;font-size:22px;font-weight:800}
 #cdeep .card-photo .credit3{position:absolute;right:16px;bottom:10px;font-size:15px;color:#fff;text-shadow:0 1px 3px #000}
 #cdeep .name{margin-top:20px;position:relative}
 #cdeep .name .zh{font-size:72px;line-height:1.1}

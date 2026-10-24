@@ -1,6 +1,6 @@
 # 20 下载图片
 
-**读**：`issue/09-creature.json`（周一才有，`photo_url`）、`issue/10-cover.json`（`photo.url`）、`issue/17-news.json`（每条的 `photo_url`）、`issue/18-serial.json`（`photo_url`，折纸另有 `diagram_url`）、`issue/19-check.json`（`photo_url`，可能为空）
+**读**：`issue/09-creature.json`（周一才有，`legend_url` 和 `photo_url`）、`issue/10-cover.json`（`photo.url`）、`issue/17-news.json`（每条的 `photo_url`）、`issue/18-serial.json`（`photo_url`，折纸另有 `diagram_url`）、`issue/19-check.json`（`photo_url`，可能为空）
 
 **写**：`issue/20-assets/` 下的图片文件和 `issue/20-assets/assets.json`
 
@@ -9,13 +9,14 @@
   "_meta": {"stage": "20-assets", "by": "", "at": ""},
   "cover": "cover.jpg",
   "creature": "creature.jpg",
+  "creature_legend": "creature-legend.jpg",
   "news": ["news-1.jpg", "news-2.jpg", "news-3.jpg"],
   "serial": "serial.jpg",
   "check": "check.jpg"
 }
 ```
 
-`creature` 只在周一有；`check` 只在 `19-check.json` 有 `photo_url` 时有，没有就不写这两个字段。
+`creature`、`creature_legend` 只在周一有；`check` 只在 `19-check.json` 有 `photo_url` 时有，没有就不写这两个字段。
 
 折纸那期的 `serial` 是成品的完成图（横图，裁到成品占满画面，水印、日期裁掉），另加 `"serial_steps": ["step-1.png", …]`（图式一步切一张，张数等于 `diagram_steps`，页面排成网格铺满，每格下面配那一步的提示）；图式切不开时（几步挤在一起、编号对不上格子）才用整张 `"serial_diagram": "serial-diagram.png"`。
 

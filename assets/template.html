@@ -68,8 +68,10 @@ cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} �
 const CR = D.creature;
 const meter = (n, icon) => `<span class="meter">${icon.repeat(n)}<i>${icon.repeat(5 - n)}</i></span>`;
 if (CR) cards.push(`<section class="card" id="cdeep">${topBar(CR.series || "🐙 传说怪物档案 · Legend Files", `No.${String(CR.no).padStart(3, "0")}`)}
-  <div class="box card-photo"><div class="pic" style="background-image:url('${CR.photo}');background-position:${CR.photo_pos || "center"}"></div>
-    ${CR.tag ? `<div class="depth fun">${CR.tag}</div>` : ""}<div class="credit3 en">${CR.credit}</div></div>
+  <div class="card-photo"><div class="box half legend"><div class="pic" style="background-image:url('${CR.legend}');background-position:${CR.legend_pos || "center"}"></div>
+      <div class="lab fun">📜 传说里的样子</div><div class="credit3 en">${CR.legend_credit}</div></div>
+    <div class="box half real"><div class="pic" style="background-image:url('${CR.photo}');background-position:${CR.photo_pos || "center"}"></div>
+      <div class="lab fun">📷 可能的真身</div>${CR.tag ? `<div class="depth fun">${CR.tag}</div>` : ""}<div class="credit3 en">${CR.credit}</div></div></div>
   <div class="name"><div class="zh fun">${CR.name_zh}</div>
     <div class="en">${CR.parts.map(p => `<span><b>${p.en}</b><small class="fun">${p.zh}</small></span>`).join("<em>+</em>")}</div></div>
   <div class="stats">${CR.stats.map(s => `<div class="box st"><small class="fun">${s.k}</small><b class="fun">${s.v}</b></div>`).join("")}</div>

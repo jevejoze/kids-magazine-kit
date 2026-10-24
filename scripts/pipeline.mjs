@@ -40,7 +40,7 @@ const checks = {
     fields(b, "00", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level", "story"]);
   },
   "09-creature.json": r => {
-    fields(r, "09", ["no", "name_zh", "parts", "photo_url", "photo_credit", "stats", "meters", "boxes", "fast", "slow", "sources", "log_update"]);
+    fields(r, "09", ["no", "name_zh", "parts", "legend_url", "legend_credit", "photo_url", "photo_credit", "stats", "meters", "boxes", "fast", "slow", "sources", "log_update"]);
     need(len(r.name_zh) <= 8, "09", `名字 ${len(r.name_zh)} 字，超过 8`);
     need(r.stats?.length === 3, "09", "stats 要 3 格");
     need(r.meters?.length >= 2 && r.meters?.length <= 3, "09", "meters 要 2–3 条");
@@ -189,8 +189,9 @@ const checks = {
       else need(a.serial, "20", "assets.json 缺少连载插画 serial");
     }
     need(!has("09-creature.json") || a.creature, "20", "assets.json 缺少怪物卡照片 creature");
+    need(!has("09-creature.json") || a.creature_legend, "20", "assets.json 缺少怪物卡传说图 creature_legend");
     need(!has("19-check.json") || !read("19-check.json").photo_url || a.check, "20", "assets.json 缺少真的假的配图 check");
-    [a.cover, ...(a.news ?? []), ...[a.creature, a.check, a.serial, a.serial_diagram, ...(a.serial_steps ?? [])].filter(Boolean)].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
+    [a.cover, ...(a.news ?? []), ...[a.creature, a.creature_legend, a.check, a.serial, a.serial_diagram, ...(a.serial_steps ?? [])].filter(Boolean)].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
   },
 };
 
@@ -218,7 +219,7 @@ function assemble() {
     question: c.question,
     cover: { photo: asset(a.cover), photo_pos: c.photo_pos, strip: c.strip, stamp: c.stamp, asked_by: c.asked_by, crew: c.crew, crew_say: c.crew_say, credit: c.credit },
     comic: { ...strip(m), theme_icon: m.theme_icon || c.theme_icon, sources: undefined },
-    creature: cr ? { ...strip(cr), photo: asset(a.creature), credit: cr.photo_credit, photo_url: undefined, photo_credit: undefined, sources: undefined, log_update: undefined } : undefined,
+    creature: cr ? { ...strip(cr), photo: asset(a.creature), credit: cr.photo_credit, legend: asset(a.creature_legend), legend_url: undefined, photo_url: undefined, photo_credit: undefined, sources: undefined, log_update: undefined } : undefined,
     words: w ? strip(w) : undefined,
     story: { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
     challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, slots: p.slots }, english: e.english },
