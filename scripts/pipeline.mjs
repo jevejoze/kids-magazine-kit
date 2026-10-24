@@ -21,12 +21,12 @@ const done = s => s.id === "90-archive" ? false : s.outputs.every(p => {
 });
 const read = name => JSON.parse(readFileSync(join(issue, name), "utf8"));
 const has = name => existsSync(join(issue, name));
-// 有 when 的步骤（如 09-creature 只在周一出）：任务书里这个字段不为 true 就算本期不出
+// 有 when 的步骤（如 09-creature 只在周一出、08-think 只在周五出）：任务书里这个字段不为 true 就算本期不出
 const skipped = s => s.when && has("00-brief.json") && !read("00-brief.json")[s.when];
 
-// 渲染出来的页面顺序（card-1..N），和 template.html 一致；怪物档案、单词屋、新闻、真的假的、连载有才出
+// 渲染出来的页面顺序（card-1..N），和 template.html 一致；怪物档案、单词屋、新闻、真的假的、连载、周末思辨有才出
 const pageOrder = () => ["cover", "comic", has("09-creature.json") && "creature", has("12-words.json") && "words", "story", "challenge",
-  has("17-news.json") && "news", has("19-check.json") && "check", has("18-serial.json") && "serial", "mailbox"].filter(Boolean);
+  has("17-news.json") && "news", has("19-check.json") && "check", has("18-serial.json") && "serial", has("08-think.json") && "think", "mailbox"].filter(Boolean);
 
 // ---------- check ----------
 const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
@@ -38,6 +38,17 @@ const fields = (obj, where, keys) => keys.forEach(k => need(obj[k] !== undefined
 const checks = {
   "00-brief.json": b => {
     fields(b, "00", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level", "story"]);
+  },
+  "08-think.json": t => {
+    fields(t, "08", ["title", "story", "sides", "role", "deeper", "parent_guide", "source", "log_update"]);
+    need(len(t.title) <= 18, "08", `话题 ${len(t.title)} 字，超过 18`);
+    need(len(t.story) <= 120, "08", `故事 ${len(t.story)} 字，超过 120`);
+    need(t.sides?.length === 2, "08", "sides 要 2 个成员，各站一边");
+    t.sides?.forEach((x, i) => need(len(x.say) <= 36, "08", `第 ${i + 1} 个观点 ${len(x.say)} 字，超过 36`));
+    need(len(t.role) <= 40, "08", `角色代入 ${len(t.role)} 字，超过 40`);
+    need(t.deeper?.length === 2, "08", "deeper 要 2 个追问");
+    t.deeper?.forEach((x, i) => need(len(x) <= 30, "08", `第 ${i + 1} 个追问 ${len(x)} 字，超过 30`));
+    need(!t.photo_url || t.photo_credit, "08", "有配图就写 photo_credit");
   },
   "09-creature.json": r => {
     fields(r, "09", ["no", "name_zh", "parts", "legend_url", "legend_credit", "photo_url", "photo_credit", "stats", "meters", "boxes", "fast", "slow", "sources", "log_update"]);
@@ -156,7 +167,7 @@ const checks = {
     const order = pageOrder(), cards = order.length;
     need([...Array(cards)].every((_, i) => pages.some(p => p.card === i + 1)), "50", `${cards} 页都要有讲读`);
     // 每页最多几句，按页的种类定；card 编号和渲染出来的 card-N.png 顺序一致
-    const MAX = { cover: 12, comic: 26, creature: 14, words: 22, story: 30, challenge: 12, news: 24, check: 12, serial: 20, mailbox: 10 };
+    const MAX = { cover: 12, comic: 26, creature: 14, words: 22, story: 30, challenge: 12, news: 24, check: 12, serial: 20, think: 14, mailbox: 10 };
     const max = c => MAX[order[c - 1]] ?? 30;
     let total = 0;
     pages.forEach(p => {
@@ -190,8 +201,9 @@ const checks = {
     }
     need(!has("09-creature.json") || a.creature, "20", "assets.json 缺少怪物卡照片 creature");
     need(!has("09-creature.json") || a.creature_legend, "20", "assets.json 缺少怪物卡传说图 creature_legend");
+    need(!has("08-think.json") || !read("08-think.json").photo_url || a.think, "20", "assets.json 缺少周末思辨配图 think");
     need(!has("19-check.json") || !read("19-check.json").photo_url || a.check, "20", "assets.json 缺少真的假的配图 check");
-    [a.cover, ...(a.news ?? []), ...[a.creature, a.creature_legend, a.check, a.serial, a.serial_diagram, ...(a.serial_steps ?? [])].filter(Boolean)].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
+    [a.cover, ...(a.news ?? []), ...[a.creature, a.creature_legend, a.check, a.think, a.serial, a.serial_diagram, ...(a.serial_steps ?? [])].filter(Boolean)].forEach(f => need(f && has(join("20-assets", f)), "20", `找不到图片 ${f}`));
   },
 };
 
@@ -212,6 +224,7 @@ function assemble() {
   const w = has("12-words.json") ? read("12-words.json") : null, e = has("15-english.json") ? read("15-english.json") : {};
   const nw = has("17-news.json") ? read("17-news.json") : null;
   const cr = has("09-creature.json") ? read("09-creature.json") : null, ck = has("19-check.json") ? read("19-check.json") : null;
+  const th = has("08-think.json") ? read("08-think.json") : null;
   const asset = f => f ? `20-assets/${f}` : f;
   const strip = o => Object.fromEntries(Object.entries(o).filter(([k]) => !k.startsWith("_")));
   const issueJson = {
@@ -224,8 +237,9 @@ function assemble() {
     story: { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
     challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, slots: p.slots }, english: e.english },
     check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict } : undefined,
+    think: th ? { title: th.title, title_en: th.title_en, story: th.story, photo: asset(a.think), photo_pos: th.photo_pos, credit: th.photo_credit, sides: th.sides, role: th.role, deeper: th.deeper } : undefined,
     mailbox: strip(mb),
-    _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { truth: ck.truth, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources },
+    _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { truth: ck.truth, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
   };
   if (nw) {
     issueJson.news = {

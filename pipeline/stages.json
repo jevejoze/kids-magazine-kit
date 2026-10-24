@@ -2,8 +2,9 @@
   "about": "一期杂志的流水线。每步读 inputs、写 outputs；depends 里的步骤全部完成后才能开始。optional=true 的步骤默认不做，profile.md 里写明要这一栏时才做；有 when 的步骤只在 00-brief.json 里这个字段为 true 时做，否则算本期不出。kind=agent 的步骤由任意 agent 按 stages/<id>.md 完成；kind=script 的步骤在任意有 Node、Chrome、ffmpeg 的环境里运行。路径：data/ 是数据目录，issue/ 是 data/issues/NNN/。",
   "stages": [
     {"id": "00-brief",     "title": "本期任务书",   "kind": "agent",  "depends": [],
-     "inputs": ["data/MY_CHILD.md", "data/profile.md", "data/curation-log.md", "data/child-questions.md", "data/story-bible.md", "data/serial-bible.md", "上一期 issue/30-issue.json"],
+     "inputs": ["data/MY_CHILD.md", "data/profile.md", "data/curation-log.md", "data/child-questions.md", "data/story-bible.md", "data/serial-bible.md", "data/think-log.md", "上一期 issue/30-issue.json"],
      "outputs": ["issue/00-brief.json"]},
+    {"id": "08-think",     "title": "周末思辨",     "kind": "agent",  "depends": ["00-brief"],  "when": "think", "outputs": ["issue/08-think.json"]},
     {"id": "09-creature",  "title": "传说怪物档案", "kind": "agent",  "depends": ["00-brief"],  "when": "creature", "outputs": ["issue/09-creature.json"]},
     {"id": "10-cover",     "title": "封面选题",     "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/10-cover.json"]},
     {"id": "11-comic",     "title": "今日一问",     "kind": "agent",  "depends": ["10-cover"],  "outputs": ["issue/11-comic.json", "issue/11-diagram.svg"]},
@@ -15,8 +16,8 @@
     {"id": "17-news",      "title": "环球小报",     "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/17-news.json"]},
     {"id": "18-serial",    "title": "经典连载",     "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/18-serial.json"]},
     {"id": "19-check",     "title": "真的假的",     "kind": "agent",  "depends": ["00-brief"],  "outputs": ["issue/19-check.json"]},
-    {"id": "20-assets",    "title": "下载图片",     "kind": "agent",  "depends": ["09-creature", "10-cover", "17-news", "18-serial", "19-check"], "outputs": ["issue/20-assets/assets.json"]},
-    {"id": "30-assemble",  "title": "合并整期",     "kind": "script", "depends": ["09-creature", "11-comic", "13-story", "14-puzzle", "16-mailbox", "18-serial", "19-check", "20-assets"],
+    {"id": "20-assets",    "title": "下载图片",     "kind": "agent",  "depends": ["08-think", "09-creature", "10-cover", "17-news", "18-serial", "19-check"], "outputs": ["issue/20-assets/assets.json"]},
+    {"id": "30-assemble",  "title": "合并整期",     "kind": "script", "depends": ["08-think", "09-creature", "11-comic", "13-story", "14-puzzle", "16-mailbox", "18-serial", "19-check", "20-assets"],
      "run": "node scripts/pipeline.mjs assemble <issue>", "outputs": ["issue/30-issue.json"]},
     {"id": "31-review",    "title": "审稿",         "kind": "agent",  "depends": ["30-assemble"], "outputs": ["issue/31-review.md"]},
     {"id": "40-render",    "title": "渲染图片和 PDF", "kind": "script", "depends": ["31-review"],
@@ -27,6 +28,6 @@
     {"id": "70-video",     "title": "讲读视频",     "kind": "script", "depends": ["40-render", "60-audio"],
      "run": "python3 scripts/make_video.py <issue>", "outputs": ["issue/70-final/"]},
     {"id": "90-archive",   "title": "更新档案",     "kind": "agent",  "depends": ["40-render"],
-     "outputs": ["data/story-bible.md", "data/serial-bible.md", "data/profile.md"]}
+     "outputs": ["data/story-bible.md", "data/serial-bible.md", "data/creature-log.md", "data/think-log.md", "data/profile.md"]}
   ]
 }

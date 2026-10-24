@@ -11,19 +11,19 @@
 ```
 我的云端硬盘/<刊名>/          数据目录，下文写作 data/
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
-  story-bible.md  serial-bible.md  creature-log.md  vocab.json  feedback.jsonl
+  story-bible.md  serial-bible.md  creature-log.md  think-log.md  vocab.json  feedback.jsonl
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
   voices/polyphones.json    这个孩子常用词的多音字读音（可选，补充引擎的通用词典）
   sfx/                       讲读版音效（可选）
   issues/
     007/                     本期工作区，下文写作 issue/
       00-brief.json
-      09-creature.json（周一）  10-cover.json  11-comic.json  11-diagram.svg  12-words.json  13-story.json
+      08-think.json（周五）  09-creature.json（周一）  10-cover.json  11-comic.json  11-diagram.svg  12-words.json  13-story.json
       14-puzzle.json  15-english.json  16-mailbox.json  17-news.json  18-serial.json  19-check.json
-      20-assets/             cover.jpg、creature.jpg 和 creature-legend.jpg（周一）、news-1..3.jpg、check.jpg（有配图时）、serial.jpg（折纸是 step-1..N.png，切不开时用 serial-diagram.png）、assets.json
+      20-assets/             cover.jpg、creature.jpg 和 creature-legend.jpg（周一）、news-1..3.jpg、check.jpg 和 think.jpg（有配图时）、serial.jpg（折纸是 step-1..N.png，切不开时用 serial-diagram.png）、assets.json
       30-issue.json          合并后的整期
       31-review.md
-      40-cards/              card-1..N.png（平时 8 张，周一 9 张）、<刊名>-第007期.pdf
+      40-cards/              card-1..N.png（平时 8 张，周一、周五 9 张）、<刊名>-第007期.pdf
       50-narration.json
       60-audio/              c{card}_{序号}.wav、manifest.json
       70-final/              <刊名>-第007期.pdf、讲读版.mp4
@@ -41,6 +41,7 @@
 | 步 | 做什么 | 依赖 | 类型 |
 |---|---|---|---|
 | 00 | 本期任务书 | — | agent |
+| 08 | 周末思辨（只在周五） | 00 | agent |
 | 09 | 传说怪物档案（只在周一） | 00 | agent |
 | 10 | 封面选题 | 00 | agent |
 | 11 | 今日一问（漫画 + 图解） | 10 | agent |
@@ -52,8 +53,8 @@
 | 17 | 环球小报 | 00 | agent |
 | 18 | 经典连载 | 00 | agent |
 | 19 | 真的假的 | 00 | agent |
-| 20 | 下载图片 | 09、10、17、18、19 | agent |
-| 30 | 合并整期 | 09、11、13、14、16、18、19、20（做了 12、15 也一起合并） | 脚本 |
+| 20 | 下载图片 | 08、09、10、17、18、19 | agent |
+| 30 | 合并整期 | 08、09、11、13、14、16、18、19、20（做了 12、15 也一起合并） | 脚本 |
 | 31 | 审稿 | 30 | agent |
 | 40 | 渲染图片和 PDF | 31 | 脚本 |
 | 50 | 讲读稿 | 31 | agent |
@@ -61,7 +62,7 @@
 | 70 | 讲读视频 | 40、60 | 脚本 |
 | 90 | 更新档案 | 40 | agent |
 
-00 完成后，09、10、12、13、14、16、17、18、19 可以同时开工。`stages.json` 里带 `when` 的步骤只在任务书里那个字段为真时做（09 看 `creature`，只在周一），其他日子 `status` 显示「本期不出」、算作完成。完整定义见 `stages.json`。
+00 完成后，08、09、10、12、13、14、16、17、18、19 可以同时开工。`stages.json` 里带 `when` 的步骤只在任务书里那个字段为真时做（09 看 `creature`，只在周一；08 看 `think`，只在周五），其他日子 `status` 显示「本期不出」、算作完成。完整定义见 `stages.json`。
 
 ## 两种用法
 

@@ -25,7 +25,7 @@ const NEXT = name => { const t = TOC.map(x => x[1]), nx = t[t.indexOf(name) + 1]
 const coverFoot = left => `<div class="foot"><span class="fun">${left}</span></div>`;
 // 目录 = 本期实际有的页，顺序和页序一致：今日一问 → (怪物档案) → (单词屋) → 小剧场 → 挑战 → 环球小报 → 真的假的 → 连载 → 信箱
 const SERIAL = { book: ["📚", "经典连载", "Story Classics"], music: ["🎵", "音乐盒", "Music Box"], film: ["🎬", "放映室", "Movie Time"], make: ["✂️", "动手做", "Make It"] }[D.serial?.kind];
-const TOC = [["🤔", "今日一问"], D.creature && ["🐙", "怪物档案"], D.words && ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], D.news && ["🌏", "环球小报"], D.check && ["🕵️", "真的假的"], SERIAL?.slice(0, 2), D.mailbox && ["💌", "信箱"]].filter(Boolean);
+const TOC = [["🤔", "今日一问"], D.creature && ["🐙", "怪物档案"], D.words && ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], D.news && ["🌏", "环球小报"], D.check && ["🕵️", "真的假的"], SERIAL?.slice(0, 2), D.think && ["🗣️", "周末思辨"], D.mailbox && ["💌", "信箱"]].filter(Boolean);
 const GANG = ["owl:happy:230", "dog:happy:290", "mouse:wave:260", "raccoon:smirk:220"];
 
 const cards = [];
@@ -172,6 +172,19 @@ if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SE
   <div class="end"><div class="crew">${ch(SR.crew.who)}<div class="bub fun">${SR.crew.say}</div></div>
     <div class="next fun">${SR.guess ? `<span class="guess">🔮 猜一猜：${SR.guess}</span>` : ""}<span>${SR.tbc}</span></div></div>
   ${foot(SR.foot || NEXT(SERIAL[1]).replace(/^ · /, "") || "明天见！See you tomorrow!")}</section>`);
+
+// 周末思辨（周五）：一个两边都有道理的话题，孩子先写下想法，周六和家人聊
+const TK = D.think;
+if (TK) cards.push(`<section class="card" id="cthink">${topBar("🗣️ 周末思辨 · Big Talk", "周六聊一聊")}
+  <div class="h1 fun">${TK.title}${TK.title_en ? `<span class="en">${TK.title_en}</span>` : ""}</div>
+  <div class="box story fun${TK.photo ? " has-pic" : ""}">${TK.photo ? `<div class="pic" style="background-image:url('${TK.photo}');background-position:${TK.photo_pos || "center"}"></div>` : ""}<p>${TK.story}</p></div>
+  <div class="sides">${TK.sides.map((x, i) => `<div class="side s${i}">${ch(x.who)}<div class="bub fun">${x.say}</div></div>`).join("")}</div>
+  <div class="box role fun"><b>🎭 换你来</b>${TK.role}</div>
+  <div class="box deeper fun"><b>🤔 再想深一点</b>${TK.deeper.map(q => `<p>${q}</p>`).join("")}</div>
+  <div class="box mine fun"><h3>✏️ 我的想法：______，因为……</h3>${lines(3)}
+    <div class="after">周六聊完，我的想法：<span>没变</span><span>变了一点</span><span>完全变了</span></div></div>
+  ${TK.credit ? `<div class="credit2 en">${TK.credit}</div>` : ""}
+  ${foot(`周六和家人聊一聊，听听别人怎么想${NEXT("周末思辨")}`)}</section>`);
 
 // 信箱（最后一页）：几句关于本期的问题，孩子口头答、家长拍照或转述都行
 const M = D.mailbox;

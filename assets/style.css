@@ -338,6 +338,33 @@ svg.ch{display:block}
 #cserial .end .crew .bub:after{left:-26px;bottom:auto;top:50%;margin-top:-14px;margin-left:0;border-top-color:transparent;border-right-color:var(--ink)}
 #cserial .end .next{flex:1;display:flex;flex-direction:column;gap:8px;font-size:28px;color:var(--tomato)}
 #cserial .end .guess{font-size:26px;color:var(--ink);background:#fff;border:4px dashed var(--ink);border-radius:20px;padding:8px 18px}
+/* 周末思辨：故事 → 两个成员各站一边 → 换你来 → 追问 → 我的想法 */
+#cthink{background:#EEF3FF}
+#cthink .h1{font-size:62px}
+#cthink .h1 .en{font-size:32px}
+#cthink .story{margin-top:22px;padding:18px 28px;font-size:29px;line-height:1.5;flex:none;display:flex;gap:22px;align-items:center}
+#cthink .story .pic{flex:0 0 300px;height:200px;border-radius:20px;border:4px solid var(--ink);background-size:cover}
+#cthink .sides{display:flex;gap:28px;margin-top:22px;position:relative}
+#cthink .side{flex:1;display:flex;align-items:center;gap:22px}
+#cthink .side.s1{flex-direction:row-reverse}
+#cthink .side svg{flex:none}
+#cthink .side .bub{font-size:27px;margin:0;padding:12px 16px}
+#cthink .side.s0 .bub{background:#FFF1D6}
+#cthink .side.s1 .bub{background:#E3F6EE}
+#cthink .side .bub:after{bottom:auto;top:50%;margin-top:-14px;margin-left:0;left:-30px;border-top-color:transparent;border-right-color:var(--ink)}
+#cthink .side.s1 .bub:after{left:auto;right:-30px;border-right-color:transparent;border-left-color:var(--ink)}
+#cthink .role{margin-top:18px;padding:14px 28px;font-size:30px;line-height:1.4;background:var(--butter);flex:none}
+#cthink .role b,#cthink .deeper b{display:block;font-weight:400;font-size:26px;color:var(--tomato)}
+#cthink .role b{color:var(--ink)}
+#cthink .deeper{margin-top:18px;padding:12px 28px;font-size:28px;line-height:1.4;flex:none}
+#cthink .deeper p:before{content:"· "}
+#cthink .mine{margin-top:18px;padding:12px 28px 14px;flex:1;display:flex;flex-direction:column;min-height:0}
+#cthink .mine h3{font-size:30px;font-weight:400}
+#cthink .mine .lines{flex:1;display:flex;flex-direction:column;justify-content:space-around}
+#cthink .mine .after{margin-top:auto;display:flex;align-items:center;gap:12px;font-size:25px}
+#cthink .mine .after span{border:3px solid var(--ink);border-radius:999px;padding:2px 16px;background:#fff}
+#cthink .credit2{font-size:15px;color:var(--soft);margin-top:8px;line-height:1.3}
+
 /* 有经典连载时"最喜欢哪一页"有 7 个选项，收紧一点排成一行 */
 #c6 .pick.many{gap:6px;flex-wrap:nowrap}
 #c6 .pick.many span{padding:2px 10px;font-size:22px;white-space:nowrap}
