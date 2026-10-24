@@ -139,15 +139,17 @@ if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报
   <div class="credit2 en">${NW.credits}</div>
   ${foot(NW.foot || `新闻来源已交叉核实${NEXT("环球小报")}`)}</section>`);
 
-// 真的假的（每天一页）：一条网上流传的说法，快脑袋先投票，慢脑袋按线索查，答案倒着印
+// 真的假的（每天一页）：一条网上流传的说法，快脑袋先投票，慢脑袋按线索查，答案倒着印；有思维课表时换成本周练的本领和选项
 const CK = D.check;
-if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
+const CK_CHOICES = CK?.choices ?? ["✅ 真的", "❌ 假的", "🤔 说不清"];
+const CK_TOOLS = CK?.tools ?? [["👤 谁说的？", "他怎么知道的"], ["🧪 有证据吗？", "实验、照片、数字"], ["📚 别处怎么说？", "再找一个来源"]];
+if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?", CK.skill ? `本周练：${CK.skill}` : undefined)}
   <div class="box post${CK.photo ? " has-pic" : ""}"><div class="txt"><div class="ph fun">📱 ${CK.where}</div><div class="claim fun">${CK.claim}</div><div class="likes en">👍 ${CK.likes || "10万+"}　💬 ${CK.comments || "2,333"}</div></div>
     ${CK.photo ? `<div class="pic" style="background-image:url('${CK.photo}');background-position:${CK.photo_pos || "center"}"></div>` : ""}</div>
-  <div class="vote fun">你的快脑袋说：<span>✅ 真的</span><span>❌ 假的</span><span>🤔 说不清</span></div>
-  <div class="tools fun"><span>👤 谁说的？<small>他怎么知道的</small></span><span>🧪 有证据吗？<small>实验、照片、数字</small></span><span>📚 别处怎么说？<small>再找一个来源</small></span></div>
+  <div class="vote fun">你的快脑袋说：${CK_CHOICES.map(c => `<span>${c}</span>`).join("")}</div>
+  <div class="tools fun">${CK_TOOLS.map(([t, s]) => `<span>${t}<small>${s}</small></span>`).join("")}</div>
   <div class="box clues fun"><h3>🦉 慢脑袋查一查</h3>${CK.clues.map((c, i) => `<p><b>${i + 1}</b>${c}</p>`).join("")}</div>
-  <div class="box mine fun"><h3>🕵️ 我的结论：真 / 假，因为……</h3>${lines(2)}</div>
+  <div class="box mine fun"><h3>🕵️ 我的结论：${CK.choices ? CK_CHOICES.map(c => c.replace(/^\S+\s/, "")).join(" / ") : "真 / 假"}，因为……</h3>${lines(2)}</div>
   <div class="upside fun"><span>👀 倒过来看答案：</span>${CK.verdict}</div>
   ${CK.credit ? `<div class="credit2 en">${CK.credit}</div>` : ""}
   ${foot(`看完再倒过来对答案${NEXT("真的假的")}`)}</section>`);

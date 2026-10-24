@@ -151,11 +151,16 @@ const checks = {
     need(len(r.crew?.say) <= 20, "18", `crew.say ${len(r.crew?.say)} 字，超过 20`);
   },
   "19-check.json": k => {
-    fields(k, "19", ["where", "claim", "clues", "truth", "verdict", "explain", "sources"]);
+    fields(k, "19", ["where", "claim", "clues", "verdict", "explain", "sources"]);
     need(len(k.claim) <= 30, "19", `说法 ${len(k.claim)} 字，超过 30`);
     need(k.clues?.length === 3, "19", "线索要 3 条");
     k.clues?.forEach((c, i) => need(len(c) <= 36, "19", `第 ${i + 1} 条线索 ${len(c)} 字，超过 36`));
-    need(["true", "false", "half"].includes(k.truth), "19", `truth 要写 true、false 或 half：${k.truth}`);
+    if (k.choices) {
+      need(k.choices.length >= 2 && k.choices.length <= 3 && k.choices.every(c => len(c) <= 8), "19", "choices 要 2–3 个，每个 ≤ 8 字（含表情）");
+      need(k.choices.includes(k.answer), "19", `answer 要是 choices 里的一个：${k.answer}`);
+    } else need(["true", "false", "half"].includes(k.truth), "19", `truth 要写 true、false 或 half：${k.truth}`);
+    need(!k.skill || len(k.skill) <= 10, "19", `skill ${len(k.skill)} 字，超过 10`);
+    need(!k.tools || (k.tools.length === 3 && k.tools.every(t => t.length === 2)), "19", "tools 要 3 个 [标题, 小字]");
     need(len(k.verdict) <= 40, "19", `倒印答案 ${len(k.verdict)} 字，超过 40`);
     need((k.sources ?? []).length >= 2, "19", "要 2 个来源");
     need(!k.photo_url || k.photo_credit, "19", "有配图就写 photo_credit");
@@ -236,10 +241,10 @@ function assemble() {
     words: w ? strip(w) : undefined,
     story: { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
     challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, slots: p.slots }, english: e.english },
-    check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict } : undefined,
+    check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict, skill: ck.skill, choices: ck.choices, tools: ck.tools } : undefined,
     think: th ? { title: th.title, title_en: th.title_en, story: th.story, photo: asset(a.think), photo_pos: th.photo_pos, credit: th.photo_credit, sides: th.sides, role: th.role, deeper: th.deeper } : undefined,
     mailbox: strip(mb),
-    _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { truth: ck.truth, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
+    _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { skill: ck.skill, truth: ck.truth ?? ck.answer, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
   };
   if (nw) {
     issueJson.news = {

@@ -11,7 +11,7 @@
 ```
 我的云端硬盘/<刊名>/          数据目录，下文写作 data/
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
-  story-bible.md  serial-bible.md  creature-log.md  think-log.md  vocab.json  feedback.jsonl
+  story-bible.md  serial-bible.md  creature-log.md  think-log.md  thinking-plan.md  vocab.json  feedback.jsonl
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
   voices/polyphones.json    这个孩子常用词的多音字读音（可选，补充引擎的通用词典）
   sfx/                       讲读版音效（可选）
