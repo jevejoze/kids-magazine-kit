@@ -159,6 +159,7 @@ const checks = {
     if (has("18-serial.json")) {
       const r = read("18-serial.json");
       if (r.craft === "origami") {
+        need(a.serial, "20", "assets.json 缺少折纸完成图 serial（真实拍的成品照片）");
         need(a.serial_steps || a.serial_diagram, "20", "assets.json 缺少折纸图式：serial_steps（一步一张）或 serial_diagram（整张）");
         need(!a.serial_steps || a.serial_steps.length === r.diagram_steps, "20", `serial_steps ${a.serial_steps?.length} 张，图式 ${r.diagram_steps} 步`);
       }

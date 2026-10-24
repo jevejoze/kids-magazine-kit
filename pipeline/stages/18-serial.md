@@ -52,6 +52,7 @@
   "kind": "make", "craft": "origami",
   "title_zh": "会跳的纸青蛙", "title_en": "Jumping Paper Frog",
   "by": "折纸 · 难度 ⭐⭐ · 约 15 分钟 · 一张名片大小的卡纸",
+  "photo_url": "https://commons.wikimedia.org/wiki/File:PaperFrogs.jpg", "photo_credit": "Greeshma856 · CC0", "photo_pos": "center",
   "diagram_url": "https://commons.wikimedia.org/wiki/File:Origami_frog.svg", "diagram_credit": "Ftiercel · Wikimedia Commons · Public domain", "diagram_steps": 9,
   "paragraphs": ["按住屁股一滑就蹦起来，秘密是 Z 字折攒下的弹力。"],
   "tasks": ["长方形对折，折出折痕", "翻面，折出 X 和横线", "……"],
@@ -84,6 +85,7 @@
   - 图式来源：先在 Wikimedia Commons 找自由授权的（`Category:Origami diagrams`、搜 `<作品> origami diagram`）；没有就用折纸网站或书上的图式，和新闻原图一样只放在私有数据目录，`diagram_credit` 写作者和来源。`diagram_url` 写图式页面
   - 整套 ≤ 12 步、能排在一张图里；第 20 步会把图式一步切一格、排成网格铺满页面，所以优先挑每一步分得开的图式；只有零散几步、缺步、跳步的图式不用，换一件作品。agent 不自己画图式，也不用文字步骤代替
   - `diagram_steps` 写图式的步数；`tasks` 每一步配一句 ≤ 14 字的提示，条数和步数一样，按图式的编号对应（"翻面""对折出折痕"这种图上不好看出的地方写清楚）
+  - 完成图：`photo_url` 放一张真人折出来的成品照片（排在标题右侧，横图），和图式是同一款；同样先找 Commons（搜 `<作品> origami`），没有就用别处的照片，只放私有数据目录，`photo_credit` 写作者和来源
   - `paragraphs` 一句 ≤ 30 字：好玩在哪，带一个背后的小知识（青蛙为什么能跳：纸的弹力）。页面空间留给图式
   - `where` 给家长一个跟做视频的搜索词和纸张建议
 - 3D 打印：`paragraphs` ≤ 120 字，这是什么、好玩在哪、一个小知识；`tasks` 写 4–8 步，每步 ≤ 24 字，一步只做一个动作。只选 Printables、Thingiverse 上自由授权（CC）、允许个人打印的原创模型，不选真实 IP 角色；挑免支撑、单色 PLA、两小时内打完的；`photo_url` 用模型页的照片，`photo_credit` 写作者和协议；`by` 写打印时长；`where` 写模型链接和打印设置（材料、层高、要不要支撑），用模型页推荐的参数。打印机型号看 `profile.md`

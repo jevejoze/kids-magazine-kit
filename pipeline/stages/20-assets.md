@@ -1,6 +1,6 @@
 # 20 下载图片
 
-**读**：`issue/10-cover.json`（`photo.url`）、`issue/17-news.json`（每条的 `photo_url`）、`issue/18-serial.json`（`photo_url`，折纸是 `diagram_url`）
+**读**：`issue/10-cover.json`（`photo.url`）、`issue/17-news.json`（每条的 `photo_url`）、`issue/18-serial.json`（`photo_url`，折纸另有 `diagram_url`）
 
 **写**：`issue/20-assets/` 下的图片文件和 `issue/20-assets/assets.json`
 
@@ -13,7 +13,7 @@
 }
 ```
 
-折纸那期没有 `serial`，换成 `"serial_steps": ["step-1.png", …]`（图式一步切一张，张数等于 `diagram_steps`，页面排成网格铺满，每格下面配那一步的提示）；图式切不开时（几步挤在一起、编号对不上格子）才用整张 `"serial_diagram": "serial-diagram.png"`。
+折纸那期的 `serial` 是成品的完成图（横图，裁到成品占满画面，水印、日期裁掉），另加 `"serial_steps": ["step-1.png", …]`（图式一步切一张，张数等于 `diagram_steps`，页面排成网格铺满，每格下面配那一步的提示）；图式切不开时（几步挤在一起、编号对不上格子）才用整张 `"serial_diagram": "serial-diagram.png"`。
 
 **规则**
 - 封面图长边 ≥ 1200 像素；新闻图、连载插画长边 ≥ 800 像素；都存成 JPG，单张 ≤ 2 MB（太大就缩小）

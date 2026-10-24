@@ -303,6 +303,11 @@ svg.ch{display:block}
 #cserial.make .pic{width:340px;height:340px}
 #cserial.make .tasks p{margin-top:5px}
 /* 折纸：完整图式占满中间，下面两列配每一步的一句话 */
+/* 折纸：标题右侧的完成图 */
+#cserial .done{position:absolute;top:140px;right:64px;width:340px;height:178px;overflow:hidden;background:#FFFDF7}
+#cserial .done .img{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat}
+#cserial .done .lb{position:absolute;left:10px;top:8px;font-size:20px;background:#FFFDF2;border:2px solid var(--ink);border-radius:12px;padding:0 10px}
+#cserial .done .credit3{position:absolute;right:10px;bottom:6px;font-size:14px;color:#fff;text-shadow:0 1px 3px #000}
 #cserial .diagram{margin-top:16px;flex:1;min-height:0;background:#fff;overflow:hidden}
 #cserial .diagram .img{position:absolute;inset:12px 12px 32px;background-size:contain;background-position:center;background-repeat:no-repeat}
 #cserial .diagram .credit3{position:absolute;right:16px;bottom:8px;font-size:15px;color:var(--soft)}
