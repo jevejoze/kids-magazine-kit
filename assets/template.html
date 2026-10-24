@@ -139,11 +139,11 @@ if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报
   <div class="credit2 en">${NW.credits}</div>
   ${foot(NW.foot || `新闻来源已交叉核实${NEXT("环球小报")}`)}</section>`);
 
-// 真的假的（每天一页）：一条网上流传的说法，快脑袋先投票，慢脑袋按线索查，答案倒着印；有思维课表时换成本周练的本领和选项
+// 真的假的（每天一页）：一条网上流传的说法，快脑袋先投票，慢脑袋按线索查，答案倒着印；有思维课表时选项和查证工具跟着本周换
 const CK = D.check;
 const CK_CHOICES = CK?.choices ?? ["✅ 真的", "❌ 假的", "🤔 说不清"];
 const CK_TOOLS = CK?.tools ?? [["👤 谁说的？", "他怎么知道的"], ["🧪 有证据吗？", "实验、照片、数字"], ["📚 别处怎么说？", "再找一个来源"]];
-if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?", CK.skill ? `本周练：${CK.skill}` : undefined)}
+if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
   <div class="box post${CK.photo ? " has-pic" : ""}"><div class="txt"><div class="ph fun">📱 ${CK.where}</div><div class="claim fun">${CK.claim}</div><div class="likes en">👍 ${CK.likes || "10万+"}　💬 ${CK.comments || "2,333"}</div></div>
     ${CK.photo ? `<div class="pic" style="background-image:url('${CK.photo}');background-position:${CK.photo_pos || "center"}"></div>` : ""}</div>
   <div class="vote fun">你的快脑袋说：${CK_CHOICES.map(c => `<span>${c}</span>`).join("")}</div>
