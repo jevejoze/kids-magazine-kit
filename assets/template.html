@@ -23,9 +23,9 @@ const foot = left => `<div class="foot"><span class="fun">${left}</span><span cl
 // 页脚的"往后翻"提示：指向下一页；后面没有页了就是空串
 const NEXT = name => { const t = TOC.map(x => x[1]), nx = t[t.indexOf(name) + 1]; return nx ? ` · 往后翻：${nx} →` : ""; };
 const coverFoot = left => `<div class="foot"><span class="fun">${left}</span></div>`;
-// 目录 = 本期实际有的页，顺序和页序一致：今日一问 → (单词屋) → 小剧场 → 挑战 → 环球小报 → 连载 → 信箱
+// 目录 = 本期实际有的页，顺序和页序一致：今日一问 → (怪物档案) → (单词屋) → 小剧场 → 挑战 → 环球小报 → 真的假的 → 连载 → 信箱
 const SERIAL = { book: ["📚", "经典连载", "Story Classics"], music: ["🎵", "音乐盒", "Music Box"], film: ["🎬", "放映室", "Movie Time"], make: ["✂️", "动手做", "Make It"] }[D.serial?.kind];
-const TOC = [["🤔", "今日一问"], D.words && ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], D.news && ["🌏", "环球小报"], SERIAL?.slice(0, 2), D.mailbox && ["💌", "信箱"]].filter(Boolean);
+const TOC = [["🤔", "今日一问"], D.creature && ["🐙", "怪物档案"], D.words && ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], D.news && ["🌏", "环球小报"], D.check && ["🕵️", "真的假的"], SERIAL?.slice(0, 2), D.mailbox && ["💌", "信箱"]].filter(Boolean);
 const GANG = ["owl:happy:230", "dog:happy:290", "mouse:wave:260", "raccoon:smirk:220"];
 
 const cards = [];
@@ -64,7 +64,7 @@ cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} �
   <div class="fact fun"><b>💡 冷知识</b>${C.fact}</div>
   ${foot(C.host || "主持：团子狗 × 咕咕博士")}</section>`);
 
-// 3 传说怪物档案（有 creature 时）：一张可收集的卡片——传说、科学家怎么说、真实原型；否则是单词屋
+// 传说怪物档案（每周一张，有 creature 时）：一张可收集的卡片——传说、科学家怎么说、真实原型
 const CR = D.creature;
 const meter = (n, icon) => `<span class="meter">${icon.repeat(n)}<i>${icon.repeat(5 - n)}</i></span>`;
 if (CR) cards.push(`<section class="card" id="cdeep">${topBar(CR.series || "🐙 传说怪物档案 · Legend Files", `No.${String(CR.no).padStart(3, "0")}`)}
@@ -78,9 +78,9 @@ if (CR) cards.push(`<section class="card" id="cdeep">${topBar(CR.series || "🐙
   ${CR.fast ? `<div class="brains">
     <div class="br">${ch("dog:surprise:120")}<div class="bub fun"><small>快脑袋：</small>${CR.fast}</div></div>
     <div class="br slow">${ch("owl:think:120:magnifier")}<div class="bub fun"><small>慢脑袋：</small>${CR.slow}</div></div></div>` : ""}
-  ${foot(CR.foot || "收集怪物卡，凑齐一本档案！")}</section>`);
+  ${foot(CR.foot || `收集怪物卡，凑齐一本档案！${NEXT("怪物档案")}`)}</section>`);
 const W = D.words;
-if (W && !CR) cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
+if (W) cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
   <div class="intro">${ch("mouse:wave:190")}<div class="bub en">${W.intro}</div></div>
   ${W.items.map((w, i) => `<div class="box w c${i}"><div class="ico">${w.icon}</div><div class="wd">
     <div class="word en">${w.word}${w.new ? `<em class="fun">新词</em>` : ""}</div>
@@ -104,17 +104,9 @@ cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · S
   <div class="tbc fun"><span>${ST.tbc}</span>${ST.clue ? `<span class="clue">🔍 ${ST.clue}</span>` : ""}</div>
   ${foot("单日中文 · 双日英文")}</section>`);
 
-// 5 真的假的 + 游戏（有 check 时）；否则是挑战卡
-const CK = D.check, G = D.games;
-if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
-  <div class="box post"><div class="ph fun">📱 ${CK.where}</div><div class="claim fun">${CK.claim}</div><div class="likes en">👍 ${CK.likes || "10万+"}　💬 ${CK.comments || "2,333"}</div></div>
-  <div class="vote fun">你的快脑袋说：<span>✅ 真的</span><span>❌ 假的</span><span>🤔 说不清</span></div>
-  <div class="box clues fun"><h3>🦉 慢脑袋查一查</h3>${CK.clues.map((c, i) => `<p><b>${i + 1}</b>${c}</p>`).join("")}</div>
-  <div class="games">${G.map(g => `<div class="box game fun"><h3>${g.title}</h3><div class="body ${g.lang === "en" ? "en" : ""}">${g.body}</div></div>`).join("")}</div>
-  <div class="upside fun"><span>👀 倒过来看答案：</span>${CK.verdict}　${G.map(g => g.answer).join("　")}</div>
-  ${foot("看完再翻过来对答案")}</section>`);
+// 挑战卡
 const P = D.challenge;
-if (P && !CK) cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
+if (P) cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
   <div class="taunt">${ch("raccoon:smirk:160:" + (P.prop || ""))}<div class="bub fun">${P.taunt_zh}<br><span class="en">${P.taunt_en}</span></div></div>
   <div class="box puz fun"><h3>${P.puzzle.title}</h3><div class="body">${P.puzzle.body}</div>
     ${P.puzzle.slots ? `<div class="slots">${P.puzzle.slots.map(x => `<span>${x}</span>`).join("")}</div>` : ""}</div>
@@ -144,6 +136,19 @@ if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报
   <div class="box ask2 fun">💬 ${NW.ask_zh}<br><span class="en">${NW.ask_en}</span></div>
   <div class="credit2 en">${NW.credits}</div>
   ${foot(NW.foot || `新闻来源已交叉核实${NEXT("环球小报")}`)}</section>`);
+
+// 真的假的（每天一页）：一条网上流传的说法，快脑袋先投票，慢脑袋按线索查，答案倒着印
+const CK = D.check;
+if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
+  <div class="box post${CK.photo ? " has-pic" : ""}"><div class="txt"><div class="ph fun">📱 ${CK.where}</div><div class="claim fun">${CK.claim}</div><div class="likes en">👍 ${CK.likes || "10万+"}　💬 ${CK.comments || "2,333"}</div></div>
+    ${CK.photo ? `<div class="pic" style="background-image:url('${CK.photo}');background-position:${CK.photo_pos || "center"}"></div>` : ""}</div>
+  <div class="vote fun">你的快脑袋说：<span>✅ 真的</span><span>❌ 假的</span><span>🤔 说不清</span></div>
+  <div class="tools fun"><span>👤 谁说的？<small>他怎么知道的</small></span><span>🧪 有证据吗？<small>实验、照片、数字</small></span><span>📚 别处怎么说？<small>再找一个来源</small></span></div>
+  <div class="box clues fun"><h3>🦉 慢脑袋查一查</h3>${CK.clues.map((c, i) => `<p><b>${i + 1}</b>${c}</p>`).join("")}</div>
+  <div class="box mine fun"><h3>🕵️ 我的结论：真 / 假，因为……</h3>${lines(2)}</div>
+  <div class="upside fun"><span>👀 倒过来看答案：</span>${CK.verdict}</div>
+  ${CK.credit ? `<div class="credit2 en">${CK.credit}</div>` : ""}
+  ${foot(`看完再倒过来对答案${NEXT("真的假的")}`)}</section>`);
 
 // 经典连载（可选）：书一期一回；周五换成音乐盒 / 放映室 / 动手做
 const SR = D.serial;
