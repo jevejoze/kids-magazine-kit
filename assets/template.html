@@ -58,7 +58,7 @@ const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
 const chatRow = (b, bi, p, pi) => {
   const whoKey = (b.who || p.chars[bi] || p.chars[0] || "").split(":")[0];
   const side = b.side || (p.bubbles.length > 1 ? (bi % 2 === 0 ? "left" : "right") : (pi % 2 === 0 ? "left" : "right"));
-  const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, "happy", 50)}</div>`;
+  const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, "happy", 56)}</div>`;
   const bub = `<div class="bub who-${whoKey} ${side} ${b.lang === "en" ? "en" : "fun"}">${b.text}</div>`;
   return `<div class="chat-row ${side}">${side === "left" ? ava + bub : bub + ava}</div>`;
 };

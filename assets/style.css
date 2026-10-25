@@ -64,7 +64,7 @@ svg.ch{display:block}
 
 /* Avatar */
 #c2 .chat-ava{
-  width:38px;height:38px;border-radius:50%;
+  width:42px;height:42px;border-radius:50%;
   border:2.5px solid var(--ink);overflow:hidden;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 2px 0 var(--ink);
@@ -73,7 +73,7 @@ svg.ch{display:block}
 #c2 .chat-ava.owl{background:#FCE8D2}
 #c2 .chat-ava.mouse{background:#DCEBFF}
 #c2 .chat-ava.raccoon{background:#D7F4E3}
-#c2 .chat-ava svg{width:50px;height:50px;margin-top:4px;flex-shrink:0}
+#c2 .chat-ava svg{width:56px;height:56px;margin-top:4px;flex-shrink:0}
 #c2 .chat-ava.mouse svg{margin-top:2px}
 #c2 .chat-ava.owl svg{margin-top:5px}
 
