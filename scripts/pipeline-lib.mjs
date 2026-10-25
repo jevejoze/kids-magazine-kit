@@ -3,10 +3,11 @@
 //   node pipeline.mjs status   <issue>   每步做了没有，下一步能做什么
 //   node pipeline.mjs check    <issue>   检查已完成步骤的字段和字数
 //   node pipeline.mjs assemble <issue>   第 30 步：合并成 30-issue.json（渲染用）
-import { readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
+import { readFileSync, existsSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { contentFingerprint, inputFingerprint, recordBuild, currentBuild, atomicWrite } from "./build-state.mjs";
 import { validateStructure, validateIssue, pageOrder as issuePageOrder } from "./contracts.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -20,23 +21,27 @@ export function createPipeline(issueArg) {
   const has = name => existsSync(join(issue, name));
   const reviewPassed = () => has("31-review.md") && (() => {
     const md = readFileSync(join(issue, "31-review.md"), "utf8");
-    return /^结论[:：][ \t]*通过[ \t]*$/m.test(md) && !/^结论[:：][ \t]*需修改/m.test(md);
+    return currentBuild(issue, "30-assemble") && /^结论[:：][ \t]*通过[ \t]*$/m.test(md) && !/^结论[:：][ \t]*需修改/m.test(md)
+      && md.match(/^内容指纹[:：][ \t]*([a-f0-9]{64})[ \t]*$/m)?.[1] === contentFingerprint(issue);
   })();
   const nonempty = f => existsSync(f) && statSync(f).isFile() && statSync(f).size > 0;
   const done = s => {
     try {
       if (s.id === "90-archive") {
+        if (!done(stages.find(s => s.id === "40-render"))) return false;
         const receipt = read("90-archive.json");
-        return receipt.issue === read("00-brief.json").issue && Array.isArray(receipt.updated) && receipt.updated.length > 0
+        return receipt.issue === read("00-brief.json").issue && receipt.content_hash === contentFingerprint(issue) && Array.isArray(receipt.updated) && receipt.updated.length > 0
           && receipt.updated.every(p => typeof p === "string" && nonempty(join(dataDir, p)));
       }
       if (s.id === "31-review") return reviewPassed();
       if (s.id === "40-render") {
+        if (!reviewPassed() || !currentBuild(issue, s.id)) return false;
         const merged = read("30-issue.json");
         return validateIssue(merged).length === 0 && issuePageOrder(merged).every((_, i) => nonempty(join(issue, "40-cards", `card-${i + 1}.png`)))
           && nonempty(join(issue, "40-cards", `${merged.masthead.zh}-第${String(merged.issue).padStart(3, "0")}期.pdf`));
       }
       if (s.id === "60-audio") {
+        if (!done(stages.find(s => s.id === "50-narration")) || !currentBuild(issue, s.id)) return false;
         const narration = read("50-narration.json");
         if (validateStructure("50-narration.json", narration).length) return false;
         const pages = narration.narration;
@@ -47,6 +52,7 @@ export function createPipeline(issueArg) {
         }));
       }
       if (s.id === "70-video") {
+        if (!["40-render", "60-audio"].every(id => done(stages.find(s => s.id === id))) || !currentBuild(issue, s.id)) return false;
         const merged = read("30-issue.json");
         return nonempty(join(issue, "70-final/讲读版.mp4"))
           && nonempty(join(issue, "70-final", `${merged.masthead.zh}-第${String(merged.issue).padStart(3, "0")}期.pdf`));
@@ -61,7 +67,7 @@ export function createPipeline(issueArg) {
         checks[name]?.(value);
         const valid = problems.length === before;
         problems.splice(before);
-        return valid && (name !== "30-issue.json" || validateIssue(value).length === 0);
+        return valid && (name !== "30-issue.json" || (validateIssue(value).length === 0 && currentBuild(issue, "30-assemble")));
       });
     } catch { return false; }
   };
@@ -245,6 +251,7 @@ export function createPipeline(issueArg) {
       need(!k.photo_url || k.photo_credit, "19", "有配图就写 photo_credit");
     },
     "50-narration.json": n => {
+      need(reviewPassed() && n._meta?.content_hash === contentFingerprint(issue), "50", "讲读稿未绑定当前已审稿内容，请重写并记录 _meta.content_hash");
       const EMO = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
       const WHO = ["narrator", "dog", "mouse", "owl", "raccoon"];
       const pages = n.narration ?? [];
@@ -305,7 +312,7 @@ export function createPipeline(issueArg) {
         if (!structural.length) fn(value);
       } catch (e) { problems.push(`[${file}] 读不了：${e.message}`); }
     }
-    if (!contentOnly && has("31-review.md")) need(reviewPassed(), "31", "审稿结论不是「通过」");
+    if (!contentOnly && has("31-review.md")) need(reviewPassed(), "31", "审稿未通过或内容指纹已过期，请重新合并、审稿");
     return problems;
   }
 
@@ -321,6 +328,7 @@ export function createPipeline(issueArg) {
   }
   function assemble() {
     const errors = assemblyErrors();
+    const inputs = inputFingerprint(issue, "30-assemble");
     if (errors.length) throw new Error(errors.join("\n"));
     const b = read("00-brief.json"), c = read("10-cover.json"), m = read("11-comic.json"),
       s = read("13-story.json"), p = read("14-puzzle.json"), mb = read("16-mailbox.json"),
@@ -359,7 +367,8 @@ export function createPipeline(issueArg) {
     }
     const structural = validateIssue(issueJson);
     if (structural.length) throw new Error(structural.join("\n"));
-    writeFileSync(join(issue, "30-issue.json"), JSON.stringify(issueJson, null, 2));
+    atomicWrite(join(issue, "30-issue.json"), JSON.stringify(issueJson, null, 2));
+    recordBuild(issue, "30-assemble", inputs, [join(issue, "30-issue.json")]);
     console.log(join(issue, "30-issue.json"));
   }
 
@@ -368,12 +377,13 @@ export function createPipeline(issueArg) {
     const state = Object.fromEntries(stages.map(s => [s.id, done(s) || skipped(s)]));
     for (const s of stages) {
       const ready = !state[s.id] && s.depends.every(d => state[d]);
+      const outdated = !state[s.id] && s.outputs.some(p => existsSync(out(p)));
       const mark = skipped(s) ? "➖" : state[s.id] ? "✅" : s.optional ? "➖" : ready ? "👉" : "⏳";
-      console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}${skipped(s) ? "（本期不出）" : s.optional && !state[s.id] ? "（可选，默认不做）" : ""}`);
+      console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}${skipped(s) ? "（本期不出）" : s.optional && !state[s.id] ? "（可选，默认不做）" : outdated ? "（未完成、输出无效或已过期）" : ""}`);
     }
     const next = stages.filter(s => !s.optional && !state[s.id] && s.depends.every(d => state[d])).map(s => s.id);
     console.log(`\n现在可以做：${next.join("、") || "（无）"}`);
   }
 
-  return { status, check, assemble, assemblyErrors, reviewPassed, done: id => done(stages.find(s => s.id === id)) };
+  return { status, check, assemble, assemblyErrors, reviewPassed, fingerprint: () => contentFingerprint(issue), done: id => done(stages.find(s => s.id === id)) };
 }

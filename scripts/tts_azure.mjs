@@ -16,6 +16,8 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createHash } from "node:crypto";
+import { createPipeline } from "./pipeline-lib.mjs";
+import { inputFingerprint, recordBuild, atomicWrite } from "./build-state.mjs";
 
 const DEFAULT_VOICES = {
   "narrator/zh": "zh-CN-XiaoxiaoNeural", "narrator/en": "en-GB-SoniaNeural",
@@ -106,7 +108,7 @@ async function synth(xml) {
       headers: { "Ocp-Apim-Subscription-Key": k.key, "Content-Type": "application/ssml+xml", "X-Microsoft-OutputFormat": "riff-24khz-16bit-mono-pcm", "User-Agent": "kids-magazine-kit" },
       body: xml,
     });
-    if (res.ok) { await sleep(k.gap); return { wav: Buffer.from(await res.arrayBuffer()), by: k.name }; }
+    if (res.ok) { return { wav: Buffer.from(await res.arrayBuffer()), by: k.name }; }
     const msg = (await res.text()).slice(0, 200);
     // 额度用完（403）或连续被限流（429）：有付费资源就换过去
     if ((res.status === 403 || (res.status === 429 && attempt >= 2)) && current + 1 < keys.length) {
@@ -154,6 +156,7 @@ if (audition) {
     if (dry) continue;
     const { wav } = await synth(xml);
     writeFileSync(join(out, `${who}-${lang}.wav`), shift(wav, pitch));
+    await sleep(keys[current].gap);
     console.log(`${role}  ${voice}${pitch ? `（${pitch > 0 ? "升" : "降"} ${Math.abs(pitch)} 个半音）` : ""}`);
   }
   console.log(`试听共 ${total} 计费字符${dry ? "（未调用）" : `，文件在 ${out}`}`);
@@ -161,14 +164,22 @@ if (audition) {
 }
 
 const issue = resolve(target);
+if (!dry && !createPipeline(issue).done("50-narration")) throw new Error("讲读稿未通过检查或内容已过期，请先重新审稿并更新讲读稿");
+const inputs = inputFingerprint(issue, "60-audio");
 const nar = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
 const outDir = join(issue, "60-audio");
-mkdirSync(outDir, { recursive: true });
+if (!dry) mkdirSync(outDir, { recursive: true });
 const manPath = join(outDir, "manifest.json");
 const old = existsSync(manPath) ? JSON.parse(readFileSync(manPath, "utf8")) : { files: [] };
 const oldByFile = Object.fromEntries((old.files ?? []).map(f => [f.file, f]));
 
-const files = [], used = {};
+const files = [], used = {}, checkpoint = { ...oldByFile };
+const saveManifest = (complete = false) => atomicWrite(manPath, JSON.stringify({
+  _meta: { stage: "60-audio", by: "Azure 语音", at: new Date().toISOString(), complete },
+  voices: used, billable_chars: { this_run: spent, whole_issue: planned }, paid_lines: paid,
+  files: complete ? files : Object.values(checkpoint),
+}, null, 2));
+const audioHash = wav => createHash("sha256").update(wav).digest("hex");
 let spent = 0, planned = 0, skipped = 0, paid = 0, phonemes = 0, sample = "";
 for (const page of nar) {
   for (const [i, line] of page.lines.entries()) {
@@ -181,21 +192,23 @@ for (const page of nar) {
     const ph = (body.match(/<phoneme /g) || []).length;
     phonemes += ph; if (ph && !sample) sample = body;
     const prev = oldByFile[file];
-    if (prev?.hash === hash && existsSync(join(outDir, file))) {
+    const cached = prev?.hash === hash && existsSync(join(outDir, file)) ? readFileSync(join(outDir, file)) : null;
+    if (cached?.length > 44 && cached.toString("ascii", 0, 4) === "RIFF" && (!prev.audio_hash || prev.audio_hash === audioHash(cached))) {
       files.push(prev); skipped++; continue;
     }
     if (dry) continue;
     const { wav: raw, by } = await synth(xml);
     const wav = shift(raw, pitch);
-    writeFileSync(join(outDir, file), wav);
+    atomicWrite(join(outDir, file), wav);
     spent += cost; if (by === "付费") paid++;
-    files.push({ card: page.card, index: i, file, seconds: +seconds(wav).toFixed(2), hash, by });
+    const entry = { card: page.card, index: i, file, seconds: +seconds(wav).toFixed(2), hash, audio_hash: audioHash(wav), by };
+    files.push(entry); checkpoint[file] = entry;
+    saveManifest();
+    await sleep(keys[current].gap);
     process.stdout.write(`\r已合成 ${files.length} 句`);
   }
 }
 if (dry) { console.log(`整期 ${planned} 计费字符（含多音字注音 ${phonemes} 处）；已合成可跳过 ${skipped} 句${sample ? `\n注音示例：${sample}` : ""}`); process.exit(0); }
-writeFileSync(manPath, JSON.stringify({
-  _meta: { stage: "60-audio", by: "Azure 语音", at: new Date().toISOString() },
-  voices: used, billable_chars: { this_run: spent, whole_issue: planned }, paid_lines: paid, files,
-}, null, 2));
+saveManifest(true);
+recordBuild(issue, "60-audio", inputs, [manPath, ...files.map(f => join(outDir, f.file))]);
 console.log(`\n${files.length} 句完成：本次合成 ${files.length - skipped} 句（${spent} 计费字符${paid ? `，其中 ${paid} 句走付费资源` : ""}），跳过 ${skipped} 句`);
