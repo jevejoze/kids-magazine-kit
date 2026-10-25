@@ -58,15 +58,14 @@ const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
 const chatRow = (b, bi, p, pi) => {
   const whoKey = (b.who || p.chars[bi] || p.chars[0] || "").split(":")[0];
   const side = b.side || (p.bubbles.length > 1 ? (bi % 2 === 0 ? "left" : "right") : (pi % 2 === 0 ? "left" : "right"));
-  const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, "happy", 56)}</div>`;
+  const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, "happy", 68)}</div>`;
   const bub = `<div class="bub who-${whoKey} ${side} ${b.lang === "en" ? "en" : "fun"}">${b.text}</div>`;
   return `<div class="chat-row ${side}">${side === "left" ? ava + bub : bub + ava}</div>`;
 };
 cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} 今日一问 · Big Question`, C.tool ? `<span class="toolpill fun">🧰 ${C.tool}</span>` : undefined)}
   <div class="h1 fun">${C.title_zh || D.question.zh}<span class="en">${C.title_en || D.question.en}</span></div>
   <div class="grid">${C.panels.map((p, i) => `<div class="box panel p${i}"><span class="n en">${i + 1}</span>
-    <div class="bubs ${p.bubbles.length > 1 ? "pair" : "solo"}">${p.bubbles.map((b, bi) => chatRow(b, bi, p, i)).join("")}</div>
-    <div class="cast">${p.chars.map(ch).join("")}</div></div>`).join("")}</div>
+    <div class="bubs ${p.bubbles.length > 1 ? "pair" : "solo"}">${p.bubbles.map((b, bi) => chatRow(b, bi, p, i)).join("")}</div></div>`).join("")}</div>
   ${C.diagram ? `<div class="box diagram"><div class="dl fun">🦉 咕咕博士画给你看</div>${C.diagram}</div>` : ""}
   <div class="fact fun"><b>💡 冷知识</b>${C.fact}</div>
   ${foot(C.host || "主持：团子狗 × 咕咕博士")}</section>`);
