@@ -2,6 +2,11 @@
 
 **读**：`issue/30-issue.json`、`issue/13-story.json`（`bible_update`）、`issue/18-serial.json`（`bible_update`）、`issue/09-creature.json`（周一才有，`log_update`）、`issue/08-think.json`（周五才有，`log_update`）
 
+**助手脚本**：先运行下面的命令，它会只追加地更新 `vocab.json`、`story-bible.md`（本集摘要）、`serial-bible.md`、`creature-log.md`、`think-log.md`，按固定文件名把页图、PDF 和有效的讲读版复制到 `data/成品/NNN/`，最后打印一行归档回执。第 40 步未完成或已过期时脚本会停下。脚本不改"未回收伏笔"和 `profile.md`，也不碰网盘，这几件照下面的要求自己做。
+```bash
+node scripts/pipeline.mjs archive <issue>
+```
+
 **写**
 - `data/vocab.json`：做了单词屋时追加本期 3 个单词 `{"word", "cn", "issue"}`；没做就跳过
 - `data/story-bible.md`：追加本集摘要和新伏笔，更新"未回收伏笔"

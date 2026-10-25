@@ -120,14 +120,18 @@ async function synth(xml) {
   throw new Error("重试多次仍失败");
 }
 
-const seconds = wav => (wav.length - 44) / (24000 * 2);
+function seconds(wav) {
+  const i = wav.indexOf("data", 12, "ascii");
+  const bytes = i > 0 && i + 8 <= wav.length ? wav.readUInt32LE(i + 4) : Math.max(0, wav.length - 44);
+  return bytes / (24000 * 2);
+}
 // 升降调：改采样率抬高音高，再用 atempo 把语速拉回原样
 function shift(wav, semitones) {
   if (!semitones) return wav;
   const r = 2 ** (semitones / 12), dir = mkdtempSync(join(tmpdir(), "pitch-"));
   try {
     writeFileSync(join(dir, "a.wav"), wav);
-    execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", join(dir, "a.wav"), "-af", `asetrate=${24000 * r},aresample=24000,atempo=${1 / r}`, join(dir, "b.wav")]);
+    execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", join(dir, "a.wav"), "-af", `asetrate=${24000 * r},aresample=24000,atempo=${1 / r}`, "-bitexact", join(dir, "b.wav")]);
     return readFileSync(join(dir, "b.wav"));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 }

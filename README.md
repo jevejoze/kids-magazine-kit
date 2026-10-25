@@ -74,7 +74,7 @@ node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/iss
 ```
 SKILL.md              给 agent 的总规则（AGENTS.md、CLAUDE.md 是它的软链接）
 pipeline/             流水线：stages.json 步骤表、stages/ 每步说明
-scripts/              pipeline.mjs（进度、检查、合并）、render.mjs（渲染）、make_video.py（视频）
+scripts/              pipeline.mjs（进度、检查、合并、讲读稿导出、归档）、assets.mjs（图片下载与裁剪）、render.mjs（渲染）、tts_azure.mjs（语音）、make_video.py（视频）
 assets/               页面模板、样式、角色 SVG
 templates/data/       空白的数据目录（问卷、画像、策展记录、参考音说明……）
 examples/demo/        虚构孩子「小满」的数据目录，issues/003/ 是一期完整的流水线文件

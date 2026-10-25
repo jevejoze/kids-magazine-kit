@@ -55,7 +55,7 @@
 | 18 | 经典连载 | 00 | agent |
 | 19 | 真的假的 | 00 | agent |
 | 20 | 下载图片 | 08、09、10、17、18、19 | agent |
-| 30 | 合并整期 | 08、09、11、13、14、16、18、19、20（做了 12、15 也一起合并） | 脚本 |
+| 30 | 合并整期 | 08、09、11、13、14、16、17、18、19、20（做了 12、15 也一起合并） | 脚本 |
 | 31 | 审稿 | 30 | agent |
 | 40 | 渲染图片和 PDF | 31 | 脚本 |
 | 50 | 讲读稿 | 31 | agent |
@@ -106,12 +106,15 @@ node --test tests/*.test.mjs
 ```bash
 node scripts/pipeline.mjs status   <issue>   # 看每步做了没有、下一步能做什么
 node scripts/pipeline.mjs check    <issue>   # 检查已完成步骤的字段和字数
+node scripts/assets.mjs   fetch|trim|slice … # 第 20 步：下载图片、折纸图式裁边与切步骤
 node scripts/pipeline.mjs assemble <issue>   # 第 30 步
 node scripts/pipeline.mjs fingerprint <issue> # 第 31、50 步记录当前内容指纹
-node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40 步
+node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40 步（版面溢出会打印警告）
 node scripts/tts_azure.mjs <issue> --pinyin  # 第 60 步之前：列出没注音的多音字
 node scripts/tts_azure.mjs <issue>           # 第 60 步（Azure 语音）
 python3 scripts/make_video.py <issue>        # 第 70 步
+node scripts/pipeline.mjs script   <issue>   # 没有语音合成时：导出 70-final/家长讲读稿.md
+node scripts/pipeline.mjs archive  <issue>   # 第 90 步助手：追加档案、整理 成品/NNN/
 ```
 
 第 60 步默认用 Azure 语音（`scripts/tts_azure.mjs`），需要环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`；换别的语音服务也行，按 `stages/60-audio.md` 的约定把音频放好即可。

@@ -1,6 +1,15 @@
-// Shared structural contracts. Editorial checks remain in pipeline-lib.mjs.
+// Shared structural contracts and domain constants. Editorial checks remain in pipeline-lib.mjs.
 export const PAGE_KEYS = ["cover", "comic", "creature", "words", "story", "challenge", "news", "check", "serial", "think", "mailbox"];
 export const CARD_IDS = { cover: "c1", comic: "c2", creature: "cdeep", words: "c3", story: "c4", challenge: "c5", news: "cnews", check: "ccheck", serial: "cserial", think: "cthink", mailbox: "c6" };
+export const PAGE_TITLES = { cover: "封面", comic: "今日一问", creature: "传说怪物档案", words: "单词屋", story: "小剧场", challenge: "挑战", news: "环球小报", check: "真的假的", serial: "经典连载", think: "周末思辨", mailbox: "信箱" };
+export const NARRATION_MAX_LINES = { cover: 12, comic: 26, creature: 14, words: 22, story: 30, challenge: 12, news: 24, check: 12, serial: 20, think: 14, mailbox: 10 };
+export const CHARS = ["dog", "mouse", "owl", "raccoon", "box", "dogbox"];
+export const PROP_HOLDERS = ["dog", "mouse", "owl", "raccoon"];
+export const MOODS = ["normal", "happy", "wave", "smirk", "sleepy", "angry", "surprise", "talk", "think", "peek"];
+export const PROPS = ["sunglasses", "eyemask", "partyhat", "scarf", "magnifier", "sweat"];
+export const SPEAKERS = ["narrator", "dog", "mouse", "owl", "raccoon"];
+export const SPEAKER_NAMES = { narrator: "🎙 旁白", dog: "🐶 团子狗", mouse: "🐭 波波鼠", owl: "🦉 咕咕博士", raccoon: "🦝 捣蛋浣熊" };
+export const EMOTIONS = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
 export const pageOrder = issue => PAGE_KEYS.filter(key => issue[key] != null);
 
 // Paths with [] validate every array item, as well as the array itself.

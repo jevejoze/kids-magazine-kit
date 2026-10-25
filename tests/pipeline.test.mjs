@@ -295,3 +295,40 @@ test("video provenance includes sound effects and every upstream output", t => {
   writeFileSync(join(issue, "../../sfx/bgm.wav"), "new background music");
   assert.equal(p.done("70-video"), false);
 });
+
+test("Chinese narration rejects raw digits, percent signs, and thinking-plan spoilers", t => {
+  const issue = fixture(t), narration = json(issue, "50-narration.json");
+  narration.narration[0].lines[0].text = "今天有 7% 的概率下雨！";
+  put(issue, "50-narration.json", narration);
+  assert.ok(createPipeline(issue).check().some(x => x.includes("阿拉伯数字或 %")));
+  narration.narration[0].lines[0].text = "今天练一项思维本领！";
+  put(issue, "50-narration.json", narration);
+  assert.ok(createPipeline(issue).check().some(x => x.includes("不得点破")));
+});
+
+test("diagram SVG viewBox and font size limits are enforced", t => {
+  const issue = fixture(t);
+  writeFileSync(join(issue, "11-diagram.svg"), '<svg viewBox="0 0 100 100"><text font-size="14">小字</text></svg>');
+  const errors = createPipeline(issue).check();
+  assert.ok(errors.some(x => x.includes("viewBox")));
+  assert.ok(errors.some(x => x.includes("过小字号")));
+});
+
+test("parent script export and archive helper respect render freshness", t => {
+  const issue = fixture(t), p = createPipeline(issue);
+  assert.ok(readFileSync(p.script(), "utf8").includes("## 第 1 页 · 封面"));
+  assert.deepEqual(readdirSync(join(issue, "70-final")), ["家长讲读稿.md"]);
+  assert.throws(() => p.archive(), /第 40 步/);
+  cards(issue);
+  const r1 = p.archive(), pub = join(issue, "../../成品/003");
+  assert.equal(r1.content_hash, p.fingerprint());
+  assert.ok(r1.updated.includes("story-bible.md") && r1.updated.includes("vocab.json"));
+  assert.ok(existsSync(join(pub, "card-9.png")) && existsSync(join(pub, "小满早知道-第003期.pdf")));
+  assert.equal(existsSync(join(pub, "小满早知道-第003期-讲读版.mp4")), false);
+  assert.equal(p.done("90-archive"), false);
+  const bible = readFileSync(join(issue, "../../story-bible.md"), "utf8");
+  assert.deepEqual(p.archive(), r1);
+  assert.equal(readFileSync(join(issue, "../../story-bible.md"), "utf8"), bible);
+  put(issue, "90-archive.json", r1);
+  assert.equal(p.done("90-archive"), true);
+});

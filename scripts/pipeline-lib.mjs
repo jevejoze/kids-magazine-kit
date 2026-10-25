@@ -3,12 +3,27 @@
 //   node pipeline.mjs status   <issue>   每步做了没有，下一步能做什么
 //   node pipeline.mjs check    <issue>   检查已完成步骤的字段和字数
 //   node pipeline.mjs assemble <issue>   第 30 步：合并成 30-issue.json（渲染用）
-import { readFileSync, existsSync, statSync } from "node:fs";
+//   node pipeline.mjs script   <issue>   把 50-narration.json 导出为 70-final/家长讲读稿.md
+//   node pipeline.mjs archive  <issue>   第 90 步助手：追加档案、整理 成品/NNN/，打印归档回执
+import { readFileSync, existsSync, statSync, mkdirSync, copyFileSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { contentFingerprint, inputFingerprint, recordBuild, currentBuild, atomicWrite } from "./build-state.mjs";
-import { validateStructure, validateIssue, pageOrder as issuePageOrder } from "./contracts.mjs";
+import {
+  validateStructure,
+  validateIssue,
+  pageOrder as issuePageOrder,
+  CHARS,
+  PROP_HOLDERS,
+  MOODS,
+  PROPS,
+  SPEAKERS,
+  SPEAKER_NAMES,
+  EMOTIONS,
+  PAGE_TITLES,
+  NARRATION_MAX_LINES,
+} from "./contracts.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const { stages } = JSON.parse(readFileSync(join(here, "..", "pipeline", "stages.json"), "utf8"));
@@ -91,9 +106,6 @@ export function createPipeline(issueArg) {
   const problems = [];
   const need = (cond, where, msg) => { if (!cond) problems.push(`[${where}] ${msg}`); };
   const fields = (obj, where, keys) => keys.forEach(k => need(obj[k] !== undefined && obj[k] !== null && obj[k] !== "", where, `缺少字段 ${k}`));
-  const CHARS = ["dog", "mouse", "owl", "raccoon", "box", "dogbox"];
-  const MOODS = ["normal", "happy", "wave", "smirk", "sleepy", "angry", "surprise", "talk", "think", "peek"];
-  const PROPS = ["sunglasses", "eyemask", "partyhat", "scarf", "magnifier", "sweat"];
   const checkProp = (p, where, at = "prop") => p && String(p).split("+").filter(Boolean).forEach(k => need(PROPS.includes(k), where, `${at} 道具不存在：${k}`));
   const checkChar = (spec, where, at = "角色") => {
     const [n, m = "normal", s = "180", p = ""] = String(spec ?? "").split(":");
@@ -101,14 +113,23 @@ export function createPipeline(issueArg) {
     need(MOODS.includes(m), where, `${at} 表情不对：${spec}`);
     need(Number(s) > 0, where, `${at} 尺寸不对：${spec}`);
     if (p) {
-      need(["dog", "mouse", "owl", "raccoon"].includes(n), where, `${at} 不支持戴道具：${spec}`);
+      need(PROP_HOLDERS.includes(n), where, `${at} 不支持戴道具：${spec}`);
       checkProp(p, where, `${at} (${spec})`);
     }
   };
 
+  const META_SPOILER = /思维本领|思维方法|今天学|今天练|本周练/;
+
   const checks = {
     "00-brief.json": b => {
       fields(b, "00", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level", "story"]);
+      const prevIssue = join(issue, "..", String(Number(b.issue) - 1).padStart(3, "0"), "30-issue.json");
+      if (existsSync(prevIssue)) {
+        try {
+          const prev = JSON.parse(readFileSync(prevIssue, "utf8"));
+          need(b.story?.ep === (prev.story?.ep ?? 0) + 1, "00", `小剧场集数 ep=${b.story?.ep} 与上期 ep=${prev.story?.ep} 不连续`);
+        } catch {}
+      }
     },
     "08-think.json": t => {
       fields(t, "08", ["title", "story", "sides", "role", "deeper", "parent_guide", "source", "log_update"]);
@@ -123,6 +144,7 @@ export function createPipeline(issueArg) {
       need(t.deeper?.length === 2, "08", "deeper 要 2 个追问");
       t.deeper?.forEach((x, i) => need(len(x) <= 30, "08", `第 ${i + 1} 个追问 ${len(x)} 字，超过 30`));
       need(!t.photo_url || t.photo_credit, "08", "有配图就写 photo_credit");
+      need(!META_SPOILER.test([t.title, t.story, ...(t.sides ?? []).map(s => s.say), t.role, ...(t.deeper ?? [])].join(" ")), "08", "周末思辨正文不得点破「思维本领/今天练」等课表字眼");
     },
     "09-creature.json": r => {
       fields(r, "09", ["no", "name_zh", "parts", "legend_url", "legend_credit", "photo_url", "photo_credit", "stats", "meters", "boxes", "fast", "slow", "sources", "log_update"]);
@@ -149,11 +171,20 @@ export function createPipeline(issueArg) {
       fields(c, "11", ["title_zh", "title_en", "panels", "fact"]);
       need(c.panels?.length === 4, "11", "漫画要 4 格");
       c.panels?.forEach((p, i) => {
+        need(p.bubbles.length <= 2, "11", `第 ${i + 1} 格气泡 ${p.bubbles.length} 个，最多 2 个`);
         p.bubbles.forEach(b => need(len(b.text) <= 30, "11", `第 ${i + 1} 格气泡 ${len(b.text)} 字，超过 30 字`));
         (p.chars ?? []).forEach(x => checkChar(x, "11", `第 ${i + 1} 格角色`));
       });
       need(len(c.fact) <= 60, "11", `冷知识 ${len(c.fact)} 字，超过 60 字`);
-      need(c.diagram && nonempty(join(issue, c.diagram)), "11", `找不到非空图解 ${c.diagram}`);
+      const diagPath = c.diagram ? join(issue, c.diagram) : "";
+      need(c.diagram && nonempty(diagPath), "11", `找不到非空图解 ${c.diagram}`);
+      if (c.diagram && nonempty(diagPath) && String(c.diagram).endsWith(".svg")) {
+        const svg = readFileSync(diagPath, "utf8");
+        need(/<svg\b[^>]*\bviewBox=["']0 0 880 300["']/.test(svg), "11", "图解 SVG 必须设置 viewBox=\"0 0 880 300\"");
+        need(!/<image\b[^>]*\b(?:href|xlink:href)=["']https?:/i.test(svg), "11", "图解 SVG 不可引用外部网络图片");
+        const small = [...svg.matchAll(/font-size=["']?(\d+(?:\.\d+)?)/g)].map(m => Number(m[1])).find(sz => sz < 20);
+        need(!small, "11", `图解 SVG 含过小字号 ${small}px（要求中文标注 ≥ 24 号字）`);
+      }
     },
     "12-words.json": w => {
       fields(w, "12", ["intro", "grammar", "items", "task"]);
@@ -249,17 +280,16 @@ export function createPipeline(issueArg) {
       need(len(k.verdict) <= 40, "19", `倒印答案 ${len(k.verdict)} 字，超过 40`);
       need((k.sources ?? []).length >= 2, "19", "要 2 个来源");
       need(!k.photo_url || k.photo_credit, "19", "有配图就写 photo_credit");
+      need(!META_SPOILER.test([k.claim, ...(k.clues ?? []), k.verdict].join(" ")), "19", "真的假的正文与答案不得点破「思维本领/今天练」等课表字眼");
     },
     "50-narration.json": n => {
       need(reviewPassed() && n._meta?.content_hash === contentFingerprint(issue), "50", "讲读稿未绑定当前已审稿内容，请重写并记录 _meta.content_hash");
-      const EMO = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
-      const WHO = ["narrator", "dog", "mouse", "owl", "raccoon"];
       const pages = n.narration ?? [];
       const hasStages = has("10-cover.json") || has("30-issue.json");
       const order = pageOrder(), cards = order.length;
       if (hasStages) need(pages.length === cards && pages.every((p, i) => p.card === i + 1), "50", `${cards} 页都要按顺序讲读，不可重复或遗漏`);
       // 每页最多几句，按页的种类定；card 编号和渲染出来的 card-N.png 顺序一致（有英文三关时挑战页多 6 句）
-      const MAX = { cover: 12, comic: 26, creature: 14, words: 22, story: 30, challenge: has("15-english.json") ? 18 : 12, news: 24, check: 12, serial: 20, think: 14, mailbox: 10 };
+      const MAX = { ...NARRATION_MAX_LINES, challenge: has("15-english.json") ? 18 : NARRATION_MAX_LINES.challenge };
       const max = c => (hasStages ? MAX[order[c - 1]] : undefined) ?? 30;
       let total = 0;
       pages.forEach(p => {
@@ -268,11 +298,15 @@ export function createPipeline(issueArg) {
         let run = 0;
         p.lines.forEach((l, i) => {
           const at = `第 ${p.card} 页第 ${i + 1} 句`;
-          need(WHO.includes(l.who), "50", `${at} who 不对：${l.who}`);
+          need(SPEAKERS.includes(l.who), "50", `${at} who 不对：${l.who}`);
           need(["zh", "en"].includes(l.lang), "50", `${at} lang 不对：${l.lang}`);
-          need(!l.emotion || EMO.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);
+          need(!l.emotion || EMOTIONS.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);
           if (l.lang === "en") need(words(l.text) <= 12, "50", `${at} ${words(l.text)} 个英文单词，超过 12`);
-          else need(len(l.text) <= 30, "50", `${at} ${len(l.text)} 字，超过 30`);
+          else {
+            need(len(l.text) <= 30, "50", `${at} ${len(l.text)} 字，超过 30`);
+            need(!/[0-9%]/.test(l.text), "50", `${at} 中文台词含阿拉伯数字或 %，请写成中文读法（如"十八点五"、"百分之七"）：${l.text}`);
+            need(!META_SPOILER.test(l.text), "50", `${at} 讲读台词不得点破「思维本领/今天练」等课表字眼：${l.text}`);
+          }
           run = i && p.lines[i - 1].who === l.who ? run + 1 : 1;
           if (run === 4) problems.push(`[50] ${at} 起同一个角色连说超过 3 句，拆给别的角色接话`);
           total += len(l.text) * (l.repeat || 1);
@@ -385,5 +419,111 @@ export function createPipeline(issueArg) {
     console.log(`\n现在可以做：${next.join("、") || "（无）"}`);
   }
 
-  return { status, check, assemble, assemblyErrors, reviewPassed, fingerprint: () => contentFingerprint(issue), done: id => done(stages.find(s => s.id === id)) };
+  // ---------- script (家长讲读稿导出) ----------
+  function script(outArg) {
+    if (!has("50-narration.json")) throw new Error("缺少 50-narration.json");
+    const n = read("50-narration.json");
+    const b = has("00-brief.json") ? read("00-brief.json") : (has("30-issue.json") ? read("30-issue.json") : {});
+    const order = pageOrder();
+    const lines = [
+      `# ${b.masthead?.zh || "每日杂志"} · 第 ${String(b.issue ?? "").padStart(3, "0")} 期 家长讲读稿`,
+      "",
+      `> 日期：${b.date || ""}　｜　按页照着念即可，括号内为语气和停顿提示。`,
+      "",
+    ];
+    for (const p of n.narration ?? []) {
+      const key = order[p.card - 1];
+      const title = PAGE_TITLES[key] || key || "";
+      lines.push(`## 第 ${p.card} 页 · ${title}`);
+      lines.push("");
+      for (const l of p.lines ?? []) {
+        const who = SPEAKER_NAMES[l.who] || l.who;
+        const tags = [];
+        if (l.emotion && l.emotion !== "平静") tags.push(l.emotion);
+        if (l.rate === "slow") tags.push("慢速");
+        if (l.sfx) tags.push(`音效:${l.sfx}`);
+        const prefix = tags.length ? `（${tags.join("·")}）` : "";
+        const suffix = l.pause ? ` *(停 ${l.pause} 秒${l.hold ? ` · ${l.hold}` : ""})*` : "";
+        lines.push(`- **${who}**${prefix}：${l.text}${suffix}`);
+      }
+      lines.push("");
+    }
+    const finalDir = join(issue, "70-final");
+    mkdirSync(finalDir, { recursive: true });
+    const outPath = outArg ? resolve(outArg) : join(finalDir, "家长讲读稿.md");
+    atomicWrite(outPath, lines.join("\n"));
+    console.log(outPath);
+    return outPath;
+  }
+
+  // ---------- archive (第 90 步助手) ----------
+  // 只做本地能自动完成的部分；"未回收伏笔"、profile.md 和网盘核对仍由 agent 做，核对完再写 90-archive.json
+  function archive() {
+    if (!done(stages.find(s => s.id === "40-render"))) throw new Error("页图未完成、审稿未通过或已过期，请先完成第 40 步再归档");
+    const b = read("00-brief.json");
+    const num = Number(b.issue);
+    const padNum = String(num).padStart(3, "0");
+    const updated = [];
+
+    if (has("12-words.json")) {
+      const vocabPath = join(dataDir, "vocab.json");
+      const vocab = existsSync(vocabPath) ? JSON.parse(readFileSync(vocabPath, "utf8")) : [];
+      let changed = false;
+      for (const item of read("12-words.json").items ?? []) {
+        if (!vocab.some(v => v.word.toLowerCase() === item.word.toLowerCase())) {
+          vocab.push({ word: item.word, cn: item.cn, issue: num });
+          changed = true;
+        }
+      }
+      if (changed) atomicWrite(vocabPath, JSON.stringify(vocab, null, 2) + "\n");
+      if (vocab.some(v => v.issue === num)) updated.push("vocab.json");
+    }
+
+    // 只追加；marker 已在文件里就视为追加过
+    const appendSection = (relName, marker, text) => {
+      if (!text || !String(text).trim()) return;
+      const p = join(dataDir, relName);
+      const cur = existsSync(p) ? readFileSync(p, "utf8") : `# ${relName}\n`;
+      if (!cur.includes(marker) && !cur.includes(String(text).trim())) atomicWrite(p, cur.replace(/\s*$/, "\n\n") + String(text).trim() + "\n");
+      updated.push(relName);
+    };
+    if (has("13-story.json")) {
+      const s = read("13-story.json");
+      const marker = `EP.${String(s.ep).padStart(2, "0")}`;
+      const entry = s.bible_update
+        ? (String(s.bible_update).includes(marker) ? s.bible_update : `### ${marker}（第 ${padNum} 期）\n${s.bible_update}`)
+        : `### ${marker}《${s.title_zh}》（第 ${padNum} 期）\n- 真相：${s.secret || ""}`;
+      appendSection("story-bible.md", marker, entry);
+    }
+    if (has("18-serial.json")) {
+      const r = read("18-serial.json");
+      if (r.bible_update) appendSection("serial-bible.md", `第 ${padNum} 期`, `- 第 ${padNum} 期（${b.date}）：${r.bible_update}`);
+    }
+    if (useCreature()) {
+      const cr = read("09-creature.json");
+      if (cr.log_update) appendSection("creature-log.md", `No.${cr.no}`, `- No.${cr.no}（第 ${padNum} 期）：${cr.log_update}`);
+    }
+    if (useThink()) {
+      const th = read("08-think.json");
+      if (th.log_update) appendSection("think-log.md", `第 ${padNum} 期`, `- 第 ${padNum} 期（${b.date}）：${th.log_update}`);
+    }
+
+    // 成品/NNN/：文件名照 pipeline/README.md「目录」；讲读版只在第 70 步有效时复制
+    const merged = read("30-issue.json");
+    const pdf = `${merged.masthead.zh}-第${padNum}期.pdf`;
+    const pubDir = join(dataDir, "成品", padNum), cardsDir = join(issue, "40-cards");
+    mkdirSync(pubDir, { recursive: true });
+    for (const f of readdirSync(pubDir)) if (/^card-\d+\.png$/.test(f)) rmSync(join(pubDir, f));
+    issuePageOrder(merged).forEach((_, i) => copyFileSync(join(cardsDir, `card-${i + 1}.png`), join(pubDir, `card-${i + 1}.png`)));
+    copyFileSync(join(cardsDir, pdf), join(pubDir, pdf));
+    const video = done(stages.find(s => s.id === "70-video"));
+    if (video) copyFileSync(join(issue, "70-final", "讲读版.mp4"), join(pubDir, `${merged.masthead.zh}-第${padNum}期-讲读版.mp4`));
+
+    const receipt = { issue: num, content_hash: contentFingerprint(issue), updated: [...new Set(updated)] };
+    console.log(`成品已整理到 ${pubDir}${video ? "" : "（讲读版未完成或已过期，没有复制）"}`);
+    console.log(`核对网盘、更新"未回收伏笔"后，把下面这行写进 90-archive.json：\n${JSON.stringify(receipt)}`);
+    return receipt;
+  }
+
+  return { status, check, assemble, script, archive, assemblyErrors, reviewPassed, fingerprint: () => contentFingerprint(issue), done: id => done(stages.find(s => s.id === id)) };
 }

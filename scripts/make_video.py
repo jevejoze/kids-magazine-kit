@@ -10,7 +10,7 @@
 做法：先把整期的声音拼成一条音轨，记下每页从几秒开始；画面按这些时间点一次编码，
 翻页用淡入淡出，新的一页完全出现后才开始说话，所以声音和画面不会越拼越错位。
 """
-import json, os, re, shutil, subprocess, sys, tempfile, glob
+import json, os, re, shutil, subprocess, sys, tempfile, glob, wave
 
 RATE = 24000
 GAP_REPEAT = 0.5   # 同一句重复之间的间隔
@@ -31,6 +31,12 @@ def run(*args):
 
 
 def seconds(path):
+    if path.endswith(".wav"):
+        try:
+            with wave.open(path, "rb") as w:
+                return w.getnframes() / float(w.getframerate())
+        except (wave.Error, EOFError):
+            pass
     out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
                          check=True, capture_output=True, text=True).stdout
     return float(out.strip())
@@ -44,7 +50,11 @@ def mean_db(path):
 
 
 def silence(path, sec):
-    run("ffmpeg", "-y", "-f", "lavfi", "-i", f"anullsrc=r={RATE}:cl=mono", "-t", f"{sec:.3f}", "-c:a", "pcm_s16le", path)
+    with wave.open(path, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes(b"\x00\x00" * int(round(sec * RATE)))
 
 
 # 去掉合成语音首尾自带的静音（Azure 每句前后各有一两百毫秒），句间停顿改由下面的规则决定

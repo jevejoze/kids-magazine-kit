@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 用法: node render.mjs <issue.json> [输出目录] [--flat] [--preview]
 // 产出: 输出目录/issue-NNN/{issue.html, card-1..N.png, <刊名>-第NNN期.pdf}；加 --flat 直接写进输出目录
-// JSON 里以 .jpg/.jpeg/.png/.webp 结尾、且相对 JSON 所在目录存在的路径，会内嵌进 HTML；.svg 文件按原文内联。
+// JSON 里以 .jpg/.jpeg/.png/.webp/.svg 结尾、且相对 JSON 所在目录存在的路径，会内嵌进 HTML；comic.diagram 的 SVG 按原文内联。
 // 截图走 Chrome DevTools 协议，按每张卡片的实际位置裁切，需要 Node 22+（内置 WebSocket）。
 import { readFileSync, writeFileSync, mkdirSync, existsSync, mkdtempSync, rmSync, readdirSync } from "node:fs";
 import { dirname, join, resolve, extname } from "node:path";
@@ -21,15 +21,16 @@ if (!jsonPath) { console.error("用法: node render.mjs <issue.json> [输出目�
 const here = dirname(fileURLToPath(import.meta.url));
 const assets = join(here, "..", "assets");
 const jsonDir = dirname(resolve(jsonPath));
-const MIME = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp" };
-const embed = v => {
+const MIME = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml" };
+const embed = (v, path = "") => {
   if (typeof v === "string") {
-    const f = resolve(jsonDir, v);
-    if (extname(v).toLowerCase() === ".svg" && existsSync(f)) return readFileSync(f, "utf8");
-    return MIME[extname(v).toLowerCase()] && existsSync(f) ? `data:${MIME[extname(v).toLowerCase()]};base64,${readFileSync(f).toString("base64")}` : v;
+    const ext = extname(v).toLowerCase(), f = resolve(jsonDir, v);
+    if (!MIME[ext] || !existsSync(f)) return v;
+    if (ext === ".svg" && path === "comic.diagram") return readFileSync(f, "utf8");
+    return `data:${MIME[ext]};base64,${readFileSync(f).toString("base64")}`;
   }
-  if (Array.isArray(v)) return v.map(embed);
-  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === "_answers" ? x : embed(x)]));
+  if (Array.isArray(v)) return v.map((x, i) => embed(x, `${path}[${i}]`));
+  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === "_answers" ? x : embed(x, path ? `${path}.${k}` : k)]));
   return v;
 };
 const raw = JSON.parse(readFileSync(jsonPath, "utf8"));
@@ -93,9 +94,11 @@ await new Promise((ok, fail) => {
 });
 let seq = 0;
 const waiting = new Map(), events = new Map();
+let pageError = null;
 ws.addEventListener("message", e => {
   const m = JSON.parse(e.data);
   if (m.id && waiting.has(m.id)) { const [ok, fail, timeout] = waiting.get(m.id); clearTimeout(timeout); waiting.delete(m.id); m.error ? fail(new Error(m.error.message)) : ok(m.result); }
+  else if (m.method === "Runtime.exceptionThrown") { const d = m.params?.exceptionDetails; pageError ??= d?.exception?.description || d?.text || "页面脚本出错"; }
   else if (m.method && events.has(m.method)) { events.get(m.method)(m.params); events.delete(m.method); }
 });
 const send = (method, params = {}, sessionId) => new Promise((ok, fail) => {
@@ -112,20 +115,29 @@ const once = method => new Promise((ok, fail) => {
   const { targetId } = await send("Target.createTarget", { url: "about:blank" });
   const { sessionId: s } = await send("Target.attachToTarget", { targetId, flatten: true });
   await send("Page.enable", {}, s);
+  await send("Runtime.enable", {}, s);
   await send("Emulation.setDeviceMetricsOverride", { width: 1080, height: 1440, deviceScaleFactor: 1, mobile: false }, s);
   const loaded = once("Page.loadEventFired");
   await send("Page.navigate", { url: pathToFileURL(htmlPath).href }, s);
   await loaded;
   const ready = await send("Runtime.evaluate", { expression: "Promise.all([document.fonts.ready, window.READY]).then(() => 1)", awaitPromise: true }, s);
   if (ready.exceptionDetails) throw new Error(ready.exceptionDetails.exception?.description || ready.exceptionDetails.text);
+  if (pageError) throw new Error(`模板脚本出错：${pageError}`);
   const { result } = await send("Runtime.evaluate", {
-    expression: "JSON.stringify([...document.querySelectorAll('.card')].map(c => { const r = c.getBoundingClientRect(); return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }))",
+    // clip：页脚超出卡片底边；overlap：正文压到页脚
+    expression: `JSON.stringify([...document.querySelectorAll('.card')].map(c => {
+      const r = c.getBoundingClientRect(), foot = c.querySelector('.foot'), prev = foot?.previousElementSibling;
+      const clip = foot ? Math.round(foot.getBoundingClientRect().bottom - (r.bottom - 8)) : 0;
+      const overlap = foot && prev ? Math.round(prev.getBoundingClientRect().bottom - foot.getBoundingClientRect().top) : 0;
+      return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, clip, overlap };
+    }))`,
     returnByValue: true,
   }, s);
   const rects = JSON.parse(result.value);
   const expected = pageOrder(data).map(key => CARD_IDS[key]);
   if (JSON.stringify(rects.map(r => r.id)) !== JSON.stringify(expected)) throw new Error("渲染页面数量或顺序与数据契约不一致");
   for (const [i, r] of rects.entries()) {
+    if (r.clip > 0 || r.overlap > 4) console.warn(`⚠️ 版面溢出：card-${i + 1}（#${r.id}）${r.clip > 0 ? `页脚超出底边 ${r.clip}px` : `正文与页脚重叠 ${r.overlap}px`}`);
     const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, clip: { x: r.x, y: r.y, width: r.w, height: r.h, scale: 1 } }, s);
     writeFileSync(join(outDir, `card-${i + 1}.png`), Buffer.from(shot.data, "base64"));
   }
