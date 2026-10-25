@@ -15,7 +15,6 @@
   },
   "send_note": "拍照发给妈妈",
   "english_level": "L2",
-  "stamps_done": 3,
   "topic_hint": "挪威的午夜太阳",
   "child_question": null,
   "focus": [
@@ -28,8 +27,10 @@
     "resolve": "四杯奶茶被喝光（团子狗梦游）",
     "plan": "揭晓真相，结尾留下半夜吸溜声的新悬念"
   },
+  "creature": false,
+  "think": false,
   "last_answers": {
     "puzzle": "金字塔搭 6 层剩 9 块，7 层还差 40 块"
   },
-  "letters_summary": "上期没有收到回复"
+  "last_feedback": "上期没有收到回复"
 }

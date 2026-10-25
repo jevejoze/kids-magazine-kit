@@ -104,7 +104,7 @@ cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · S
   <div class="box stage">${ATTIC}<div class="scene">${ST.scene.map(ch).join("")}</div></div>
   <div class="story ${ST.lang === "en" ? "en" : "fun"}">${ST.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
   <div class="tbc fun"><span>${ST.tbc}</span>${ST.clue ? `<span class="clue">🔍 ${ST.clue}</span>` : ""}</div>
-  ${foot("单日中文 · 双日英文")}</section>`);
+  ${foot(ST.foot || `编辑部推理连载${NEXT("小剧场")}`)}</section>`);
 
 // 挑战卡
 const P = D.challenge;
@@ -118,16 +118,6 @@ if (P) cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的�
   ${P.puzzle.slots ? "" : `<div class="box mine fun"><b>我的答案：</b>${lines(1)}</div>`}`}
   ${foot("答案明天公布！")}</section>`);
 
-// 6 孩子的地盘（有 corner 时）：回信、投票、如果你是……、心情天气、悄悄话；否则是信箱
-const K = D.corner;
-const MOODS = [["☀️", "晴"], ["⛅", "多云"], ["🌧️", "下雨"], ["⛈️", "打雷"], ["🌈", "雨过天晴"]];
-if (K) cards.push(`<section class="card" id="ccorner">${topBar(`🏠 ${K.title || "我的地盘"}`)}
-  <div class="box letter fun">${K.letter}</div>
-  <div class="box vote2 fun"><h3>🗳️ ${K.vote.q}</h3><div class="ab"><span><b>A</b>${K.vote.a}</span><span><b>B</b>${K.vote.b}</span></div><small>圈一个，说说为什么也行</small></div>
-  <div class="box ifyou fun"><h3>🎭 ${K.ifyou}</h3><div class="space"></div></div>
-  <div class="row2"><div class="box mood fun"><h3>今天的心情天气</h3><div class="w">${MOODS.map(([e, t]) => `<span>${e}<small>${t}</small></span>`).join("")}</div><p>${K.mood_tip}</p></div>
-    <div class="box whisper fun"><h3>🤫 悄悄话</h3><p>${K.whisper}</p><div class="space"></div></div></div>
-  ${foot((K.send_note || "拍照发给家长") + (D.news ? " · 往后翻看世界新闻 →" : ""))}</section>`);
 // 环球小报（可选）：1 条头条 + 2 条小新闻
 const NW = D.news;
 const story = (n, cls) => `<div class="box nw ${cls}"><div class="pic" style="background-image:url('${n.photo}');background-position:${n.photo_pos || "center"}"></div>

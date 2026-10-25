@@ -430,54 +430,7 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "做完挑战，来拆今天的信箱！",
-          "emotion": "开心"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "小满，先公布上期答案！",
-          "emotion": "温柔"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "金字塔搭六层剩九块，搭七层还差四十块。",
-          "sfx": "ding"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "我要爆料！我梦见喝奶茶，醒来枕边真有根吸管！",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "小满，梦游的人，记得自己做过什么吗？",
-          "emotion": "委屈"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "开放题：在挪威过一个没有黑夜的夏天，你最想做什么？",
-          "pause": 3
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "别忘了今日打卡，拍照发给妈妈！",
-          "emotion": "温柔"
-        }
-      ]
-    },
-    {
-      "card": 7,
-      "lines": [
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "最后一页，环球小报！第一条，来自英国伦敦。",
+          "text": "做完挑战，来看环球小报！第一条，来自英国伦敦。",
           "emotion": "开心"
         },
         {
@@ -549,11 +502,53 @@
           "lang": "zh",
           "text": "你怎么看？鹈鹕为什么会去敲人类的门？",
           "pause": 3
+        }
+      ]
+    },
+    {
+      "card": 7,
+      "lines": [
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "最后一页，来拆今天的信箱！",
+          "emotion": "开心"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "明天是艺术日，我们去看一种会转圈圈的花。",
+          "text": "小满，先公布上期答案：金字塔搭六层剩九块，搭七层还差四十块。",
+          "emotion": "温柔",
+          "sfx": "ding"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "我要爆料！我梦见喝奶茶，醒来枕边真有根吸管！",
+          "emotion": "兴奋"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "小满，梦游的人，记得自己做过什么吗？",
+          "emotion": "委屈"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "开放题：在挪威过没有黑夜的夏天，你最想做什么？",
+          "pause": 3
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "最喜欢哪一页、今天想到什么问题，记得说给妈妈听！",
+          "emotion": "温柔"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "明天是数学日，我们去看看蜜蜂的六边形小房子。",
           "emotion": "神秘"
         },
         {

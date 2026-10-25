@@ -119,21 +119,18 @@ svg.ch{display:block}
 /* card 6 信箱 */
 #c6{background:#FFEFD9}
 #c6 .letter{padding:24px 34px;margin-top:20px;font-size:30px;line-height:1.6;background:#FFFDF7;flex:none}
-#c6 .ask{margin-top:20px;padding:18px 30px 12px;background:#fff;border-color:var(--tomato);box-shadow:0 10px 0 var(--tomato);font-size:32px;line-height:1.4;flex:none}
-#c6 .ask .en{font-size:28px;color:var(--soft)}
 #c6 .checkin{margin-top:22px;padding:18px 30px 16px;background:#F3FBFF;flex:none}
 #c6 .checkin h3{font-size:34px;font-weight:400;color:#2F6FB5}
 #c6 .checkin .row{margin-top:10px;font-size:28px}
 #c6 .checkin .row b{font-weight:400}
 #c6 .pick{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 #c6 .pick span{border:3px solid var(--ink);border-radius:999px;padding:2px 16px;font-size:25px;background:#fff}
+/* 有经典连载时"最喜欢哪一页"有 7 个选项，收紧一点排成一行 */
+#c6 .pick.many{gap:6px;flex-wrap:nowrap}
+#c6 .pick.many span{padding:2px 10px;font-size:22px;white-space:nowrap}
 #c6 .checkin .lines i{height:44px}
 #c6 .answers{margin-top:20px;padding:16px 30px;background:#FFF4C9;font-size:27px;line-height:1.5;flex:none}
 #c6 .answers b{display:block;font-weight:400;color:var(--tomato);font-size:30px}
-#c6 .stamps{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-top:22px;position:relative}
-#c6 .stamps div{aspect-ratio:1;border:4px dashed var(--soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--soft)}
-#c6 .stamps div.ok{border:5px solid var(--tomato);color:var(--tomato);background:#fff;transform:rotate(-12deg);font-size:22px;text-align:center;line-height:1.1}
-#c6 .stamps p{grid-column:1/-1;text-align:center;font-size:26px;color:var(--soft)}
 @page{size:1080px 1440px;margin:0}
 @media print{body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0;break-after:page}.card:last-of-type{break-after:auto}}
 
@@ -178,7 +175,7 @@ svg.ch{display:block}
 #cnews .pair h3{font-size:32px}
 #cnews .pair p{font-size:25px;line-height:1.45}
 #cnews .pair .kw{font-size:24px}
-#cnews .ask2{font-size:29px !important;flex:none;margin-top:18px;padding:12px 30px;background:var(--tomato);color:#fff;font-size:31px;line-height:1.4}
+#cnews .ask2{flex:none;margin-top:18px;padding:12px 30px;background:var(--tomato);color:#fff;font-size:29px;line-height:1.4}
 #cnews .ask2 .en{font-size:24px;opacity:.9}
 #cnews .credit2{font-size:15px;color:var(--soft);margin-top:10px;position:relative;line-height:1.3}
 
@@ -189,8 +186,7 @@ svg.ch{display:block}
 #cdeep{background:#0F2A4A;color:#fff}
 #cdeep .dots{opacity:.15}
 #cdeep .top .en{color:#9CD3FF}
-#cdeep .card-photo{height:470px;margin-top:22px;overflow:hidden;flex:none;border-color:#9CD3FF;box-shadow:0 10px 0 #061628}
-#cdeep .card-photo{display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;box-shadow:none;overflow:visible}
+#cdeep .card-photo{height:380px;margin-top:22px;flex:none;display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;box-shadow:none;overflow:visible}
 #cdeep .card-photo .half{position:relative;overflow:hidden;border-color:#9CD3FF;box-shadow:0 10px 0 #061628}
 #cdeep .card-photo .legend{background:#F3E7C9}
 #cdeep .card-photo .legend .pic{background-size:contain;background-repeat:no-repeat}
@@ -199,25 +195,27 @@ svg.ch{display:block}
 #cdeep .card-photo .legend .lab{color:#FFE9A8}
 #cdeep .card-photo .depth{position:absolute;left:14px;top:66px;background:rgba(6,22,40,.75);color:#9CD3FF;border-radius:14px;padding:2px 12px;font-size:22px;font-weight:800}
 #cdeep .card-photo .credit3{position:absolute;right:16px;bottom:10px;font-size:15px;color:#fff;text-shadow:0 1px 3px #000}
-#cdeep .name{margin-top:20px;position:relative}
-#cdeep .name .zh{font-size:72px;line-height:1.1}
-#cdeep .name .en{display:flex;align-items:center;gap:12px;margin-top:6px;font-size:36px}
+#cdeep .name{margin-top:14px;position:relative;display:flex;align-items:baseline;gap:24px}
+#cdeep .name .zh{font-size:60px;line-height:1.1}
+#cdeep .name .en{display:flex;align-items:center;gap:12px;margin-top:0;font-size:36px}
 #cdeep .name .en span{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05}
 #cdeep .name .en b{color:#FFD45C}
 #cdeep .name .en small{font-size:22px;color:#9CD3FF}
 #cdeep .name .en em{font-style:normal;color:#9CD3FF}
-#cdeep .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px;position:relative}
+#cdeep .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px;position:relative}
 #cdeep .st{padding:10px 16px;color:var(--ink);text-align:center}
 #cdeep .st small{display:block;font-size:22px;color:var(--soft)}
 #cdeep .st b{display:block;font-size:30px;font-weight:400;line-height:1.2}
-#cdeep .meters{margin-top:18px;padding:10px 24px;color:var(--ink);font-size:28px;display:flex;justify-content:space-between;flex:none}
+#cdeep .meters{margin-top:14px;padding:10px 24px;color:var(--ink);font-size:28px;display:flex;justify-content:space-between;flex:none}
 #cdeep .meter{letter-spacing:2px;margin-left:6px}
 #cdeep .meter i{font-style:normal;opacity:.18}
-#cdeep .power{margin-top:16px;padding:12px 24px;color:var(--ink);font-size:28px;line-height:1.4;background:#FFFDF2;flex:none}
+#cdeep .power{margin-top:12px;padding:10px 24px;color:var(--ink);font-size:25px;line-height:1.4;background:#FFFDF2;flex:none}
 #cdeep .power b{display:block;font-weight:400;color:var(--tomato)}
-#cdeep .brains{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px;position:relative}
+#cdeep .power.b1{background:#E9FFF6}
+#cdeep .power.b1 b{color:#2E8C72}
+#cdeep .brains{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px;position:relative}
 #cdeep .br{display:flex;align-items:flex-end;gap:6px}
-#cdeep .br .bub{font-size:24px;line-height:1.35;padding:10px 14px;color:var(--ink);margin:0 0 20px}
+#cdeep .br .bub{font-size:24px;line-height:1.35;padding:10px 14px;color:var(--ink);margin:0 0 14px}
 #cdeep .br .bub small{display:block;font-size:20px;color:var(--soft)}
 #cdeep .br.slow .bub{background:#E9FFF6}
 #cdeep .foot{color:#9CD3FF}
@@ -225,67 +223,26 @@ svg.ch{display:block}
 /* 真的假的 */
 #ccheck{background:#FFF4E0}
 #ccheck .post{margin-top:22px;padding:18px 28px;border-radius:28px;background:#fff;flex:none}
-#ccheck .post .ph{font-size:24px;color:var(--soft)}
-#ccheck .post .claim{font-size:42px;line-height:1.3;margin-top:6px}
-#ccheck .post .likes{font-size:22px;color:var(--soft);margin-top:6px}
-#ccheck .vote{display:flex;align-items:center;gap:16px;margin-top:18px;font-size:28px;position:relative}
-#ccheck .vote span{border:4px solid var(--ink);border-radius:999px;padding:4px 20px;background:#fff}
-#ccheck .clues{margin-top:18px;padding:14px 28px 16px;font-size:27px;line-height:1.4;background:#F1FBF6;flex:none}
-#ccheck .clues h3{font-size:32px;font-weight:400;margin-bottom:4px}
-#ccheck .clues p{display:flex;gap:12px;margin-top:6px}
-#ccheck .clues p b{flex:0 0 36px;height:36px;border-radius:50%;background:var(--mint);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:400;font-size:22px;margin-top:2px}
-#ccheck .upside{margin-top:18px;transform:rotate(180deg);font-size:22px;color:var(--soft);line-height:1.4;position:relative;text-align:center}
-
-/* 孩子的地盘 */
-#ccorner{background:#FFEFF3}
-#ccorner .letter{margin-top:22px;padding:18px 30px;font-size:28px;line-height:1.5;flex:none}
-#ccorner h3{font-size:30px;font-weight:400}
-#ccorner .vote2{margin-top:18px;padding:14px 28px;flex:none}
-#ccorner .vote2 .ab{display:flex;gap:18px;margin-top:10px}
-#ccorner .vote2 .ab span{flex:1;border:4px solid var(--ink);border-radius:24px;padding:10px 16px;font-size:28px;background:#FFF8EE;display:flex;align-items:center;gap:12px}
-#ccorner .vote2 .ab b{flex:0 0 44px;height:44px;border-radius:50%;background:var(--butter);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:400}
-#ccorner .vote2 small{display:block;margin-top:8px;font-size:22px;color:var(--soft)}
-#ccorner .ifyou{margin-top:18px;padding:14px 28px;flex:1;display:flex;flex-direction:column;min-height:0}
-#ccorner .ifyou .space,#ccorner .whisper .space{flex:1;border:4px dashed #E9C6CF;border-radius:20px;margin-top:10px;min-height:60px}
-#ccorner .row2{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:18px;position:relative}
-#ccorner .mood{padding:12px 22px}
-#ccorner .mood .w{display:flex;justify-content:space-between;margin-top:8px}
-#ccorner .mood .w span{display:flex;flex-direction:column;align-items:center;font-size:44px;line-height:1.1}
-#ccorner .mood .w small{font-size:20px;color:var(--soft)}
-#ccorner .mood p{font-size:22px;line-height:1.4;margin-top:8px;color:var(--soft)}
-#ccorner .whisper{padding:12px 22px;display:flex;flex-direction:column}
-#ccorner .whisper p{font-size:22px;line-height:1.4;color:var(--soft)}
-#ccheck .post .claim{font-size:50px}
-#ccheck .clues{font-size:30px;padding:18px 30px 20px}
-#ccheck .upside{font-size:24px;margin-bottom:6px}
 #ccheck .post.has-pic{display:flex;gap:24px;align-items:stretch}
 #ccheck .post .txt{flex:1;min-width:0}
 #ccheck .post .pic{flex:0 0 300px;border-radius:20px;border:4px solid var(--ink);background-size:cover;min-height:220px}
-#ccheck .mine{margin-top:18px;padding:14px 28px 18px;flex:1;display:flex;flex-direction:column;min-height:0}
-#ccheck .mine h3{font-size:30px;font-weight:400}
-#ccheck .mine .lines{flex:1;display:flex;flex-direction:column;justify-content:space-around}
-#ccheck .credit2{margin-top:6px}
+#ccheck .post .ph{font-size:24px;color:var(--soft)}
+#ccheck .post .claim{font-size:50px;line-height:1.3;margin-top:6px}
+#ccheck .post .likes{font-size:22px;color:var(--soft);margin-top:6px}
+#ccheck .vote{display:flex;align-items:center;gap:16px;margin-top:18px;font-size:28px;position:relative}
+#ccheck .vote span{border:4px solid var(--ink);border-radius:999px;padding:4px 20px;background:#fff}
 #ccheck .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px;position:relative}
 #ccheck .tools span{border:4px solid var(--ink);border-radius:22px;background:var(--butter);padding:10px 14px;font-size:28px;text-align:center;box-shadow:0 5px 0 var(--ink)}
 #ccheck .tools small{display:block;font-size:20px;color:var(--soft)}
-#ccheck .clues{display:flex;flex-direction:column}
-#ccheck .clues p{font-size:31px}
-
-#cdeep .card-photo{height:520px}
-#cdeep .br .bub{font-size:26px}
-#cdeep .power.b1{background:#E9FFF6}
-#cdeep .power.b1 b{color:#2E8C72}
-#cdeep .power{font-size:26px;padding:10px 24px}
-#cdeep .card-photo{height:400px}
-#cdeep .name{margin-top:14px;display:flex;align-items:baseline;gap:24px}
-#cdeep .name .zh{font-size:60px}
-#cdeep .name .en{margin-top:0}
-#cdeep .stats{margin-top:12px}
-#cdeep .meters{margin-top:14px}
-#cdeep .power{margin-top:12px;font-size:25px;line-height:1.4}
-#cdeep .brains{margin-top:8px}
-#cdeep .br .bub{font-size:24px;margin-bottom:14px}
-#cdeep .card-photo{height:380px}
+#ccheck .clues{margin-top:18px;padding:18px 30px 20px;font-size:30px;line-height:1.4;background:#F1FBF6;flex:none;display:flex;flex-direction:column}
+#ccheck .clues h3{font-size:32px;font-weight:400;margin-bottom:4px}
+#ccheck .clues p{display:flex;gap:12px;margin-top:6px;font-size:31px}
+#ccheck .clues p b{flex:0 0 36px;height:36px;border-radius:50%;background:var(--mint);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:400;font-size:22px;margin-top:2px}
+#ccheck .mine{margin-top:18px;padding:14px 28px 18px;flex:1;display:flex;flex-direction:column;min-height:0}
+#ccheck .mine h3{font-size:30px;font-weight:400}
+#ccheck .mine .lines{flex:1;display:flex;flex-direction:column;justify-content:space-around}
+#ccheck .upside{margin:18px 0 6px;transform:rotate(180deg);font-size:24px;color:var(--soft);line-height:1.4;position:relative;text-align:center}
+#ccheck .credit2{margin-top:6px}
 
 /* 经典连载：书 / 音乐盒 / 放映室 / 动手做 */
 #cserial{background:#F4EBDD}
@@ -364,7 +321,3 @@ svg.ch{display:block}
 #cthink .mine .after{margin-top:auto;display:flex;align-items:center;gap:12px;font-size:25px}
 #cthink .mine .after span{border:3px solid var(--ink);border-radius:999px;padding:2px 16px;background:#fff}
 #cthink .credit2{font-size:15px;color:var(--soft);margin-top:8px;line-height:1.3}
-
-/* 有经典连载时"最喜欢哪一页"有 7 个选项，收紧一点排成一行 */
-#c6 .pick.many{gap:6px;flex-wrap:nowrap}
-#c6 .pick.many span{padding:2px 10px;font-size:22px;white-space:nowrap}
