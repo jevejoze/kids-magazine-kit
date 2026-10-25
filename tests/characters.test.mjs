@@ -99,3 +99,28 @@ test("comic speaker names inherit their configured expression and accessories", 
   assert.match(comic, /data-character="dog" data-expression="surprise"/);
   assert.match(comic, /prop-eyemask/);
 });
+
+
+test("eye masks center on both eyes in SVG and in every PNG pose", () => {
+  const svg = runtime(null).draw("dog", "surprise", "eyemask");
+  assert.match(svg, /translate\(100 110\) rotate\(0\)/);
+  // Both ends are mirrored around the eye midpoint, rather than an asymmetric relative path.
+  assert.match(svg, /M-52 -16 Q-32 -24 0 -12 Q32 -24 52 -16/);
+  const pack = loadCharacterPack("storybook-v1"), run = runtime(pack);
+  for (const name of names) for (const mood of moods) {
+    const [lx, ly, rx, ry] = pack.characters[name].attachments[mood].eyes;
+    const output = run.draw(name, mood, "eyemask");
+    const [, x, y, angle] = output.match(/<g transform="translate\(([-.\d]+) ([-.\d]+)\) rotate\(([-.\d]+)\)">/);
+    assert.equal(Number(x), (lx + rx) / 2);
+    assert.equal(Number(y), (ly + ry) / 2);
+    assert.equal(Number(angle), Math.atan2(ry - ly, rx - lx) * 180 / Math.PI);
+  }
+});
+
+test("scarves follow the pose neck instead of the old full-body coordinates", () => {
+  const pack = loadCharacterPack("storybook-v1"), run = runtime(pack);
+  for (const mood of moods) {
+    const [x, y, width] = pack.characters.mouse.attachments[mood].neck;
+    assert.ok(run.draw("mouse", mood, "scarf").includes(`translate(${x} ${y}) scale(${width/116})`));
+  }
+});

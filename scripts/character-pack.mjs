@@ -34,6 +34,13 @@ export function loadCharacterPack(id) {
     const atlas = pack.atlases[character?.atlas];
     if (!character || !atlas || character.eyes?.length !== 3 || character.top?.length !== 2) throw new Error(`角色 ${name} 缺少定位信息`);
     for (const mood of moods) {
+      if (character.attachments) {
+        const a = character.attachments[mood];
+        for (const [key, length] of [["eyes", 4], ["top", 2], ["neck", 3]]) {
+          if (!Array.isArray(a?.[key]) || a[key].length !== length || !a[key].every(v => Number.isFinite(v) && v >= 0 && v <= 200)) throw new Error(`角色 ${name}:${mood} 缺少有效道具锚点 ${key}`);
+        }
+        if (a.eyes[2] <= a.eyes[0] || a.neck[2] <= 0) throw new Error(`角色 ${name}:${mood} 的道具锚点范围无效`);
+      }
       const frame = character.frames?.[mood];
       if (!Array.isArray(frame) || frame.length !== 4 || !frame.every(Number.isFinite) || frame[0] < 0 || frame[1] < 0 || frame[2] <= 0 || frame[3] <= 0 || frame[0] + frame[2] > atlas.width || frame[1] + frame[3] > atlas.height) throw new Error(`角色 ${name} 缺少有效表情 ${mood}`);
     }

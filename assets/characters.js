@@ -256,23 +256,34 @@ const AN = {
   raccoon: { e: [68, 132, 108], t: [100, 58] }
 };
 
+// Eye accessories share the line between both eyes, including tilted bitmap poses.
+function eyeAttachment(e) {
+  const [lx, ly, rx, ry] = e.length === 4 ? e : [e[0], e[2], e[1], e[2]];
+  return { x: (lx + rx) / 2, y: (ly + ry) / 2,
+    span: Math.hypot(rx - lx, ry - ly), angle: Math.atan2(ry - ly, rx - lx) * 180 / Math.PI };
+}
+function onEyes(e, render) {
+  const a = eyeAttachment(e);
+  return `<g transform="translate(${a.x} ${a.y}) rotate(${a.angle})">${render(a.span)}</g>`;
+}
+
 const PROP = {
-  sunglasses: ([l, r, y]) => `
-    <g class="prop-sunglasses">
-      <rect x="${l-22}" y="${y-14}" width="44" height="28" rx="10" fill="#22222E" ${S}/>
-      <rect x="${r-22}" y="${y-14}" width="44" height="28" rx="10" fill="#22222E" ${S}/>
-      <path d="M${l+22} ${y-3} H${r-22}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
-      <path d="M${l-14} ${y-6} l12 -6 M${l-6} ${y+4} l8 -4" stroke="#8EC5FF" stroke-width="3" stroke-linecap="round" opacity=".8"/>
-      <path d="M${r-14} ${y-6} l12 -6 M${r-6} ${y+4} l8 -4" stroke="#8EC5FF" stroke-width="3" stroke-linecap="round" opacity=".8"/>
-    </g>
-  `,
-  eyemask: ([l, r, y]) => `
-    <g class="prop-eyemask">
-      <path d="M24 ${y-34} Q100 ${y-50} 176 ${y-34}" stroke="#7A6BD0" stroke-width="6" fill="none"/>
-      <path d="M${l-26} ${y-48} q${(r-l)/2+26} -10 ${r-l+52} 0 q6 26 -18 28 q-${(r-l)/2+8} -8 ${-(r-l)+16} 0 q-24 -2 -20 -28 z" fill="#BCAEFF" ${S}/>
-      <path d="M${l-8} ${y-34} q8 6 16 0 M${r-8} ${y-34} q8 6 16 0" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-    </g>
-  `,
+  sunglasses: e => onEyes(e, span => {
+    const l = -span / 2, r = span / 2, half = Math.min(22, span * .4);
+    return `<g class="prop-sunglasses">
+      ${[l, r].map(x => `<rect x="${x-half}" y="-14" width="${half*2}" height="28" rx="10" fill="#22222E" ${S}/><path d="M${x-half+7} -5 l10 -5" stroke="#8EC5FF" stroke-width="3" stroke-linecap="round"/>`).join("")}
+      <path d="M${l+half} -3 H${r-half}" stroke="${INK}" stroke-width="5"/>
+    </g>`;
+  }),
+  eyemask: e => onEyes(e, span => {
+    const half = span / 2 + 20;
+    return `<g class="prop-eyemask">
+      <path d="M${-half-14} 0 H${half+14}" stroke="#7A6BD0" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M${-half} -16 Q${-span/2} -24 0 -12 Q${span/2} -24 ${half} -16
+        L${half} 10 Q${span/2} 28 10 12 Q0 4 -10 12 Q${-span/2} 28 ${-half} 10 Z" fill="#BCAEFF" ${S}/>
+      <path d="M${-span/2-7} 0 q7 6 14 0 M${span/2-7} 0 q7 6 14 0" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </g>`;
+  }),
   partyhat: (e, [x, y]) => `
     <g class="prop-partyhat">
       <path d="M${x-24} ${y+6} L${x} ${y-58} L${x+24} ${y+6} Z" fill="#FF7B7B" ${S}/>
@@ -280,20 +291,20 @@ const PROP = {
       <circle cx="${x}" cy="${y-58}" r="8" fill="#FFD45C" stroke="${INK}" stroke-width="3"/>
     </g>
   `,
-  scarf: () => `
-    <g class="prop-scarf">
+  scarf: (e, t, { neck = [100, 174, 116] } = {}) => `
+    <g class="prop-scarf" transform="translate(${neck[0]} ${neck[1]}) scale(${neck[2]/116}) translate(-100 -174)">
       <path d="M42 168 Q100 192 158 168 L160 184 Q100 206 40 184 Z" fill="#FF6B6B" ${S}/>
       <path d="M128 178 l12 24 l18 -4 l-8 -24 z" fill="#E85050" ${S}/>
       <path d="M136 204 v4 M144 203 v4 M152 201 v4" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>
     </g>
   `,
   magnifier: () => "", // handled within owl
-  sweat: ([l, r, y]) => `
+  sweat: e => { const { x, y, span } = eyeAttachment(e); const r = x + span / 2; return `
     <g transform="translate(${r+26}, ${y-30})">
       <path d="M8 0 C16 12 18 20 10 24 C2 28 -4 20 2 12 Z" fill="#8EC5FF" ${S}/>
       <ellipse cx="6" cy="18" rx="2" ry="4" fill="#FFFFFF" opacity=".7"/>
     </g>
-  `
+  `; }
 };
 
 // Versioned bitmap atlas: reuse these exact pixels in every issue.
@@ -312,9 +323,10 @@ function drawBitmap(name, mood, size, props) {
   const boxed = name === "box" || name === "dogbox";
   const portrait = `<svg x="${boxed ? 35 : 0}" y="0" width="${boxed ? 130 : 200}" height="${boxed ? 130 : 200}" viewBox="${frame.join(" ")}" overflow="hidden"><use href="#kids-character-${character.atlas}"/></svg>`;
   const cardboard = boxed ? `<rect x="20" y="112" width="160" height="82" fill="#D9A465" ${S}/><path d="M20 112 l-16 -20 M180 112 l16 -20 M74 154 h52" fill="none" ${S}/>` : "";
+  const anchors = character.attachments?.[expression] || { eyes: character.eyes, top: character.top };
   const accessories = boxed ? "" : props.split("+").filter(Boolean).map(prop => {
     if (prop === "magnifier") return `<path d="M150 152 l30 30" stroke="#8A5A2B" stroke-width="12" stroke-linecap="round"/><circle cx="138" cy="140" r="24" fill="#DFF3FF" fill-opacity=".55" ${S}/>`;
-    return PROP[prop] ? PROP[prop](character.eyes, character.top) : "";
+    return PROP[prop] ? PROP[prop](anchors.eyes, anchors.top, anchors) : "";
   }).join("");
   return `<svg class="ch" data-character-pack="${activeCharacterPack.id}" data-character="${role}" data-expression="${expression}" width="${size}" height="${size}" viewBox="0 0 200 200" overflow="visible">${portrait}${cardboard}${accessories}</svg>`;
 }
