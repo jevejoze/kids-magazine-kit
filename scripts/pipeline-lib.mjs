@@ -375,7 +375,7 @@ export function createPipeline(issueArg) {
     const asset = f => f ? `20-assets/${f}` : f;
     const strip = o => Object.fromEntries(Object.entries(o).filter(([k]) => !k.startsWith("_")));
     const issueJson = {
-      issue: b.issue, date: b.date, weather: b.weather, masthead: b.masthead,
+      issue: b.issue, date: b.date, weather: b.weather, masthead: b.masthead, character_pack: b.character_pack,
       question: c.question,
       cover: { photo: asset(a.cover), photo_pos: c.photo_pos, strip: c.strip, stamp: c.stamp, asked_by: c.asked_by, crew: c.crew, crew_say: c.crew_say, credit: c.credit },
       comic: { ...strip(m), theme_icon: m.theme_icon || c.theme_icon, sources: undefined },

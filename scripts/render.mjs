@@ -11,6 +11,7 @@ import { spawn } from "node:child_process";
 import { inputFingerprint, recordBuild, publishDirectory } from "./build-state.mjs";
 import { createPipeline } from "./pipeline-lib.mjs";
 import { CARD_IDS, pageOrder, validateIssue } from "./contracts.mjs";
+import { loadCharacterPack } from "./character-pack.mjs";
 
 const args = process.argv.slice(2);
 const flat = args.includes("--flat");
@@ -34,6 +35,7 @@ const embed = (v, path = "") => {
   return v;
 };
 const raw = JSON.parse(readFileSync(jsonPath, "utf8"));
+const characterPack = loadCharacterPack(raw.character_pack);
 const errors = validateIssue(raw);
 if (!preview) {
   const pipeline = createPipeline(jsonDir);
@@ -60,6 +62,7 @@ try {
 const html = readFileSync(join(assets, "template.html"), "utf8")
   .replace("{{TITLE}}", `${data.masthead.zh} 第${N}期`)
   .replace("{{STYLE}}", () => readFileSync(join(assets, "style.css"), "utf8"))
+  .replace("{{CHARACTER_PACK}}", () => JSON.stringify(characterPack))
   .replace("{{CHARACTERS}}", () => readFileSync(join(assets, "characters.js"), "utf8"))
   .replace("{{CARD_IDS}}", () => JSON.stringify(pageOrder(data).map(key => CARD_IDS[key])))
   .replace("{{DATA}}", () => JSON.stringify(data));

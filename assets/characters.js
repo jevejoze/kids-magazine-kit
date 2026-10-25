@@ -296,7 +296,31 @@ const PROP = {
   `
 };
 
+// Versioned bitmap atlas: reuse these exact pixels in every issue.
+const activeCharacterPack = typeof CHARACTER_PACK === "undefined" ? null : CHARACTER_PACK;
+const characterPackReady = activeCharacterPack ? (() => {
+  document.body.insertAdjacentHTML("afterbegin", `<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>${Object.entries(activeCharacterPack.atlases).map(([key, atlas]) => `<image id="kids-character-${key}" width="${atlas.width}" height="${atlas.height}" href="${activeCharacterPack.images[key]}"/>`).join("")}</defs></svg>`);
+  return Promise.all(Object.values(activeCharacterPack.images).map(src => { const image = new Image(); image.src = src; return image.decode(); }));
+})() : Promise.resolve();
+
+function drawBitmap(name, mood, size, props) {
+  const role = name === "box" ? "raccoon" : name === "dogbox" ? "dog" : name;
+  const character = activeCharacterPack.characters[role];
+  const expression = mood === "peek" ? "smirk" : mood;
+  const frame = character?.frames[expression];
+  if (!frame) throw new Error(`角色素材库缺少 ${role}:${expression}`);
+  const boxed = name === "box" || name === "dogbox";
+  const portrait = `<svg x="${boxed ? 35 : 0}" y="0" width="${boxed ? 130 : 200}" height="${boxed ? 130 : 200}" viewBox="${frame.join(" ")}" overflow="hidden"><use href="#kids-character-${character.atlas}"/></svg>`;
+  const cardboard = boxed ? `<rect x="20" y="112" width="160" height="82" fill="#D9A465" ${S}/><path d="M20 112 l-16 -20 M180 112 l16 -20 M74 154 h52" fill="none" ${S}/>` : "";
+  const accessories = boxed ? "" : props.split("+").filter(Boolean).map(prop => {
+    if (prop === "magnifier") return `<path d="M150 152 l30 30" stroke="#8A5A2B" stroke-width="12" stroke-linecap="round"/><circle cx="138" cy="140" r="24" fill="#DFF3FF" fill-opacity=".55" ${S}/>`;
+    return PROP[prop] ? PROP[prop](character.eyes, character.top) : "";
+  }).join("");
+  return `<svg class="ch" data-character-pack="${activeCharacterPack.id}" data-character="${role}" data-expression="${expression}" width="${size}" height="${size}" viewBox="0 0 200 200" overflow="visible">${portrait}${cardboard}${accessories}</svg>`;
+}
+
 function draw(name, mood, size, props = "") {
+  if (activeCharacterPack) return drawBitmap(name, mood, size, props);
   const a = AN[name];
   const extra = props.split("+").filter(Boolean).map(k => PROP[k] && a ? PROP[k](a.e, a.t) : "").join("");
   const content = CH[name] ? CH[name](mood, props) : "";

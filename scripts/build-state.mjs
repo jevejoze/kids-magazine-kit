@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, renameSync, rmSync, existsSync, statSync, readdirSync, cpSync } from "node:fs";
 import { dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { characterPackFiles } from "./character-pack.mjs";
 
 const engine = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const hash = value => createHash("sha256").update(value).digest("hex");
@@ -41,7 +42,8 @@ export function inputFingerprint(issue, stage) {
   let files;
   if (stage === "30-assemble") files = [...sources(issue), ...engineFiles("scripts/pipeline-lib.mjs", "scripts/contracts.mjs", "pipeline/stages.json")];
   else if (stage === "40-render") files = [...sources(issue), ...local("30-issue.json", "31-review.md"),
-    ...engineFiles("scripts/render.mjs", "scripts/contracts.mjs", "assets/template.html", "assets/style.css", "assets/characters.js")];
+    ...engineFiles("scripts/render.mjs", "scripts/contracts.mjs", "scripts/character-pack.mjs", "assets/template.html", "assets/style.css", "assets/characters.js"),
+    ...characterPackFiles(read(join(issue, "30-issue.json")).character_pack).map(p => ["engine/" + relative(engine, p), p])];
   else if (stage === "60-audio") files = [...local("50-narration.json"),
     ["voices/azure.json", join(issue, "../../voices/azure.json")], ["voices/polyphones.json", join(issue, "../../voices/polyphones.json")],
     ...engineFiles("scripts/tts_azure.mjs", "scripts/polyphones.json")];

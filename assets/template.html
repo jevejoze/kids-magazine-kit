@@ -11,6 +11,7 @@
 <body>
 <div id="root"></div>
 <script>
+const CHARACTER_PACK = {{CHARACTER_PACK}};
 {{CHARACTERS}}
 const D = {{DATA}};
 
@@ -56,9 +57,11 @@ const C = D.comic;
 const hl = (text, word) => word ? text.replace(new RegExp(`\\b(${word}\\w*)`, "i"), "<b>$1</b>") : text;
 const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
 const chatRow = (b, bi, p, pi) => {
-  const whoKey = (b.who || p.chars[bi] || p.chars[0] || "").split(":")[0];
+  const speaker = b.who || p.chars[bi] || p.chars[0] || "";
+  const spec = speaker.includes(":") ? speaker : p.chars.find(s => s.split(":")[0] === speaker) || speaker;
+  const [whoKey, mood = "normal", , props = ""] = spec.split(":");
   const side = b.side || (p.bubbles.length > 1 ? (bi % 2 === 0 ? "left" : "right") : (pi % 2 === 0 ? "left" : "right"));
-  const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, "happy", 96)}</div>`;
+  const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, mood, 96, props)}</div>`;
   const bub = `<div class="bub who-${whoKey} ${side} ${b.lang === "en" ? "en" : "fun"}">${b.text}</div>`;
   return `<div class="chat-row ${side}">${side === "left" ? ava + bub : bub + ava}</div>`;
 };
@@ -233,7 +236,7 @@ async function coverStrip() {
   const lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
   card.classList.add(lum > 0.6 ? "light" : "dark");
 }
-window.READY = coverStrip();
+window.READY = Promise.all([coverStrip(), characterPackReady]);
 </script>
 </body>
 </html>

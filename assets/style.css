@@ -76,6 +76,7 @@ svg.ch{display:block}
 #c2 .chat-ava svg{width:96px;height:96px;margin-top:8px;flex-shrink:0}
 #c2 .chat-ava.mouse svg{margin-top:4px}
 #c2 .chat-ava.owl svg{margin-top:10px}
+#c2 .chat-ava svg[data-character-pack]{width:72px;height:72px;margin-top:0}
 
 /* Bubble */
 #c2 .bub{
