@@ -108,11 +108,47 @@ const ATTIC = `<svg class="bg" viewBox="0 0 952 340" preserveAspectRatio="none">
   <path d="M0 250 H952 V340 H0z" fill="#D9A465"/><path d="M0 250 H952" stroke="#4A3B32" stroke-width="5"/>
   <path d="M40 300 h90 M300 320 h120 M640 296 h110" stroke="#B9844A" stroke-width="5" stroke-linecap="round"/>
   <rect x="780" y="180" width="120" height="90" fill="#E7B97F" stroke="#4A3B32" stroke-width="5"/><rect x="808" y="130" width="80" height="54" fill="#D9A465" stroke="#4A3B32" stroke-width="5"/></svg>`;
+const renderStory = ST => {
+  if (ST.paragraphs && ST.paragraphs.length <= 4) {
+    const actHtml = ST.paragraphs.map((p, i) => {
+      const hasOwl = p.includes("咕咕博士") || p.includes("博士");
+      const hasMouse = p.includes("波波鼠");
+      const hasDog = p.includes("团子狗");
+      const hasRaccoon = p.includes("浣熊");
+      const quotes = [...p.matchAll(/“([^”]+)”/g)].map(m => m[1]);
+      const cleanNar = p.replace(/“[^”]+”/g, "").replace(/：\s*/g, " ").trim();
+
+      if (hasMouse && hasDog && quotes.length >= 2) {
+        return `<div class="act duo-act">
+          <div class="duo-row mouse-row"><div class="char-fig">${draw("mouse", "wave", 100)}</div><div class="bub fun">“${quotes[0]}”</div></div>
+          <div class="duo-row dog-row"><div class="bub fun">“${quotes[1]}”</div><div class="char-fig">${draw("dog", "happy", 104)}</div></div>
+        </div>`;
+      }
+      if (hasOwl) {
+        return `<div class="act owl-act"><div class="char-fig">${draw("owl", "talk", 124, "magnifier")}</div>
+          <div class="act-txt"><div class="bub fun">“${quotes.length ? quotes.join(" ") : p}”</div>${cleanNar ? `<div class="nar">${cleanNar}</div>` : ""}</div></div>`;
+      }
+      if (hasRaccoon) {
+        return `<div class="act raccoon-act"><div class="char-fig">${draw("raccoon", "smirk", 124)}</div>
+          <div class="act-txt">${quotes.length ? `<div class="bub fun">“${quotes.join(" ")}”</div>` : ""}<div class="nar">${quotes.length ? cleanNar : p}</div></div></div>`;
+      }
+      const charKey = (ST.scene[i] || "dog").split(":")[0];
+      return `<div class="act general-act"><div class="char-fig">${draw(charKey, "happy", 110)}</div>
+        <div class="act-txt">${quotes.length ? `<div class="bub fun">“${quotes.join(" ")}”</div>` : ""}<div class="nar">${quotes.length ? cleanNar : p}</div></div></div>`;
+    }).join("");
+
+    return `<div class="story-acts">${actHtml}</div>
+      ${ST.clue ? `<div class="clue-box fun"><div class="key-icon">🔑</div><div class="clue-txt"><b>关键线索</b><span>${ST.clue}</span></div></div>` : ""}
+      <div class="tbc fun"><span>📦 ${ST.tbc}</span></div>`;
+  }
+
+  return `<div class="box stage">${ATTIC}<div class="scene">${ST.scene.map(ch).join("")}</div></div>
+    <div class="story ${ST.lang === "en" ? "en" : ""}">${ST.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
+    <div class="tbc fun"><span>${ST.tbc}</span>${ST.clue ? `<span class="clue">🔍 ${ST.clue}</span>` : ""}</div>`;
+};
 cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · Story Time", "EP." + ST.ep)}
   <div class="h1 fun">第${ST.ep}集　${ST.title_zh}<span class="en">${ST.title_en}</span></div>
-  <div class="box stage">${ATTIC}<div class="scene">${ST.scene.map(ch).join("")}</div></div>
-  <div class="story ${ST.lang === "en" ? "en" : ""}">${ST.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
-  <div class="tbc fun"><span>${ST.tbc}</span>${ST.clue ? `<span class="clue">🔍 ${ST.clue}</span>` : ""}</div>
+  ${renderStory(ST)}
   ${foot(ST.foot || `编辑部推理连载${NEXT("小剧场")}`)}</section>`);
 
 // 挑战卡
@@ -123,7 +159,7 @@ if (P) cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的�
     ${P.puzzle.slots ? `<div class="slots">${P.puzzle.slots.map(x => `<span>${x}</span>`).join("")}</div>` : ""}</div>
   ${P.english?.length ? `<div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
     <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div>${e.stars === 3 ? lines(2) : ""}</div></div>`).join("")}</div>`
-    : `<div class="box draft fun"><h3>✏️ 草稿区 · 画一画、算一算</h3></div>
+    : `<div class="draft fun"><h3>✏️ 演算草稿手账 · 💡 浣熊锦囊：细心验算每一个线索哦！</h3><div class="stamp"><span>🏆 通关印</span><b>留念</b></div></div>
   ${P.puzzle.slots ? "" : `<div class="box mine fun"><b>我的答案：</b>${lines(1)}</div>`}`}
   ${foot("答案明天公布！")}</section>`);
 
@@ -179,10 +215,10 @@ const TK = D.think;
 if (TK) cards.push(`<section class="card" id="cthink">${topBar("🗣️ 周末思辨 · Big Talk", "周六聊一聊")}
   <div class="h1 fun">${TK.title}${TK.title_en ? `<span class="en">${TK.title_en}</span>` : ""}</div>
   <div class="box story fun${TK.photo ? " has-pic" : ""}">${TK.photo ? `<div class="pic" style="background-image:url('${TK.photo}');background-position:${TK.photo_pos || "center"}"></div>` : ""}<p>${TK.story}</p></div>
-  <div class="sides">${TK.sides.map((x, i) => `<div class="side s${i}">${ch(x.who)}<div class="bub fun">${x.say}</div></div>`).join("")}</div>
+  <div class="sides">${TK.sides.map((x, i) => `<div class="side s${i}"><div class="bub fun">${x.say}</div><div class="char-stage">${ch(x.who)}</div></div>`).join(`<div class="vs-emblem en">VS</div>`)}</div>
   <div class="box role fun"><b>🎭 换你来</b>${TK.role}</div>
   <div class="box deeper fun"><b>🤔 再想深一点</b>${TK.deeper.map(q => `<p>${q}</p>`).join("")}</div>
-  <div class="box mine fun"><h3>✏️ 我的想法：______，因为……</h3>${lines(3)}
+  <div class="box mine fun"><h3>✏️ 我的想法：______，因为……</h3>${lines(2)}
     <div class="after">周六聊完，我的想法：<span>没变</span><span>变了一点</span><span>完全变了</span></div></div>
   ${TK.credit ? `<div class="credit2 en">${TK.credit}</div>` : ""}
   ${foot(`周六和家人聊一聊，听听别人怎么想${NEXT("周末思辨")}`)}</section>`);

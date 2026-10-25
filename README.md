@@ -102,7 +102,8 @@ MIT
 
 新角色库 `storybook-v1` 包含 4 位成员、每位 9 种表情，直接重复使用固定的透明 PNG，不在每期重新生成。在 `00-brief.json` 中设置 `"character_pack": "storybook-v1"` 即可随整期保存；省略时继续使用原有 SVG。现有角色和道具写法不变。
 
-- [实际漫画页面](docs/characters-storybook-v1-comic.png)
+- [实际漫画页面](docs/characters-storybook-v1-comic.png)（已同步主分支无圆框布局）
+- [实际挑战页面](docs/characters-storybook-v1-challenge.png)
 - [素材文件、版本约定与接入方式](assets/characters/storybook-v1/README.md)
 - 本地查看全部表情：`node scripts/preview-characters.mjs storybook-v1`
 

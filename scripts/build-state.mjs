@@ -54,7 +54,7 @@ export function inputFingerprint(issue, stage) {
       ...narration.flatMap(p => local(`40-cards/card-${p.card}.png`, ...p.lines.map((_, i) => `60-audio/c${p.card}_${String(i).padStart(2, "0")}.wav`))),
       ...readdirSync(join(issue, "40-cards")).filter(p => p.endsWith(".pdf")).flatMap(p => local("40-cards/" + p)),
       ...[...sfx].flatMap(name => ["wav", "mp3", "m4a", "ogg"].map(ext => [`sfx/${name}.${ext}`, join(issue, `../../sfx/${name}.${ext}`)])),
-      ...engineFiles("scripts/make_video.py")];
+      ...engineFiles("scripts/make_video.mjs", "scripts/make_video.py")];
   } else throw new Error(`不支持的制作步骤：${stage}`);
   files.push(...engineFiles("scripts/build-state.mjs"));
   return hash(JSON.stringify(snapshot(files)));
