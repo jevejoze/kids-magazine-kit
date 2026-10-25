@@ -20,7 +20,7 @@
 核对并更新完档案后，写 `issue/90-archive.json`，列出本期实际更新的档案（路径相对数据目录），用于流水线判断归档是否完成。不要提前写；文件清单检查不能替代上述网盘核对。
 
 ```json
-{"issue": 3, "updated": ["story-bible.md", "serial-bible.md"]}
+{"issue": 3, "content_hash": "<当前内容指纹>", "updated": ["story-bible.md", "serial-bible.md"]}
 ```
 
 **自检**：网盘上 `issues/NNN/` 和 `成品/NNN/` 的文件都齐了，告诉家长成品在网盘的哪个文件夹

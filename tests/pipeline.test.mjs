@@ -1,20 +1,38 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, cpSync, rmSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { mkdtempSync, cpSync, rmSync, readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, basename } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createPipeline } from "../scripts/pipeline-lib.mjs";
+import { inputFingerprint, recordBuild, publishDirectory, currentBuild } from "../scripts/build-state.mjs";
 import { pageOrder, validateStructure } from "../scripts/contracts.mjs";
 
 const demo = new URL("../examples/demo/", import.meta.url);
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), "kids-test-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  cpSync(demo, root, { recursive: true });
-  return join(root, "issues/003");
+  cpSync(demo, root, { recursive: true, filter: src => !["40-cards", "60-audio", "70-final"].includes(basename(src)) });
+  const issue = join(root, "issues/003");
+  const pipeline = createPipeline(issue);
+  pipeline.assemble();
+  const fingerprint = pipeline.fingerprint();
+  writeFileSync(join(issue, "31-review.md"), `结论：通过\n内容指纹：${fingerprint}\n`);
+  const narration = json(issue, "50-narration.json");
+  narration._meta.content_hash = fingerprint;
+  put(issue, "50-narration.json", narration);
+  return issue;
 }
 const json = (issue, name) => JSON.parse(readFileSync(join(issue, name), "utf8"));
+function stamp(issue, stage, files) {
+  recordBuild(issue, stage, inputFingerprint(issue, stage), files.map(f => join(issue, f)));
+}
+function cards(issue) {
+  mkdirSync(join(issue, "40-cards"), { recursive: true });
+  const names = [...Array.from({ length: 9 }, (_, i) => `40-cards/card-${i + 1}.png`), "40-cards/小满早知道-第003期.pdf"];
+  for (const name of names) writeFileSync(join(issue, name), "generated");
+  stamp(issue, "40-render", names);
+}
 const put = (issue, name, value) => writeFileSync(join(issue, name), JSON.stringify(value));
 
 test("complete demo assembles and narration agrees with rendered page contract", t => {
@@ -63,6 +81,7 @@ test("empty output directories and missing pages are not complete", t => {
   assert.equal(p.done("70-video"), false);
   for (let i = 1; i <= 9; i++) writeFileSync(join(issue, `40-cards/card-${i}.png`), "image");
   writeFileSync(join(issue, "40-cards/小满早知道-第003期.pdf"), "pdf");
+  stamp(issue, "40-render", [...Array.from({ length: 9 }, (_, i) => `40-cards/card-${i + 1}.png`), "40-cards/小满早知道-第003期.pdf"]);
   assert.equal(p.done("40-render"), true);
   rmSync(join(issue, "40-cards/card-8.png"));
   assert.equal(p.done("40-render"), false);
@@ -77,6 +96,7 @@ test("audio completion requires every line in manifest and on disk", t => {
     writeFileSync(join(issue, "60-audio", file), "audio");
   });
   put(issue, "60-audio/manifest.json", { files });
+  stamp(issue, "60-audio", ["60-audio/manifest.json", ...files.map(f => "60-audio/" + f.file)]);
   assert.equal(p.done("60-audio"), true);
   files.pop();
   put(issue, "60-audio/manifest.json", { files });
@@ -116,9 +136,10 @@ test("enabled weekly column is required; malformed JSON is not complete", t => {
 
 test("archive receipt must refer to this issue and existing updated records", t => {
   const issue = fixture(t), p = createPipeline(issue);
+  cards(issue);
   put(issue, "90-archive.json", { issue: 2, updated: ["story-bible.md"] });
   assert.equal(p.done("90-archive"), false);
-  put(issue, "90-archive.json", { issue: 3, updated: ["story-bible.md"] });
+  put(issue, "90-archive.json", { issue: 3, content_hash: p.fingerprint(), updated: ["story-bible.md"] });
   assert.equal(p.done("90-archive"), true);
   put(issue, "90-archive.json", { issue: 3, updated: ["missing.md"] });
   assert.equal(p.done("90-archive"), false);
@@ -131,4 +152,146 @@ test("official rendering rejects unapproved content before writing output", t =>
     join(issue, "30-issue.json"), join(issue, "40-cards"), "--flat"], { encoding: "utf8" });
   assert.equal(result.status, 2);
   assert.match(result.stderr, /正式渲染需要/);
+});
+
+test("source edits invalidate assembly, review, narration and cards until each is redone", t => {
+  const issue = fixture(t), p = createPipeline(issue);
+  cards(issue);
+  assert.equal(p.done("50-narration"), true);
+  assert.equal(p.done("40-render"), true);
+  const story = json(issue, "13-story.json");
+  story.clue = "侦探笔记：窗台上少了什么？";
+  put(issue, "13-story.json", story);
+  for (const stage of ["30-assemble", "31-review", "50-narration", "40-render"]) assert.equal(p.done(stage), false, stage);
+  p.assemble();
+  assert.equal(p.done("30-assemble"), true);
+  assert.equal(p.reviewPassed(), false);
+  writeFileSync(join(issue, "31-review.md"), `结论：通过\n内容指纹：${p.fingerprint()}\n`);
+  assert.equal(p.reviewPassed(), true);
+  assert.equal(p.done("50-narration"), false);
+  assert.equal(p.done("40-render"), false);
+});
+
+test("replacing image bytes under the same filename invalidates review", t => {
+  const issue = fixture(t), p = createPipeline(issue);
+  writeFileSync(join(issue, "20-assets/cover.jpg"), "replacement");
+  assert.equal(p.done("30-assemble"), false);
+  assert.equal(p.reviewPassed(), false);
+});
+
+test("modified output is stale even when all filenames are present", t => {
+  const issue = fixture(t);
+  cards(issue);
+  writeFileSync(join(issue, "40-cards/card-1.png"), "modified image");
+  assert.equal(createPipeline(issue).done("40-render"), false);
+});
+
+test("voice settings invalidate cached audio builds", t => {
+  const issue = fixture(t);
+  mkdirSync(join(issue, "60-audio"), { recursive: true });
+  put(issue, "60-audio/manifest.json", { files: [] });
+  stamp(issue, "60-audio", ["60-audio/manifest.json"]);
+  assert.equal(currentBuild(issue, "60-audio"), true);
+  mkdirSync(join(issue, "../../voices"), { recursive: true });
+  writeFileSync(join(issue, "../../voices/azure.json"), '{"dog/zh":"different"}');
+  assert.equal(currentBuild(issue, "60-audio"), false);
+});
+
+test("recording refuses inputs that changed during generation", t => {
+  const issue = fixture(t), inputs = inputFingerprint(issue, "30-assemble");
+  writeFileSync(join(issue, "20-assets/cover.jpg"), "replacement");
+  assert.throws(() => recordBuild(issue, "30-assemble", inputs, [join(issue, "30-issue.json")]), /制作期间输入发生变化/);
+});
+
+test("publishing replaces obsolete generated files but preserves notes", t => {
+  const issue = fixture(t), target = join(issue, "40-cards"), staging = join(issue, ".staging");
+  mkdirSync(target, { recursive: true }); mkdirSync(staging);
+  writeFileSync(join(target, "card-10.png"), "old");
+  writeFileSync(join(target, "notes.md"), "keep");
+  writeFileSync(join(staging, "card-1.png"), "new");
+  publishDirectory(staging, target, name => /^card-\d+\.png$/.test(name));
+  assert.deepEqual(readdirSync(target).sort(), ["card-1.png", "notes.md"]);
+  assert.equal(readFileSync(join(target, "notes.md"), "utf8"), "keep");
+});
+
+test("Chrome failure preserves previous output and removes staging directories", t => {
+  const issue = fixture(t), target = join(issue, "40-cards");
+  mkdirSync(target, { recursive: true });
+  writeFileSync(join(target, "card-1.png"), "previous");
+  const result = spawnSync(process.execPath, [new URL("../scripts/render.mjs", import.meta.url).pathname,
+    join(issue, "30-issue.json"), target, "--flat"], { encoding: "utf8", timeout: 15000, env: { ...process.env, CHROME: "/usr/bin/false" } });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Chrome 退出/);
+  assert.equal(readFileSync(join(target, "card-1.png"), "utf8"), "previous");
+  assert.equal(readdirSync(issue).some(p => p.startsWith(".kids-render-")), false);
+});
+
+test("speech checkpoints survive interruption and resume without recharging saved lines", t => {
+  const issue = fixture(t), mock = join(issue, "mock-azure.mjs"), log = join(issue, "calls.jsonl");
+  writeFileSync(mock, `
+    import { appendFileSync } from 'node:fs';
+    const originalTimeout = globalThis.setTimeout;
+    globalThis.setTimeout = (fn, ms, ...args) => originalTimeout(fn, ms === 3200 ? 0 : ms, ...args);
+    let requests = 0;
+    globalThis.fetch = async (_url, options) => {
+      if (++requests === 2) throw new Error('simulated network interruption');
+      appendFileSync(process.env.TEST_CALLS, JSON.stringify(options.body) + '\\n');
+      const wav = Buffer.alloc(44 + 4800);
+      wav.write('RIFF'); wav.writeUInt32LE(wav.length - 8, 4); wav.write('WAVEfmt ', 8);
+      wav.writeUInt32LE(16, 16); wav.writeUInt16LE(1, 20); wav.writeUInt16LE(1, 22);
+      wav.writeUInt32LE(24000, 24); wav.writeUInt32LE(48000, 28); wav.writeUInt16LE(2, 32); wav.writeUInt16LE(16, 34);
+      wav.write('data', 36); wav.writeUInt32LE(4800, 40);
+      return new Response(wav, { status: 200 });
+    };
+  `);
+  const run = () => spawnSync(process.execPath, ["--import", mock, new URL("../scripts/tts_azure.mjs", import.meta.url).pathname, issue],
+    { encoding: "utf8", timeout: 15000, env: { ...process.env, TEST_CALLS: log, AZURE_SPEECH_KEY: "offline-test", AZURE_SPEECH_REGION: "offline-test" } });
+  const first = run();
+  assert.match(first.stderr, /simulated network interruption/);
+  assert.equal(json(issue, "60-audio/manifest.json").files.length, 1);
+  assert.equal(json(issue, "60-audio/manifest.json")._meta.complete, false);
+  assert.equal(existsSync(join(issue, "60-audio/build.json")), false);
+  const saved = readFileSync(join(issue, "60-audio/c1_00.wav"));
+  const second = run();
+  assert.match(second.stderr, /simulated network interruption/);
+  assert.equal(json(issue, "60-audio/manifest.json").files.length, 2);
+  assert.deepEqual(readFileSync(join(issue, "60-audio/c1_00.wav")), saved);
+  const calls = readFileSync(log, "utf8").trim().split("\n").map(JSON.parse);
+  assert.equal(calls.length, 2);
+  assert.notEqual(calls[0], calls[1]);
+});
+
+test("speech dry runs leave no audio directories or receipts", t => {
+  const issue = fixture(t);
+  rmSync(join(issue, "60-audio"), { recursive: true, force: true });
+  const result = spawnSync(process.execPath, [new URL("../scripts/tts_azure.mjs", import.meta.url).pathname, issue, "--dry"], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(existsSync(join(issue, "60-audio")), false);
+});
+
+test("a passing conclusion without a version cannot approve an old review", t => {
+  const issue = fixture(t);
+  writeFileSync(join(issue, "31-review.md"), "结论：通过\n");
+  assert.equal(createPipeline(issue).reviewPassed(), false);
+});
+
+test("video provenance includes sound effects and every upstream output", t => {
+  const issue = fixture(t), p = createPipeline(issue);
+  cards(issue);
+  mkdirSync(join(issue, "60-audio"), { recursive: true });
+  const files = json(issue, "50-narration.json").narration.flatMap(page => page.lines.map((_, index) => {
+    const file = `c${page.card}_${String(index).padStart(2, "0")}.wav`;
+    writeFileSync(join(issue, "60-audio", file), "audio");
+    return { card: page.card, index, file };
+  }));
+  put(issue, "60-audio/manifest.json", { files });
+  stamp(issue, "60-audio", ["60-audio/manifest.json", ...files.map(f => "60-audio/" + f.file)]);
+  mkdirSync(join(issue, "70-final"), { recursive: true });
+  const outputs = ["70-final/讲读版.mp4", "70-final/小满早知道-第003期.pdf"];
+  for (const name of outputs) writeFileSync(join(issue, name), "video output");
+  stamp(issue, "70-video", outputs);
+  assert.equal(p.done("70-video"), true);
+  mkdirSync(join(issue, "../../sfx"), { recursive: true });
+  writeFileSync(join(issue, "../../sfx/bgm.wav"), "new background music");
+  assert.equal(p.done("70-video"), false);
 });

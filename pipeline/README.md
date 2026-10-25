@@ -22,6 +22,7 @@
       14-puzzle.json  15-english.json  16-mailbox.json  17-news.json  18-serial.json  19-check.json
       20-assets/             cover.jpg、creature.jpg 和 creature-legend.jpg（周一）、news-1..3.jpg、check.jpg 和 think.jpg（有配图时）、serial.jpg（折纸是 step-1..N.png，切不开时用 serial-diagram.png）、assets.json
       30-issue.json          合并后的整期
+      30-build.json          合并输入和输出的版本记录
       31-review.md
       40-cards/              card-1..N.png（平时 8 张，周一、周五 9 张）、<刊名>-第007期.pdf
       50-narration.json
@@ -85,9 +86,13 @@
 
 - JSON 的结构契约和页面顺序在 `scripts/contracts.mjs`，编辑字数、角色等检查在 `scripts/pipeline-lib.mjs`。`check` 检查已有文件，适合制作到一半时使用；`assemble` 还会要求全部必做内容和素材齐全。缺文件、结构错误或编辑检查失败时返回非零退出码，不覆盖上一次的 `30-issue.json`。
 - 合并只检查上游内容。旧审稿写着「需修改」、旧讲读稿不合格时，仍可修订内容并重新合并。重新合并后必须重新审稿。
-- 审稿完成要求独立一行 `结论：通过`。图片阶段要求全部页图和 PDF 非空；语音阶段要求每句音频及对应 manifest 条目齐全；视频阶段要求 MP4 和 PDF 非空。这里只核对文件清单，不能代替图片视觉检查或音视频播放验收。
+- 审稿完成要求独立一行 `结论：通过` 和 `内容指纹：<SHA-256>`，指纹必须对应当前内容。图片阶段要求全部页图和 PDF 非空；语音阶段要求每句音频及对应 manifest 条目齐全；视频阶段要求 MP4 和 PDF 非空。同时核对输入指纹和每个输出文件的 SHA-256，不能代替图片视觉检查或音视频播放验收。
 - 正式渲染要求内容步骤齐全、校验通过、审稿通过。审稿前的预览，以及没有分步文件的旧格式期刊，显式加 `--preview`；预览会列出结构问题作为提示，照常出图。
-- 上游变更的自动过期检测尚未实现，修改内容后仍需按依赖顺序重新合并、审稿和制作下游产物。
+- 合并产生 `30-build.json`；图片、语音、视频目录各产生 `build.json`。内容、图片、声音配置、相关制作脚本或输出文件变更后，相关产物会被判为过期。未记录版本的旧产物也必须重新制作，不能仅补一份通过结论冒充重做。
+- 第 31 步先检查当前合并内容，再运行 `node scripts/pipeline.mjs fingerprint <issue>`，将指纹填入审稿记录。内容变化后必须重新审稿；第 50 步写稿前也读取这个指纹，放入 `_meta.content_hash`。
+- 第 40、70 步先在临时目录生成，完成后替换成品；失败保留上一版，页数变少时清掉多余旧页，目录里的其他笔记会保留。预览不生成正式制作记录。
+- 语音每完成一句就原子保存 manifest，失败后重跑同一命令可复用已完成的句子；`--dry` 不创建音频目录或制作记录。
+- 过期检测覆盖合并、审稿、讲读及脚本产物，不会自动改写 agent 撰写的各栏目。封面换题后是否重写漫画，仍需编辑按依赖判断。
 
 ```bash
 node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat --preview
@@ -102,6 +107,7 @@ node --test tests/*.test.mjs
 node scripts/pipeline.mjs status   <issue>   # 看每步做了没有、下一步能做什么
 node scripts/pipeline.mjs check    <issue>   # 检查已完成步骤的字段和字数
 node scripts/pipeline.mjs assemble <issue>   # 第 30 步
+node scripts/pipeline.mjs fingerprint <issue> # 第 31、50 步记录当前内容指纹
 node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40 步
 node scripts/tts_azure.mjs <issue> --pinyin  # 第 60 步之前：列出没注音的多音字
 node scripts/tts_azure.mjs <issue>           # 第 60 步（Azure 语音）

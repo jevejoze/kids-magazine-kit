@@ -39,4 +39,8 @@ node scripts/tts_azure.mjs <issue>         # 合成；已经合成过、内容�
 - 同一个角色、同一种语言，整期用同一个声音；选定后记进 `data/profile.md`，以后沿用
 - 用克隆声音时，只用本人同意的参考音
 
+**恢复与版本**：Azure 每完成一句就保存音频和 manifest，manifest 的 `_meta.complete` 在整期完成前为 `false`。失败后重跑同一命令；已合成、正文和声音未变且文件完整的句子会复用。完成后写 `60-audio/build.json`，记录输入版本和产物校验和。声音配置、词典或讲读稿变化会使旧制作记录过期。
+
+使用其他语音服务时，完成全部音频后调用 `scripts/build-state.mjs` 的 `inputFingerprint` / `recordBuild` API 保存同样的制作记录；采集指纹必须在制作前，制作期间输入变化时拒绝记录。
+
 **自检**：`--pinyin` 显示没有待确认的多音字；文件数 = 句数；抽听几句，没有吞字、读错

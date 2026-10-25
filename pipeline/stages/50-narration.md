@@ -7,11 +7,13 @@
 **写**：`issue/50-narration.json`
 
 ```json
-{"_meta": {"stage": "50-narration", "by": "", "at": ""},
+{"_meta": {"stage": "50-narration", "by": "", "at": "", "content_hash": "<当前内容指纹>"},
  "narration": [{"card": 1, "lines": [
    {"who": "narrator", "lang": "zh", "text": "……", "emotion": "开心", "sfx": "chime"}
  ]}]}
 ```
+
+写稿前运行 `node scripts/pipeline.mjs fingerprint <issue>`，把指纹放进 `_meta.content_hash`。必须先确认审稿通过且指纹有效；内容变化后重写对应台词并更新指纹，不能直接给旧稿换指纹。
 
 每句的字段（`who` `lang` `text` `emotion` `sfx` `pause` `repeat` `rate` `hold` `pron`）和每页讲法见 SKILL.md「讲读版」。
 

@@ -137,107 +137,115 @@ class Track:
 
 
 def main(issue):
+    issue = os.path.abspath(issue)
+    scripts = os.path.dirname(os.path.abspath(__file__))
+    node = os.environ.get("NODE", "node")
+    build_inputs = subprocess.check_output([node, os.path.join(scripts, "pipeline.mjs"), "video-inputs", issue], text=True).strip()
     nar = json.load(open(os.path.join(issue, "50-narration.json")))["narration"]
     audio_dir, cards_dir = os.path.join(issue, "60-audio"), os.path.join(issue, "40-cards")
-    final = os.path.join(issue, "70-final")
-    os.makedirs(final, exist_ok=True)
+    final = tempfile.mkdtemp(prefix=".kids-video-", dir=issue)
     tmp = tempfile.mkdtemp(prefix="narrate-")
 
-    page_fx = find_sfx(issue, "page")
-    if page_fx:
-        p = os.path.join(tmp, "page.wav"); prepare(page_fx, p, trim=False); page_fx = p
+    try:
+        page_fx = find_sfx(issue, "page")
+        if page_fx:
+            p = os.path.join(tmp, "page.wav"); prepare(page_fx, p, trim=False); page_fx = p
 
-    track, holds, starts = Track(tmp), [], []
-    track.gap(LEAD_IN)
-    for k, page in enumerate(nar):
-        card = page["card"]
-        if k:
-            # 翻页：说完 → 停一下 → 淡入淡出 → 新页完全出现 → 再停一下才开口
-            track.gap(TURN_PAD)
-            starts.append(track.t)
-            turn = FADE + SETTLE
-            if page_fx and seconds(page_fx) < turn:
-                track.add(page_fx); track.gap(turn - seconds(page_fx))
+        track, holds, starts = Track(tmp), [], []
+        track.gap(LEAD_IN)
+        for k, page in enumerate(nar):
+            card = page["card"]
+            if k:
+                # 翻页：说完 → 停一下 → 淡入淡出 → 新页完全出现 → 再停一下才开口
+                track.gap(TURN_PAD)
+                starts.append(track.t)
+                turn = FADE + SETTLE
+                if page_fx and seconds(page_fx) < turn:
+                    track.add(page_fx); track.gap(turn - seconds(page_fx))
+                else:
+                    track.gap(turn)
             else:
-                track.gap(turn)
+                starts.append(0.0)
+            lines = page["lines"]
+            for i, line in enumerate(lines):
+                sfx = find_sfx(issue, line.get("sfx"))
+                if sfx:
+                    fx = os.path.join(tmp, f"sfx_{card}_{i}.wav"); prepare(sfx, fx, trim=False)
+                    track.add(fx); track.gap(0.15)
+                src = os.path.join(audio_dir, f"c{card}_{i:02d}.wav")
+                if not os.path.exists(src):
+                    sys.exit(f"缺少音频 {src}")
+                clip = os.path.join(tmp, f"c{card}_{i:02d}.wav")
+                prepare(src, clip, slow=line.get("rate") == "slow")
+                for r in range(int(line.get("repeat", 1))):
+                    if r:
+                        track.gap(GAP_REPEAT)
+                    track.add(clip)
+                pause = gap_after(line, lines[i + 1] if i + 1 < len(lines) else None)
+                if line.get("hold") and pause > 0:
+                    holds.append((track.t, track.t + pause, plain(line["hold"])))
+                track.gap(pause)
+        track.gap(TAIL)
+        total = track.t
+        voice = os.path.join(tmp, "voice.wav")
+        track.write(voice)
+
+        # 垫乐（可选）：sfx/bgm 循环铺在底下，音量很低，首尾淡入淡出
+        audio_in, audio_map = ["-i", voice], "1:a"
+        bgm = find_sfx(issue, "bgm")
+        afilter = None
+        if bgm:
+            audio_in += ["-stream_loop", "-1", "-i", bgm]
+            afilter = (f"[2:a]aformat=sample_rates={RATE}:channel_layouts=mono,volume=-26dB,atrim=0:{total:.3f},"
+                       f"afade=t=in:d=2,afade=t=out:st={max(0, total - 3):.3f}:d=3[bg];[1:a][bg]amix=inputs=2:duration=first:normalize=0[aout]")
+            audio_map = "[aout]"
+
+        # 画面：每页一张图，在 starts 的时间点开始淡入淡出到下一页；一次编码，和音轨严格对齐
+        n = len(nar)
+        inputs, vf = [], []
+        for k, page in enumerate(nar):
+            end = starts[k + 1] + FADE if k + 1 < n else total
+            dur = end - starts[k]
+            inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{dur:.3f}", "-i", os.path.join(cards_dir, f"card-{page['card']}.png")]
+        for k in range(n):
+            vf.append(f"[{k}:v]scale=1080:1440,setsar=1,format=yuv420p,fps={FPS}[v{k}]")
+        last = "v0"
+        for k in range(1, n):
+            vf.append(f"[{last}][v{k}]xfade=transition=fade:duration={FADE}:offset={starts[k]:.3f}[x{k}]")
+            last = f"x{k}"
+        font = find_font() if holds else None
+        drawn = bool(holds and font and has_drawtext())
+        if drawn:
+            # hold 提示放在顶部刊名/标题区，避开封面问题和页面正文
+            texts = []
+            for a, b, txt in holds:
+                safe = txt.replace("\\", "\\\\").replace(":", "\\:").replace("'", "’")
+                texts.append(f"drawtext=fontfile='{font}':text='{safe}':fontsize=56:fontcolor=white:box=1:boxcolor=0x4A3B32CC:"
+                             f"boxborderw=24:x=(w-text_w)/2:y=170:enable='between(t,{a:.2f},{b:.2f})'")
+            vf.append(f"[{last}]{','.join(texts)}[vout]")
+            last = "vout"
+
+        # 音频输入排在所有图片之后，下标从 n 开始
+        graph = ";".join(vf)
+        if afilter:
+            graph += ";" + afilter.replace("[1:a]", f"[{n}:a]").replace("[2:a]", f"[{n + 1}:a]")
         else:
-            starts.append(0.0)
-        lines = page["lines"]
-        for i, line in enumerate(lines):
-            sfx = find_sfx(issue, line.get("sfx"))
-            if sfx:
-                fx = os.path.join(tmp, f"sfx_{card}_{i}.wav"); prepare(sfx, fx, trim=False)
-                track.add(fx); track.gap(0.15)
-            src = os.path.join(audio_dir, f"c{card}_{i:02d}.wav")
-            if not os.path.exists(src):
-                sys.exit(f"缺少音频 {src}")
-            clip = os.path.join(tmp, f"c{card}_{i:02d}.wav")
-            prepare(src, clip, slow=line.get("rate") == "slow")
-            for r in range(int(line.get("repeat", 1))):
-                if r:
-                    track.gap(GAP_REPEAT)
-                track.add(clip)
-            pause = gap_after(line, lines[i + 1] if i + 1 < len(lines) else None)
-            if line.get("hold") and pause > 0:
-                holds.append((track.t, track.t + pause, plain(line["hold"])))
-            track.gap(pause)
-    track.gap(TAIL)
-    total = track.t
-    voice = os.path.join(tmp, "voice.wav")
-    track.write(voice)
-
-    # 垫乐（可选）：sfx/bgm 循环铺在底下，音量很低，首尾淡入淡出
-    audio_in, audio_map = ["-i", voice], "1:a"
-    bgm = find_sfx(issue, "bgm")
-    afilter = None
-    if bgm:
-        audio_in += ["-stream_loop", "-1", "-i", bgm]
-        afilter = (f"[2:a]aformat=sample_rates={RATE}:channel_layouts=mono,volume=-26dB,atrim=0:{total:.3f},"
-                   f"afade=t=in:d=2,afade=t=out:st={max(0, total - 3):.3f}:d=3[bg];[1:a][bg]amix=inputs=2:duration=first:normalize=0[aout]")
-        audio_map = "[aout]"
-
-    # 画面：每页一张图，在 starts 的时间点开始淡入淡出到下一页；一次编码，和音轨严格对齐
-    n = len(nar)
-    inputs, vf = [], []
-    for k, page in enumerate(nar):
-        end = starts[k + 1] + FADE if k + 1 < n else total
-        dur = end - starts[k]
-        inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{dur:.3f}", "-i", os.path.join(cards_dir, f"card-{page['card']}.png")]
-    for k in range(n):
-        vf.append(f"[{k}:v]scale=1080:1440,setsar=1,format=yuv420p,fps={FPS}[v{k}]")
-    last = "v0"
-    for k in range(1, n):
-        vf.append(f"[{last}][v{k}]xfade=transition=fade:duration={FADE}:offset={starts[k]:.3f}[x{k}]")
-        last = f"x{k}"
-    font = find_font() if holds else None
-    drawn = bool(holds and font and has_drawtext())
-    if drawn:
-        # hold 提示放在顶部刊名/标题区，避开封面问题和页面正文
-        texts = []
-        for a, b, txt in holds:
-            safe = txt.replace("\\", "\\\\").replace(":", "\\:").replace("'", "’")
-            texts.append(f"drawtext=fontfile='{font}':text='{safe}':fontsize=56:fontcolor=white:box=1:boxcolor=0x4A3B32CC:"
-                         f"boxborderw=24:x=(w-text_w)/2:y=170:enable='between(t,{a:.2f},{b:.2f})'")
-        vf.append(f"[{last}]{','.join(texts)}[vout]")
-        last = "vout"
-
-    # 音频输入排在所有图片之后，下标从 n 开始
-    graph = ";".join(vf)
-    if afilter:
-        graph += ";" + afilter.replace("[1:a]", f"[{n}:a]").replace("[2:a]", f"[{n + 1}:a]")
-    else:
-        audio_map = f"{n}:a"
-    out = os.path.join(final, "讲读版.mp4")
-    run("ffmpeg", "-y", *inputs, *audio_in, "-filter_complex", graph, "-map", f"[{last}]", "-map", audio_map,
-        "-c:v", "libx264", "-tune", "stillimage", "-preset", "veryfast", "-r", str(FPS),
-        "-c:a", "aac", "-b:a", "128k", "-t", f"{total:.3f}", "-movflags", "+faststart", out)
-    for pdf in glob.glob(os.path.join(cards_dir, "*.pdf")):
-        shutil.copy(pdf, final)
-    shutil.rmtree(tmp, ignore_errors=True)
-    note = ""
-    if holds and not drawn:
-        note = "（hold 提示没有画上：" + ("没找到中文字体，设置 FONT 环境变量" if not font else "这个 ffmpeg 不带 drawtext") + "）"
-    print(f"{out}  {total / 60:.1f} 分钟；翻页时间点 " + " ".join(f"{s:.1f}s" for s in starts[1:]) + note)
+            audio_map = f"{n}:a"
+        out = os.path.join(final, "讲读版.mp4")
+        run("ffmpeg", "-y", *inputs, *audio_in, "-filter_complex", graph, "-map", f"[{last}]", "-map", audio_map,
+            "-c:v", "libx264", "-tune", "stillimage", "-preset", "veryfast", "-r", str(FPS),
+            "-c:a", "aac", "-b:a", "128k", "-t", f"{total:.3f}", "-movflags", "+faststart", out)
+        for pdf in glob.glob(os.path.join(cards_dir, "*.pdf")):
+            shutil.copy(pdf, final)
+        note = ""
+        if holds and not drawn:
+            note = "（hold 提示没有画上：" + ("没找到中文字体，设置 FONT 环境变量" if not font else "这个 ffmpeg 不带 drawtext") + "）"
+        subprocess.run([node, os.path.join(scripts, "build-state.mjs"), "finish-video", issue, "70-video", build_inputs, final], check=True)
+        out = os.path.join(issue, "70-final", "讲读版.mp4")
+        print(f"{out}  {total / 60:.1f} 分钟；翻页时间点 " + " ".join(f"{s:.1f}s" for s in starts[1:]) + note)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(final, ignore_errors=True)
 
 
 if __name__ == "__main__":

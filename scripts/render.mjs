@@ -3,11 +3,12 @@
 // 产出: 输出目录/issue-NNN/{issue.html, card-1..N.png, <刊名>-第NNN期.pdf}；加 --flat 直接写进输出目录
 // JSON 里以 .jpg/.jpeg/.png/.webp 结尾、且相对 JSON 所在目录存在的路径，会内嵌进 HTML；.svg 文件按原文内联。
 // 截图走 Chrome DevTools 协议，按每张卡片的实际位置裁切，需要 Node 22+（内置 WebSocket）。
-import { readFileSync, writeFileSync, mkdirSync, existsSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, mkdtempSync, rmSync, readdirSync } from "node:fs";
 import { dirname, join, resolve, extname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { spawn } from "node:child_process";
+import { inputFingerprint, recordBuild, publishDirectory } from "./build-state.mjs";
 import { createPipeline } from "./pipeline-lib.mjs";
 import { CARD_IDS, pageOrder, validateIssue } from "./contracts.mjs";
 
@@ -43,10 +44,17 @@ if (errors.length) {
   if (!preview) process.exit(2);
   console.error("（--preview：以上问题只提示，照常渲染草稿）");
 }
+const inputs = preview ? null : inputFingerprint(jsonDir, "40-render");
 const data = embed(raw);
 const N = String(data.issue).padStart(3, "0");
-const outDir = flat ? resolve(outRoot) : resolve(outRoot, `issue-${N}`);
-mkdirSync(outDir, { recursive: true });
+const targetDir = flat ? resolve(outRoot) : resolve(outRoot, `issue-${N}`);
+if ([jsonDir, assets, resolve(here, "..")].includes(targetDir)) throw new Error("请使用独立的成品目录，不能覆盖数据或引擎目录");
+mkdirSync(dirname(targetDir), { recursive: true });
+const outDir = mkdtempSync(join(dirname(targetDir), ".kids-render-"));
+let proc, ws, profile;
+const timers = new Set();
+const timed = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); fn(); }, ms); timers.add(t); return t; };
+try {
 
 const html = readFileSync(join(assets, "template.html"), "utf8")
   .replace("{{TITLE}}", `${data.masthead.zh} 第${N}期`)
@@ -62,35 +70,45 @@ const chrome = process.env.CHROME || [
   "/Applications/Chromium.app/Contents/MacOS/Chromium",
   "/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser",
 ].find(existsSync);
-if (!chrome) { console.error("找不到 Chrome，请设置环境变量 CHROME"); process.exit(1); }
+if (!chrome) throw new Error("找不到 Chrome，请设置环境变量 CHROME");
 
-const profile = mkdtempSync(join(tmpdir(), "dumpling-"));
-const proc = spawn(chrome, [
+profile = mkdtempSync(join(tmpdir(), "dumpling-"));
+proc = spawn(chrome, [
   "--headless=new", "--disable-gpu", "--hide-scrollbars", "--remote-debugging-port=0",
   `--user-data-dir=${profile}`, ...(process.getuid?.() === 0 ? ["--no-sandbox"] : []), "about:blank",
 ], { stdio: ["ignore", "ignore", "pipe"] });
 const wsUrl = await new Promise((ok, fail) => {
   let buf = "";
-  proc.stderr.on("data", d => { const m = (buf += d).match(/DevTools listening on (ws:\S+)/); if (m) ok(m[1]); });
+  const timeout = timed(() => fail(new Error("启动 Chrome 超时")), 10000);
+  proc.on("error", fail);
+  proc.stderr.on("data", d => { const m = (buf += d).match(/DevTools listening on (ws:\S+)/); if (m) { clearTimeout(timeout); ok(m[1]); } });
   proc.on("exit", c => fail(new Error(`Chrome 退出 (${c})`)));
 });
 
-const ws = new WebSocket(wsUrl);
-await new Promise(ok => ws.addEventListener("open", ok, { once: true }));
+ws = new WebSocket(wsUrl);
+await new Promise((ok, fail) => {
+  const timeout = timed(() => fail(new Error("Chrome WebSocket 连接超时")), 10000);
+  ws.addEventListener("open", () => { clearTimeout(timeout); ok(); }, { once: true });
+  ws.addEventListener("error", () => fail(new Error("Chrome WebSocket 连接失败")), { once: true });
+});
 let seq = 0;
 const waiting = new Map(), events = new Map();
 ws.addEventListener("message", e => {
   const m = JSON.parse(e.data);
-  if (m.id && waiting.has(m.id)) { const [ok, fail] = waiting.get(m.id); waiting.delete(m.id); m.error ? fail(new Error(m.error.message)) : ok(m.result); }
+  if (m.id && waiting.has(m.id)) { const [ok, fail, timeout] = waiting.get(m.id); clearTimeout(timeout); waiting.delete(m.id); m.error ? fail(new Error(m.error.message)) : ok(m.result); }
   else if (m.method && events.has(m.method)) { events.get(m.method)(m.params); events.delete(m.method); }
 });
 const send = (method, params = {}, sessionId) => new Promise((ok, fail) => {
-  const id = ++seq; waiting.set(id, [ok, fail]);
+  const id = ++seq;
+  const timeout = timed(() => { waiting.delete(id); fail(new Error(`Chrome 调用超时：${method}`)); }, 30000);
+  waiting.set(id, [ok, fail, timeout]);
   ws.send(JSON.stringify({ id, method, params, sessionId }));
 });
-const once = method => new Promise(ok => events.set(method, ok));
+const once = method => new Promise((ok, fail) => {
+  const timeout = timed(() => { events.delete(method); fail(new Error(`等待 Chrome 事件超时：${method}`)); }, 30000);
+  events.set(method, result => { clearTimeout(timeout); ok(result); });
+});
 
-try {
   const { targetId } = await send("Target.createTarget", { url: "about:blank" });
   const { sessionId: s } = await send("Target.attachToTarget", { targetId, flatten: true });
   await send("Page.enable", {}, s);
@@ -98,7 +116,8 @@ try {
   const loaded = once("Page.loadEventFired");
   await send("Page.navigate", { url: pathToFileURL(htmlPath).href }, s);
   await loaded;
-  await send("Runtime.evaluate", { expression: "Promise.all([document.fonts.ready, window.READY]).then(() => 1)", awaitPromise: true }, s);
+  const ready = await send("Runtime.evaluate", { expression: "Promise.all([document.fonts.ready, window.READY]).then(() => 1)", awaitPromise: true }, s);
+  if (ready.exceptionDetails) throw new Error(ready.exceptionDetails.exception?.description || ready.exceptionDetails.text);
   const { result } = await send("Runtime.evaluate", {
     expression: "JSON.stringify([...document.querySelectorAll('.card')].map(c => { const r = c.getBoundingClientRect(); return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }))",
     returnByValue: true,
@@ -127,9 +146,19 @@ try {
   await send("IO.close", { handle: stream }, s);
   rmSync(pdfHtml);
   writeFileSync(join(outDir, `${data.masthead.zh}-第${N}期.pdf`), Buffer.concat(chunks));
+  if (!preview) recordBuild(jsonDir, "40-render", inputs, readdirSync(outDir).map(f => join(outDir, f)), outDir);
+  publishDirectory(outDir, targetDir, name => name === "issue.html" || name === "build.json" || /^card-\d+\.png$/.test(name) || /-第\d+期\.pdf$/.test(name));
 } finally {
-  ws.close(); proc.kill();
-  await new Promise(ok => proc.once("exit", ok));
-  try { rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch {}
+  for (const t of timers) clearTimeout(t);
+  if (ws && ws.readyState < 2) ws.close();
+  if (proc && proc.exitCode === null && proc.signalCode === null) {
+    proc.kill();
+    await new Promise(ok => {
+      const timeout = setTimeout(() => { proc.kill("SIGKILL"); ok(); }, 2000);
+      proc.once("exit", () => { clearTimeout(timeout); ok(); });
+    });
+  }
+  if (profile) try { rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch {}
+  rmSync(outDir, { recursive: true, force: true });
 }
-console.log(outDir);
+console.log(targetDir);
