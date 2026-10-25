@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 用法: node render.mjs <issue.json> [输出目录] [--flat]
+// 用法: node render.mjs <issue.json> [输出目录] [--flat] [--preview]
 // 产出: 输出目录/issue-NNN/{issue.html, card-1..N.png, <刊名>-第NNN期.pdf}；加 --flat 直接写进输出目录
 // JSON 里以 .jpg/.jpeg/.png/.webp 结尾、且相对 JSON 所在目录存在的路径，会内嵌进 HTML；.svg 文件按原文内联。
 // 截图走 Chrome DevTools 协议，按每张卡片的实际位置裁切，需要 Node 22+（内置 WebSocket）。
@@ -8,11 +8,14 @@ import { dirname, join, resolve, extname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { spawn } from "node:child_process";
+import { createPipeline } from "./pipeline-lib.mjs";
+import { CARD_IDS, pageOrder, validateIssue } from "./contracts.mjs";
 
 const args = process.argv.slice(2);
 const flat = args.includes("--flat");
-const [jsonPath, outRoot = "."] = args.filter(x => x !== "--flat");
-if (!jsonPath) { console.error("用法: node render.mjs <issue.json> [输出目录] [--flat]"); process.exit(1); }
+const preview = args.includes("--preview");
+const [jsonPath, outRoot = "."] = args.filter(x => !["--flat", "--preview"].includes(x));
+if (!jsonPath) { console.error("用法: node render.mjs <issue.json> [输出目录] [--flat] [--preview]"); process.exit(1); }
 
 const here = dirname(fileURLToPath(import.meta.url));
 const assets = join(here, "..", "assets");
@@ -28,7 +31,19 @@ const embed = v => {
   if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === "_answers" ? x : embed(x)]));
   return v;
 };
-const data = embed(JSON.parse(readFileSync(jsonPath, "utf8")));
+const raw = JSON.parse(readFileSync(jsonPath, "utf8"));
+const errors = validateIssue(raw);
+if (!preview) {
+  const pipeline = createPipeline(jsonDir);
+  if (!pipeline.reviewPassed()) errors.push("正式渲染需要 31-review.md 的结论为「通过」；草稿请加 --preview");
+  errors.push(...pipeline.assemblyErrors());
+}
+if (errors.length) {
+  console.error(errors.join("\n"));
+  if (!preview) process.exit(2);
+  console.error("（--preview：以上问题只提示，照常渲染草稿）");
+}
+const data = embed(raw);
 const N = String(data.issue).padStart(3, "0");
 const outDir = flat ? resolve(outRoot) : resolve(outRoot, `issue-${N}`);
 mkdirSync(outDir, { recursive: true });
@@ -37,6 +52,7 @@ const html = readFileSync(join(assets, "template.html"), "utf8")
   .replace("{{TITLE}}", `${data.masthead.zh} 第${N}期`)
   .replace("{{STYLE}}", () => readFileSync(join(assets, "style.css"), "utf8"))
   .replace("{{CHARACTERS}}", () => readFileSync(join(assets, "characters.js"), "utf8"))
+  .replace("{{CARD_IDS}}", () => JSON.stringify(pageOrder(data).map(key => CARD_IDS[key])))
   .replace("{{DATA}}", () => JSON.stringify(data));
 const htmlPath = join(outDir, "issue.html");
 writeFileSync(htmlPath, html);
@@ -84,10 +100,12 @@ try {
   await loaded;
   await send("Runtime.evaluate", { expression: "Promise.all([document.fonts.ready, window.READY]).then(() => 1)", awaitPromise: true }, s);
   const { result } = await send("Runtime.evaluate", {
-    expression: "JSON.stringify([...document.querySelectorAll('.card')].map(c => { const r = c.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }))",
+    expression: "JSON.stringify([...document.querySelectorAll('.card')].map(c => { const r = c.getBoundingClientRect(); return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }))",
     returnByValue: true,
   }, s);
   const rects = JSON.parse(result.value);
+  const expected = pageOrder(data).map(key => CARD_IDS[key]);
+  if (JSON.stringify(rects.map(r => r.id)) !== JSON.stringify(expected)) throw new Error("渲染页面数量或顺序与数据契约不一致");
   for (const [i, r] of rects.entries()) {
     const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, clip: { x: r.x, y: r.y, width: r.w, height: r.h, scale: 1 } }, s);
     writeFileSync(join(outDir, `card-${i + 1}.png`), Buffer.from(shot.data, "base64"));

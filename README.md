@@ -50,6 +50,8 @@ node scripts/pipeline.mjs assemble examples/demo/issues/003
 node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/issues/003/40-cards --flat
 ```
 
+示例 003 保留历史新闻，已包含经典连载和信息查证栏目，同时演示可选的单词屋与英文三关。默认渲染会检查内容步骤及审稿结论；审稿前或渲染旧格式 JSON 时加 `--preview`。运行回归测试：`node --test tests/*.test.mjs`。完成状态和阻断规则见 [流水线说明](pipeline/README.md#校验与完成状态)。
+
 常用指令：
 
 | 说 | agent 会 |
