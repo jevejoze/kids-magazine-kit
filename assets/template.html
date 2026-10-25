@@ -195,6 +195,10 @@ if (M) cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 
   ${foot((M.send_note || "说给家长听") + " · 明天见！See you tomorrow!")}</section>`);
 
 document.getElementById("root").outerHTML = cards.join("\n").replaceAll("{{TOTAL}}", pg);
+// The renderer and narration validator share the same page contract.
+const CARD_IDS = {{CARD_IDS}};
+const actualIds = [...document.querySelectorAll(".card")].map(c => c.id);
+if (JSON.stringify(actualIds) !== JSON.stringify(CARD_IDS)) throw new Error("页面顺序与数据契约不一致");
 if (location.hash) { document.body.classList.add("single"); document.querySelector(location.hash).classList.add("on"); }
 
 // 刊名条取色：照片可见区域最上面 5% 的平均色；太灰就提一点亮度。JSON 写了 cover.strip 就用它。

@@ -167,6 +167,16 @@
       }
     ]
   },
+  "check": {
+    "where": "一段讲极昼的短视频",
+    "claim": "极昼时，太阳一直停在同一个位置。",
+    "clues": [
+      "先找一段连续拍摄的极昼视频。",
+      "看太阳和地平线的位置有没有改变。",
+      "再比较另一个地点拍到的轨迹。"
+    ],
+    "verdict": "假：太阳仍会在天空中移动。"
+  },
   "mailbox": {
     "hello": "小满早上好！团子狗爆料：我梦见喝奶茶，醒来枕头边真有吸管！梦游的人记得自己做过什么吗？",
     "answers": "上期谜题：金字塔搭 6 层剩 9 块，搭 7 层还差 40 块",
@@ -182,6 +192,15 @@
       "开放题"
     ],
     "story_secret": "第3集真相：团子狗半夜梦游喝光了四杯奶茶。决定性证据是尾巴尖上粘着的珍珠；开着的窗户是干扰线索（窗台无脚印，已排除）。新悬念：半夜的吸溜声——第4集揭晓。",
+    "check": {
+      "truth": "false",
+      "verdict": "假：太阳仍会在天空中移动。",
+      "explain": "极昼表示太阳整天不落到地平线下，不表示太阳在天空中的位置不变。",
+      "sources": [
+        "https://aa.usno.navy.mil/faq/eqtime",
+        "https://pmel.noaa.gov/arctic-zone/gallery_np_seasons.html"
+      ]
+    },
     "news_sources": [
       "https://newsforkids.net/articles/2026/10/08/british-girl-11-is-worlds-youngest-woman-grandmaster/",
       "https://www.ctvnews.ca/lifestyle/article/british-schoolgirl-becomes-chess-youngest-ever-woman-grandmaster/",
@@ -235,5 +254,36 @@
         "photo_pos": "center 30%"
       }
     ]
+  },
+  "serial": {
+    "kind": "book",
+    "ep": 1,
+    "book_zh": "爱丽丝漫游奇境",
+    "book_en": "Alice’s Adventures in Wonderland",
+    "chapter": "第一章：掉进兔子洞",
+    "author": "Lewis Carroll",
+    "title_zh": "一只看表的兔子",
+    "title_en": "A Rabbit with a Watch",
+    "paragraphs": [
+      "爱丽丝坐在姐姐身边，觉得有点无聊。一只白兔忽然跑过。",
+      "兔子一边跑，一边担心自己迟到了。更奇怪的是，它竟从背心口袋里掏出一块怀表！",
+      "爱丽丝追着它跑，钻进树篱下的大洞。洞道先向前延伸，忽然直直向下。她来不及停住，便掉了下去。"
+    ],
+    "quote": {
+      "who": "白兔",
+      "en": "Oh dear! Oh dear! I shall be late!",
+      "zh": "哎呀！哎呀！我要迟到了！"
+    },
+    "crew": {
+      "who": "dog:surprise:150",
+      "say": "兔子也要赶时间？"
+    },
+    "guess": "洞底会有什么？",
+    "tbc": "下回：越掉越深的洞",
+    "photo_credit": "John Tenniel / Project Gutenberg #11 · Public domain in the USA",
+    "sources": [
+      "https://www.gutenberg.org/ebooks/11"
+    ],
+    "photo": "20-assets/serial.jpg"
   }
 }

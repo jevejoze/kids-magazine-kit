@@ -511,6 +511,101 @@
         {
           "who": "narrator",
           "lang": "zh",
+          "text": "新闻看完，来检查一条说法。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "极昼时，太阳一直停在原地？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "你先想想，要怎么验证？"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "先看连续拍摄的极昼视频。"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "比较太阳和地平线的位置。"
+        },
+        {
+          "who": "raccoon",
+          "lang": "zh",
+          "text": "再找另一个地方的视频看看！"
+        }
+      ]
+    },
+    {
+      "card": 8,
+      "lines": [
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "查完线索，跟爱丽丝去冒险吧。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "咦，兔子怎么还穿着背心？"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "爱丽丝坐在姐姐身边，有点无聊。"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "一只白兔突然跑过她的身边。"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Oh dear! Oh dear! I shall be late!"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "它竟然会说话！"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "它还从口袋里掏出一块怀表。"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "爱丽丝追着白兔，跑进树篱下的大洞。"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "洞道先向前延伸，忽然直直向下。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "她来不及停住，掉下去了！"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "猜一猜，洞底会有什么？"
+        }
+      ]
+    },
+    {
+      "card": 9,
+      "lines": [
+        {
+          "who": "narrator",
+          "lang": "zh",
           "text": "最后一页，来拆今天的信箱！",
           "emotion": "开心"
         },

@@ -28,6 +28,6 @@
     {"id": "70-video",     "title": "讲读视频",     "kind": "script", "depends": ["40-render", "60-audio"],
      "run": "python3 scripts/make_video.py <issue>", "outputs": ["issue/70-final/"]},
     {"id": "90-archive",   "title": "更新档案",     "kind": "agent",  "depends": ["40-render"],
-     "outputs": ["data/story-bible.md", "data/serial-bible.md", "data/creature-log.md", "data/think-log.md", "data/profile.md"]}
+     "outputs": ["issue/90-archive.json"]}
   ]
 }
