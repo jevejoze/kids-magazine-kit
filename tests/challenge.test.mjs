@@ -84,7 +84,7 @@ test("standard challenge samples omit optional English and each has one solution
 });
 
 const chrome = process.env.CHROME || ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome", "/usr/bin/chromium"].find(existsSync);
-test("Chinese challenge with 240 characters and a two-line heading fits both character modes", { skip: !chrome }, t => {
+test("short and full-budget Chinese challenges fit both character modes with small inverted answers", { skip: !chrome }, t => {
   const dir = mkdtempSync(join(tmpdir(), "kids-challenge-budget-"));
   t.after(() => rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }));
   const data = issue(); data.cover = {};
@@ -93,23 +93,31 @@ test("Chinese challenge with 240 characters and a two-line heading fits both cha
     clues: Array.from({ length: 4 }, () => "条件".repeat(12)), question: "提问".repeat(12),
   } };
   const read = p => readFileSync(new URL(p, import.meta.url), "utf8");
-  for (const mode of ["svg", "png"]) {
-    let html = read("../assets/template.html").replace("{{STYLE}}", () => read("../assets/style.css"))
-      .replace("{{CHARACTER_PACK}}", () => JSON.stringify(mode === "png" ? loadCharacterPack("storybook-v1") : null))
-      .replace("{{CHARACTERS}}", () => read("../assets/characters.js"))
-      .replace("{{CARD_IDS}}", () => JSON.stringify(pageOrder(data).map(k => CARD_IDS[k]))).replace("{{DATA}}", () => JSON.stringify(data));
-    html = html.replace("</body>", `<script>window.READY.then(()=>{
-      const c=document.querySelector('#c5'),r=c.getBoundingClientRect(),p=c.querySelector('.puz').getBoundingClientRect(),a=c.querySelector('.answer-key').getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
-      const result={compact:c.classList.contains('challenge-compact'),footer:f.bottom<=r.bottom-56+1,answer:p.bottom+12<=a.top&&a.bottom<=f.top,
-        text:[...c.querySelectorAll('.taunt-text,.puz h3,.body,.clues li>span,.question,.answer-content')].every(e=>e.scrollWidth<=e.clientWidth+1),
-        flipped:getComputedStyle(c.querySelector('.answer-content')).transform.startsWith('matrix(-1, 0, 0, -1'),
-        noEnglish:!c.querySelector('.route,.english-key,.taunt .en')};
-      const e=document.createElement('pre');e.id='layout-result';e.textContent=JSON.stringify(result);document.body.append(e);
-    });</script></body>`);
-    const file = join(dir, mode + ".html"); writeFileSync(file, html);
-    const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", `--user-data-dir=${join(dir, mode)}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#c5"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 25000 });
-    const metrics = JSON.parse(dom.match(/<pre id="layout-result">(\{[^<]+\})<\/pre>/)[1]);
-    t.diagnostic(`${mode}: ${JSON.stringify(metrics)}`);
-    for (const [key, value] of Object.entries(metrics)) assert.equal(value, true, `${mode}: ${key}`);
+  const short = JSON.parse(read("../examples/challenge-previews/queue.json"));
+  const full = data.challenge;
+  for (const [name, challenge] of [["short", { taunt_zh: short.taunt_zh, prop: short.prop, puzzle: short.puzzle }], ["full", full]]) {
+    data.challenge = challenge;
+    for (const mode of ["svg", "png"]) {
+      let html = read("../assets/template.html").replace("{{STYLE}}", () => read("../assets/style.css"))
+        .replace("{{CHARACTER_PACK}}", () => JSON.stringify(mode === "png" ? loadCharacterPack("storybook-v1") : null))
+        .replace("{{CHARACTERS}}", () => read("../assets/characters.js"))
+        .replace("{{CARD_IDS}}", () => JSON.stringify(pageOrder(data).map(k => CARD_IDS[k]))).replace("{{DATA}}", () => JSON.stringify(data));
+      html = html.replace("</body>", `<script>window.READY.then(()=>{
+        const c=document.querySelector('#c5'),r=c.getBoundingClientRect(),p=c.querySelector('.puz').getBoundingClientRect(),a=c.querySelector('.answer-key').getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
+        const result={compact:c.classList.contains('challenge-compact'),footer:f.bottom<=r.bottom-56+1,answer:p.bottom+15<=a.top&&a.bottom<=f.top,
+          answerSmall:parseFloat(getComputedStyle(c.querySelector('.puzzle-key')).fontSize)<=16&&Number(getComputedStyle(c.querySelector('.puzzle-key')).fontWeight)<=400,
+          text:[...c.querySelectorAll('.taunt-text,.puz h3,.body,.clues li>span,.question,.answer-content')].every(e=>e.scrollWidth<=e.clientWidth+1),
+          flipped:getComputedStyle(c.querySelector('.answer-content')).transform.startsWith('matrix(-1, 0, 0, -1'),
+          noEnglish:!c.querySelector('.route,.english-key,.taunt .en')};
+        const e=document.createElement('pre');e.id='layout-result';e.textContent=JSON.stringify(result);document.body.append(e);
+      });</script></body>`);
+      const file = join(dir, name + "-" + mode + ".html"); writeFileSync(file, html);
+      const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", `--user-data-dir=${join(dir, name + "-" + mode + "-profile")}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#c5"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 25000 });
+      const result = dom.match(/<pre id="layout-result">(\{[^<]+\})<\/pre>/);
+      assert.ok(result, `${name}/${mode}: browser did not finish layout measurement`);
+      const metrics = JSON.parse(result[1]);
+      t.diagnostic(`${name}/${mode}: ${JSON.stringify(metrics)}`);
+      for (const key of ["footer", "answer", "answerSmall", "text", "flipped", "noEnglish"]) assert.equal(metrics[key], true, `${name}/${mode}: ${key}`);
+    }
   }
 });

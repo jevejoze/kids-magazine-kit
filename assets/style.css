@@ -217,6 +217,7 @@ svg.ch{display:block}
 #c5 .taunt .bub:before{content:"";position:absolute;left:-12px;top:30px;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:12px solid var(--ink)}
 #c5 .taunt .bub:after{content:"";position:absolute;left:-7px;top:31px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:9px solid #FFFDF7}
 #c5 .puz{padding:24px 28px;margin-top:16px;position:relative;background:#FFFDF9;border:3px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 #CBBDE0}
+#c5:not(.with-english) .puz{margin-bottom:16px}
 #c5 .puzzle-label{font-size:21px;font-weight:600;color:#75608D;letter-spacing:2px;margin-bottom:8px}
 #c5 .puz h3{font-size:48px;line-height:1.25;margin-bottom:14px;font-weight:400}
 #c5 .puz .body{font-size:32px;line-height:1.5}
