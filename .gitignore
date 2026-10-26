@@ -5,3 +5,7 @@ output/
 examples/demo/issues/*/40-cards/
 examples/demo/issues/*/60-audio/
 examples/demo/issues/*/70-final/
+
+# 本地生成的排版预览、截图与对比页
+docs/*.png
+docs/*-comparison.html
