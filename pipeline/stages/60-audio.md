@@ -16,6 +16,19 @@ node scripts/tts_azure.mjs <issue>         # 合成；已经合成过、内容�
 - 音色：`azure.json` 里写 `{"voice": "声音名", "pitch": 3}` 可以在合成后升降几个半音，让声音更卡通，不占计费字符（需要 ffmpeg）
 - `emotion` 对应 Azure 的说话风格：开心、惊讶 → cheerful，兴奋 → excited，委屈 → sad，紧张 → fearful，温柔 → gentle，神秘 → whispering；平静、困倦、得意不加。声音不支持的风格按普通语气念
 
+**克隆声音（可选）**：数据目录有 `voices/voicestudio.json` 时，Azure 跑完再跑一步，把指定角色的句子换成 VoiceStudio（OmniVoice）克隆的声音：
+
+```bash
+node scripts/tts_voicestudio.mjs <issue> --dry   # 看要替换几句
+node scripts/tts_voicestudio.mjs <issue>         # 替换；已替换、正文没变的句子跳过
+```
+
+- 配置写法：`{"narrator/zh": "parent", "narrator/zh@serial": "parent-reading", "profiles": {"parent": ["本机 id", "另一台机器的 id"]}}`。键是"角色/语言"，加 `@serial` 只用于经典连载（读书）那一页；`profiles` 列出档案在各台 VoiceStudio 上的 id，脚本按顺序试
+- 环境变量 `VOICESTUDIO_URL`，默认 `http://127.0.0.1:3900`；远程机器用 `ssh -L 3900:127.0.0.1:3900` 转到本地
+- VoiceStudio 在 CPU 上很慢（一句一两分钟），可以随时中断重跑；单句失败保留 Azure 版，连不上时退出码 3，Azure 版整期照样能用
+- 每次重跑 Azure 之后都要再跑一次这一步：Azure 会复用克隆句的音频，但把声音说明改回 Azure 的，制作记录也由这一步来写
+- 克隆档案的参照音频是本人的声音，只放在私有数据目录 `voices/clone/`
+
 换别的语音服务也可以，产出按下面的约定放好即可。
 
 **读**：`issue/50-narration.json`、`data/voices/azure.json`（可选）

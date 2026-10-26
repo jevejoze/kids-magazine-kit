@@ -56,6 +56,9 @@ export function inputFingerprint(issue, stage) {
       ...[...sfx].flatMap(name => ["wav", "mp3", "m4a", "ogg"].map(ext => [`sfx/${name}.${ext}`, join(issue, `../../sfx/${name}.${ext}`)])),
       ...engineFiles("scripts/make_video.mjs", "scripts/make_video.py")];
   } else throw new Error(`不支持的制作步骤：${stage}`);
+  // 用克隆声音时，配置和替换脚本也算输入
+  if (stage === "60-audio" && existsSync(join(issue, "../../voices/voicestudio.json")))
+    files.push(["voices/voicestudio.json", join(issue, "../../voices/voicestudio.json")], ...engineFiles("scripts/tts_voicestudio.mjs"));
   files.push(...engineFiles("scripts/build-state.mjs"));
   return hash(JSON.stringify(snapshot(files)));
 }

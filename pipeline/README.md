@@ -124,6 +124,7 @@ node scripts/pipeline.mjs fingerprint <issue> # 第 31、50 步记录当前内�
 node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40 步（版面溢出会打印警告）
 node scripts/tts_azure.mjs <issue> --pinyin  # 第 60 步之前：列出没注音的多音字
 node scripts/tts_azure.mjs <issue>           # 第 60 步（Azure 语音）
+node scripts/tts_voicestudio.mjs <issue>     # 第 60 步之后（可选）：数据目录有 voices/voicestudio.json 时换成克隆声音
 python3 scripts/make_video.py <issue>        # 第 70 步
 node scripts/pipeline.mjs script   <issue>   # 没有语音合成时：导出 70-final/家长讲读稿.md
 node scripts/pipeline.mjs archive  <issue>   # 第 90 步助手：追加档案、整理 成品/NNN/
