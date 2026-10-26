@@ -38,6 +38,11 @@ svg.ch{display:block}
 /* 通用：气泡 */
 .bub{background:#FFF8EE;border:4px solid var(--ink);border-radius:28px;padding:16px 20px;font-size:30px;line-height:1.38;position:relative;margin-bottom:10px;width:100%}
 .bub:after{content:"";position:absolute;bottom:-20px;left:50%;margin-left:-14px;border:14px solid transparent;border-top-color:var(--ink)}
+/* Custom tails must clear the default downward tail before setting their own sides. */
+#c4 .act .bub:after,
+#c4 .duo-row .bub:after,
+#c5 .taunt .bub:after,
+#cthink .side .bub:after{inset:auto;margin:0;border:0;width:0;height:0}
 .bub.en{font-size:34px;background:#E9F6FF}
 
 /* 通用：写字格 */
@@ -174,22 +179,12 @@ svg.ch{display:block}
   padding:10px 18px;font-size:26px;line-height:1.35;color:var(--ink);
   position:relative;box-shadow:0 3px 0 rgba(74,59,50,.08);margin:0;width:auto;
 }
-#c4 .act.owl-act .bub:before{
+#c4 .act:not(.duo-act) .bub:before{
   content:"";position:absolute;left:-12px;top:22px;
   border-top:8px solid transparent;border-bottom:8px solid transparent;
   border-right:12px solid var(--ink);
 }
-#c4 .act.owl-act .bub:after{
-  content:"";position:absolute;left:-8px;top:23px;
-  border-top:7px solid transparent;border-bottom:7px solid transparent;
-  border-right:10px solid #FFF5E6;
-}
-#c4 .act.raccoon-act .bub:before{
-  content:"";position:absolute;left:-12px;top:22px;
-  border-top:8px solid transparent;border-bottom:8px solid transparent;
-  border-right:12px solid var(--ink);
-}
-#c4 .act.raccoon-act .bub:after{
+#c4 .act:not(.duo-act) .bub:after{
   content:"";position:absolute;left:-8px;top:23px;
   border-top:7px solid transparent;border-bottom:7px solid transparent;
   border-right:10px solid #FFF5E6;
