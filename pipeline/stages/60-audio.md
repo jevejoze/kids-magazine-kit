@@ -26,10 +26,10 @@ node scripts/tts_voicestudio.mjs <issue>         # 替换；已替换、正文�
 - 配置写法：`{"narrator/zh": "parent", "narrator/zh@serial": "parent-reading", "profiles": {"parent": ["本机 id", "另一台机器的 id"]}}`。键是"角色/语言"，加 `@serial` 只用于经典连载（读书）那一页；`profiles` 列出档案在各台 VoiceStudio 上的 id，脚本按顺序试
 - 环境变量 `VOICESTUDIO_URL`，默认 `http://127.0.0.1:3900`；远程机器用 `ssh -L 3900:127.0.0.1:3900` 转到本地
 - VoiceStudio 在 CPU 上很慢（一句一两分钟），可以随时中断重跑；单句失败保留 Azure 版，连不上时退出码 3，Azure 版整期照样能用
-- 每次重跑 Azure 之后都要再跑一次这一步：Azure 会复用克隆句的音频，但把声音说明改回 Azure 的，制作记录也由这一步来写
+- 每次重跑 Azure 或 MiMo 之后都要再跑一次这一步：它们会复用克隆句的音频，但把声音说明改回 Azure 的，制作记录也由这一步来写
 - 克隆档案的参照音频是本人的声音，只放在私有数据目录 `voices/clone/`
 
-**MiMo 语音（可选）**：数据目录有 `voices/mimo.json` 时，用小米 MiMo 一步合成整期，代替 Azure 和 VoiceStudio（这时 `tts_azure.mjs`、`tts_voicestudio.mjs` 会直接退出）：
+**MiMo 语音（可选）**：数据目录有 `voices/mimo.json` 时，用小米 MiMo 合成整期，代替 Azure（这时 `tts_azure.mjs` 会直接退出，要用加 `--azure`）。有 `voices/voicestudio.json` 时，跑完 MiMo 照样再跑 `tts_voicestudio.mjs` 换克隆声音，MiMo 重跑时会复用换好的克隆句：
 
 ```bash
 node scripts/tts_mimo.mjs --audition <数据目录>   # 每个角色合成一句试听，写到 voices/试听/mimo-*.wav
@@ -41,7 +41,7 @@ node scripts/tts_mimo.mjs <issue>                 # 合成；已合成、内容�
 - 配置写法：`{"narrator/zh": {"clone": "clone/parent/ref.wav"}, "narrator/zh@serial": {"clone": "clone/parent-reading/ref.wav"}, "dog/zh": {"voice": "苏打", "style": "憨憨的小男孩，慢悠悠的"}}`。键是"角色/语言"，加 `@serial` 只用于经典连载（读书）那一页；`voice` 是 MiMo 内置音色（中文 冰糖 茉莉 苏打 白桦，英文 Mia Chloe Milo Dean），`clone` 是相对 `voices/` 的参照音频（wav 或 mp3，base64 后 ≤ 10MB），用 `mimo-v2.5-tts-voiceclone` 克隆；`style` 是这个角色的语气说明，`pitch` 合成后升降半音（需要 ffmpeg）
 - `emotion` 写成句首的风格标签，如"(开心)"；MiMo 不支持注音，多音字读错时回第 50 步换个说法
 - 单句失败会重试 5 次，仍失败就退出码 1，重跑只补缺的句子
-- 克隆用的参照音频是本人的声音，只放在私有数据目录 `voices/clone/`
+- MiMo 自己的克隆（`clone`）音质不稳，家长的声音优先用 VoiceStudio
 
 换别的语音服务也可以，产出按下面的约定放好即可。
 

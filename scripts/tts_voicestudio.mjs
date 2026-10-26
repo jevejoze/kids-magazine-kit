@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 第 60 步的克隆声音：Azure 合成完整期之后，把指定角色的句子换成 VoiceStudio（OmniVoice）克隆的声音。需要 Node 22+ 和 ffmpeg。
+// 第 60 步的克隆声音：Azure 或 MiMo 合成完整期之后，把指定角色的句子换成 VoiceStudio（OmniVoice）克隆的声音。需要 Node 22+ 和 ffmpeg。
 //   node scripts/tts_voicestudio.mjs <issue 目录>          替换整期（已经替换过、正文没变的句子跳过，可随时中断重跑）
 //   node scripts/tts_voicestudio.mjs <issue 目录> --dry    只列出要替换几句，不调用 VoiceStudio
 // 环境变量：VOICESTUDIO_URL（默认 http://127.0.0.1:3900，远程机器可用 ssh -L 转到本地）
@@ -8,7 +8,7 @@
 //    "profiles": {"parent": ["本机 id", "另一台机器的 id"], "parent-reading": ["本机 id"]}}
 //   键是 角色/语言，加 @serial 表示只用于经典连载（读书）那一页；值是档案名。
 //   profiles 写每个档案在各台 VoiceStudio 上的 id，按顺序试，哪台机器上有就用哪个；参照音频在 voices/clone/<档案名>/
-// 单句失败保留 Azure 版，不阻塞出刊；VoiceStudio 连不上时退出码 3，Azure 版整期照样可用
+// 单句失败保留原来合成的版本，不阻塞出刊；VoiceStudio 连不上时退出码 3，原来的整期照样可用
 import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
@@ -25,13 +25,12 @@ if (!target) { console.error("用法: node tts_voicestudio.mjs <issue 目录> [-
 const issue = resolve(target), dataDir = resolve(issue, "..", "..");
 const confFile = join(dataDir, "voices", "voicestudio.json");
 if (!existsSync(confFile)) { console.log("没有 voices/voicestudio.json，不用克隆声音"); process.exit(0); }
-if (existsSync(join(dataDir, "voices", "mimo.json"))) { console.log("数据目录用 MiMo 语音（voices/mimo.json），克隆声音已由 tts_mimo.mjs 合成，这一步跳过"); process.exit(0); }
 const conf = JSON.parse(readFileSync(confFile, "utf8"));
 const URL_ = (process.env.VOICESTUDIO_URL || "http://127.0.0.1:3900").replace(/\/$/, "");
 
 const outDir = join(issue, "60-audio"), manPath = join(outDir, "manifest.json");
 if (!existsSync(manPath) || JSON.parse(readFileSync(manPath, "utf8"))._meta?.complete === false) {
-  console.error("先跑完 Azure：node scripts/tts_azure.mjs <issue>"); process.exit(1);
+  console.error("先跑完整期合成：node scripts/tts_azure.mjs <issue>（数据目录有 voices/mimo.json 时用 tts_mimo.mjs）"); process.exit(1);
 }
 const inputs = inputFingerprint(issue, "60-audio");
 const man = JSON.parse(readFileSync(manPath, "utf8"));
@@ -52,7 +51,7 @@ for (const page of nar) page.lines.forEach((line, i) => {
   const profile = profileOf(line, page.card);
   if (!profile) return;
   const file = `c${page.card}_${String(i).padStart(2, "0")}.wav`, entry = byFile[file], text = plain(line.text);
-  if (!entry) throw new Error(`manifest 里没有 ${file}，先重跑 Azure`);
+  if (!entry) throw new Error(`manifest 里没有 ${file}，先重跑整期合成`);
   const done = entry.by === `VoiceStudio-${profile}` && entry.vs_text_sha === sha1(text) && existsSync(join(outDir, file));
   // 早先的替换脚本没更新 audio_hash，重跑 Azure 时会把克隆句覆盖回去，这里补上
   if (done) { kept++; entry.audio_hash = audioHash(readFileSync(join(outDir, file))); }
@@ -65,7 +64,7 @@ if (dry || !todo.length) { if (!dry) finish(); process.exit(0); }
 try {
   const res = await fetch(`${URL_}/health`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-} catch (e) { console.error(`VoiceStudio 连不上（${URL_}）：${e.message}。Azure 版音频照样可用`); process.exit(3); }
+} catch (e) { console.error(`VoiceStudio 连不上（${URL_}）：${e.message}。原来合成的音频照样可用`); process.exit(3); }
 
 const ids = {};  // 档案名 → 这台机器上能用的 id
 async function generate(profile, lang, text) {
@@ -82,7 +81,7 @@ async function generate(profile, lang, text) {
   }
   throw new Error(last);
 }
-// 统一成和 Azure 一样的 24kHz 16 位单声道
+// 统一成和 Azure、MiMo 一样的 24kHz 16 位单声道
 function normalize(wav) {
   const dir = mkdtempSync(join(tmpdir(), "vs-"));
   try {
@@ -106,13 +105,13 @@ for (const t of todo) {
     save(false);
     const left = (Date.now() - started) / n * (todo.length - n) / 60000;
     console.log(`${n}/${todo.length} ${t.file} ${t.profile}，预计还要 ${left.toFixed(0)} 分钟`);
-  } catch (e) { failed++; console.warn(`${n}/${todo.length} ${t.file} 失败，保留 Azure 版：${e.message}`); }
+  } catch (e) { failed++; console.warn(`${n}/${todo.length} ${t.file} 失败，保留原版：${e.message}`); }
 }
 finish();
-console.log(`完成：替换 ${todo.length - failed} 句，跳过 ${kept} 句${failed ? `，${failed} 句失败保留 Azure 版（重跑可补）` : ""}`);
+console.log(`完成：替换 ${todo.length - failed} 句，跳过 ${kept} 句${failed ? `，${failed} 句失败保留原版（重跑可补）` : ""}`);
 
 function save(complete) {
-  atomicWrite(manPath, JSON.stringify({ ...man, _meta: { ...man._meta, by: "Azure 语音 + VoiceStudio", at: new Date().toISOString(), complete } }, null, 2));
+  atomicWrite(manPath, JSON.stringify({ ...man, _meta: { ...man._meta, by: `${(man._meta.by ?? "Azure 语音").replace(/ \+ VoiceStudio$/, "")} + VoiceStudio`, at: new Date().toISOString(), complete } }, null, 2));
 }
 function finish() {
   for (const key of Object.keys(conf)) if (key.includes("/")) man.voices[key.replace("@serial", "（连载）")] = `VoiceStudio ${conf[key]}`;

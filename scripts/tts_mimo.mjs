@@ -10,6 +10,7 @@
 //   voice 是 MiMo 内置音色（冰糖 茉莉 苏打 白桦 Mia Chloe Milo Dean）；clone 是相对 voices/ 的参照音频（wav 或 mp3，几秒到一分钟），
 //   用 mimo-v2.5-tts-voiceclone 克隆；style 是给这个角色的语气说明；pitch 是合成后用 ffmpeg 升降几个半音（需要 ffmpeg）。
 //   没写的角色用下面的 DEFAULT_VOICES，没写的语言退回旁白
+//   旁白想用 VoiceStudio 克隆声音时，跑完这一步再跑 tts_voicestudio.mjs 替换，这里的旁白音色就是连不上时的备用
 // 讲读稿的 emotion 写成句首的风格标签，如"(开心)今天……"。MiMo 不支持注音，多音字读错时改讲读稿的说法
 import { readFileSync, writeFileSync, mkdirSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -140,7 +141,8 @@ for (const page of nar) page.lines.forEach((line, i) => {
   const { v, body, hash } = request(line, serial);
   used[`${line.who}/${line.lang}${serial && voices[`${line.who}/${line.lang}@serial`] ? "（连载）" : ""}`] = `MiMo ${label(v)}${v.pitch ? ` ${v.pitch > 0 ? "+" : ""}${v.pitch} 半音` : ""}`;
   const prev = oldByFile[file], path = join(outDir, file);
-  const cached = prev?.by === "MiMo" && prev.hash === hash && existsSync(path) ? readFileSync(path) : null;
+  // VoiceStudio 换过的克隆句也复用，和 Azure 一样
+  const cached = (prev?.by === "MiMo" || prev?.by?.startsWith("VoiceStudio-")) && prev.hash === hash && existsSync(path) ? readFileSync(path) : null;
   if (cached?.length > 44 && prev.audio_hash === sha(cached)) { files.push(prev); skipped++; return; }
   const entry = { card: page.card, index: i, file };
   files.push(entry); jobs.push({ entry, body, hash, pitch: v.pitch, path });
