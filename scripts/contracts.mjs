@@ -52,6 +52,14 @@ export function validateStructure(file, value, omit = []) {
     };
     visit(value, path.split("."), "");
   }
+  if (file === "11-comic.json") {
+    for (const key of ["diagram_title", "takeaway", "fact_title"]) {
+      if (value[key] !== undefined && (typeof value[key] !== "string" || !value[key].trim())) errors.push(`[${file}] ${key} 必须是非空 string`);
+    }
+    if (Array.isArray(value.panels)) value.panels.forEach((panel, i) => {
+      if (panel?.title !== undefined && (typeof panel.title !== "string" || !panel.title.trim())) errors.push(`[${file}] panels[${i}].title 必须是非空 string`);
+    });
+  }
   if (file === "14-puzzle.json") errors.push(...validatePuzzleLayout(value));
   return [...new Set(errors)];
 }

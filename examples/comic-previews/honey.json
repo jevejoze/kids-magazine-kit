@@ -1,0 +1,80 @@
+{
+  "theme_icon": "🍯",
+  "title_zh": "蜂巢为什么偏偏是六边形？",
+  "title_en": "Why do bees build hexagons?",
+  "panels": [
+    {
+      "title": "先看看有没有空隙",
+      "chars": [
+        "dog:surprise:130"
+      ],
+      "bubbles": [
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "圆圆的格子不好吗？为什么偏偏是六边形？"
+        }
+      ]
+    },
+    {
+      "title": "既要铺满，也要省边",
+      "chars": [
+        "owl:talk:130"
+      ],
+      "bubbles": [
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "圆格会留缝。一样大又铺满时，六边形更省边。"
+        }
+      ]
+    },
+    {
+      "title": "正方形也能铺满呀",
+      "chars": [
+        "dog:think:110",
+        "owl:talk:110"
+      ],
+      "bubbles": [
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "正方形也没有缝，为什么不用？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "装的一样多，六边形的边长合计更短。"
+        }
+      ]
+    },
+    {
+      "title": "拿方格纸比一比",
+      "chars": [
+        "mouse:happy:110",
+        "dog:think:110"
+      ],
+      "bubbles": [
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Same space, less wax!"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "比较前，要先保证每格面积一样大！"
+        }
+      ]
+    }
+  ],
+  "diagram_title": "同样大的格子，哪种更省边？",
+  "takeaway": "能铺满、容量相同，六边形需要的总边长更少。",
+  "fact_title": "💡 别忘了",
+  "fact": "比较的是同样面积的格子。把格子画小当然更省边，但它能装下的蜂蜜也变少了。",
+  "sources": [
+    "https://arxiv.org/abs/math/9906042"
+  ],
+  "host": "主持：团子狗 × 咕咕博士",
+  "diagram": "honey.svg"
+}

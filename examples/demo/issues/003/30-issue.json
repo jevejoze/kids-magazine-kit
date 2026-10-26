@@ -25,67 +25,80 @@
     "credit": "© Yan Zhang · CC BY-SA 3.0"
   },
   "comic": {
-    "fact": "挪威斯瓦尔巴群岛一年有4个月极昼。当地不许养猫，怕猫咪伤害北极的鸟；北极熊比人还多，出门要带枪！",
+    "fact": "不是整个挪威都有极昼，要看地点和季节。北极出现极昼时，南极附近正是冬天。",
     "panels": [
       {
+        "title": "明明已经半夜了",
         "bubbles": [
           {
+            "who": "dog",
             "lang": "zh",
-            "text": "听说挪威的夏天，半夜12点太阳还在天上？那小朋友几点睡觉啊！"
+            "text": "半夜十二点还这么亮，太阳不下班吗？"
           }
         ],
         "chars": [
-          "dog:surprise:120:eyemask"
+          "dog:surprise:130:eyemask"
         ]
       },
       {
+        "title": "关键是地球的倾斜",
         "bubbles": [
           {
+            "who": "owl",
             "lang": "zh",
-            "text": "地球是斜着转的！夏天北极歪向太阳，整天都晒得到。"
+            "text": "地球斜着转。北极附近转一圈，也可能一直晒到太阳。"
           }
         ],
         "chars": [
-          "owl:talk:120"
+          "owl:talk:130"
         ]
       },
       {
+        "title": "那冬天会怎样？",
         "bubbles": [
           {
+            "who": "dog",
             "lang": "zh",
-            "text": "冬天为啥整天黑？"
+            "text": "那北极的冬天呢？"
           },
           {
+            "who": "owl",
             "lang": "zh",
-            "text": "歪到另一边就照不到了，北角76天不见日落！"
+            "text": "朝向背光一侧，可能整天见不到太阳。"
           }
         ],
         "chars": [
           "dog:think:110",
-          "owl:happy:110"
+          "owl:talk:110"
         ]
       },
       {
+        "title": "自己动手找一找",
         "bubbles": [
           {
+            "who": "mouse",
             "lang": "en",
-            "text": "Sun can't sleep!"
+            "text": "One turn, still in the light!"
           },
           {
+            "who": "dog",
             "lang": "zh",
-            "text": "太阳在转圈圈不睡觉！暑假去挪威！"
+            "text": "拿手电照地球仪，转一圈找找看！"
           }
         ],
         "chars": [
-          "mouse:happy:110",
+          "mouse:wave:110",
           "dog:happy:110"
         ]
       }
     ],
     "theme_icon": "🌍",
-    "title_en": "Why doesn't the sun set at midnight?",
-    "title_zh": "半夜12点，太阳为什么不下班？",
-    "diagram": "11-diagram.svg"
+    "title_en": "Why is the sun still up at midnight?",
+    "title_zh": "半夜了，太阳怎么还没下班？",
+    "diagram": "11-diagram.svg",
+    "diagram_title": "跟着红点：它转一圈也没有离开亮面",
+    "takeaway": "地球斜着转，让北极附近的夏天出现极昼。",
+    "fact_title": "💡 再发现"
   },
   "words": {
     "intro": "Hi! I'm Boba Mouse. 🧋 Pack your bags — today we are going to Norway! 挪威！",

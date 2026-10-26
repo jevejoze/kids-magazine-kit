@@ -23,7 +23,7 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 | 页 | 内容 |
 |---|---|
 | 封面 | 顶部刊名条 + 大幅真实照片（刊名条取照片的颜色）+ 一个反直觉问题，编辑部成员按主题换表情和道具 |
-| 今日一问 | 4 格漫画讲清一个机制 + agent 画的原理图解 + 冷知识便利贴 |
+| 今日一问 | 两格对话 → 主图解释 → 两格追问，一句话结论与紧扣主问题的延伸 |
 | 小剧场 | 编辑部推理连载，中文，带"侦探笔记"提问 |
 | 挑战 | 情境、条件、问题分层呈现，答案在本页底部倒印 |
 | 环球小报 | 本周 3 条适合孩子的真实新闻，照片一眼看懂，交叉核实来源；讲读版讲得最丰富 |
@@ -55,6 +55,8 @@ node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/iss
 示例 003 保留历史新闻，已包含经典连载和信息查证栏目，同时演示可选的单词屋与英文三关。默认渲染会检查内容步骤、审稿结论及内容指纹；审稿前或渲染旧格式 JSON 时加 `--preview`。运行回归测试：`node --test tests/*.test.mjs`。完成状态和阻断规则见 [流水线说明](pipeline/README.md#校验与完成状态)。
 
 封面排版预览：[前后对比](docs/cover-comparison.html) · [SVG 角色版](docs/cover-after-svg.png) · [PNG 角色版](docs/cover-after-png.png)。
+
+今日一问预览：[前后对比](docs/big-question-comparison.html) · [蜂巢](docs/big-question-honey.png) · [猫木乃伊](docs/big-question-cat.png) · [内容依据与复现](examples/comic-previews/README.md)。
 
 常用指令：
 

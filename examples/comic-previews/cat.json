@@ -1,0 +1,82 @@
+{
+  "theme_icon": "🏛️",
+  "title_zh": "猫咪木乃伊，布里藏着什么？",
+  "title_en": "What is inside a cat mummy?",
+  "panels": [
+    {
+      "title": "先回答封面的问题",
+      "chars": [
+        "dog:surprise:130"
+      ],
+      "bubbles": [
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "猫咪也有木乃伊？布里真的是猫吗？"
+        }
+      ]
+    },
+    {
+      "title": "它和古人的信仰有关",
+      "chars": [
+        "owl:talk:130"
+      ],
+      "bubbles": [
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "确实有。古埃及人把猫木乃伊作为祭礼。"
+        }
+      ]
+    },
+    {
+      "title": "外形能说明全部吗",
+      "chars": [
+        "dog:think:110",
+        "owl:talk:110"
+      ],
+      "bubbles": [
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "像猫的包裹里，一定有完整的猫？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "不一定，有的只包含部分遗骸。"
+        }
+      ]
+    },
+    {
+      "title": "不拆布，也能找线索",
+      "chars": [
+        "mouse:think:110",
+        "owl:happy:110"
+      ],
+      "bubbles": [
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Look inside, not just outside."
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "研究人员能用X光或CT检查内部。"
+        }
+      ]
+    }
+  ],
+  "diagram_title": "看外形、问用途，再找内部证据",
+  "takeaway": "猫木乃伊是文物；判断内部有什么，要靠检测证据。",
+  "fact_title": "💡 真有其物",
+  "fact": "史密森尼馆藏中有一件2000多年前的猫木乃伊，研究人员用X光检查过内部。",
+  "host": "主持：团子狗 × 咕咕博士",
+  "sources": [
+    "https://www.si.edu/collections/snapshot/mummy-cat",
+    "https://www.si.edu/object/mummy-cat-wrapped-linen%3Anmnhanthropology_8125402",
+    "https://collections.carlos.emory.edu/objects/21069/cat-mummy"
+  ],
+  "diagram": "cat.svg"
+}
