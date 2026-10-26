@@ -4,7 +4,7 @@
   "title_en": "What is inside a cat mummy?",
   "panels": [
     {
-      "title": "先回答封面的问题",
+      "title": "布里真的是猫吗",
       "chars": [
         "dog:surprise:130"
       ],
@@ -58,7 +58,7 @@
         {
           "who": "mouse",
           "lang": "en",
-          "text": "Look inside, not just outside."
+          "text": "Look inside, too!"
         },
         {
           "who": "owl",

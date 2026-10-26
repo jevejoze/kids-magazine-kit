@@ -78,7 +78,7 @@
           {
             "who": "mouse",
             "lang": "en",
-            "text": "One turn, still in the light!"
+            "text": "Still in the light!"
           },
           {
             "who": "dog",
@@ -96,7 +96,7 @@
     "title_en": "Why is the sun still up at midnight?",
     "title_zh": "半夜了，太阳怎么还没下班？",
     "diagram": "11-diagram.svg",
-    "diagram_title": "跟着红点：它转一圈也没有离开亮面",
+    "diagram_title": "先看整球，再到放大窗跟着红点转一圈",
     "takeaway": "地球斜着转，让北极附近的夏天出现极昼。",
     "fact_title": "💡 再发现"
   },

@@ -9,6 +9,7 @@ export const MOODS = ["normal", "happy", "wave", "smirk", "sleepy", "angry", "su
 export const PROPS = ["sunglasses", "eyemask", "partyhat", "scarf", "magnifier", "sweat"];
 export const SPEAKERS = ["narrator", "dog", "mouse", "owl", "raccoon"];
 export const SPEAKER_NAMES = { narrator: "🎙 旁白", dog: "🐶 团子狗", mouse: "🐭 波波鼠", owl: "🦉 咕咕博士", raccoon: "🦝 捣蛋浣熊" };
+export const COMIC_LIMITS = Object.freeze({ solo: 26, pair: 20, takeaway: 28, fact: 45, character: 130 });
 export const EMOTIONS = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
 export const pageOrder = issue => PAGE_KEYS.filter(key => issue[key] != null);
 
@@ -53,6 +54,7 @@ export function validateStructure(file, value, omit = []) {
     visit(value, path.split("."), "");
   }
   if (file === "11-comic.json") {
+    errors.push(...validateComicContent(value).map(error => `[${file}] ${error}`));
     for (const key of ["diagram_title", "takeaway", "fact_title"]) {
       if (value[key] !== undefined && (typeof value[key] !== "string" || !value[key].trim())) errors.push(`[${file}] ${key} 必须是非空 string`);
     }
@@ -92,5 +94,33 @@ function validatePuzzleLayout(puzzle) {
   const errors = [];
   if (!Array.isArray(puzzle.clues) || !puzzle.clues.length || puzzle.clues.some(c => typeof c !== "string" || !c.trim())) errors.push("谜题 clues 必须是非空字符串数组，每条条件单独写");
   if (typeof puzzle.question !== "string" || !puzzle.question.trim()) errors.push("谜题 question 必须明确说明要求解的问题");
+  return errors;
+}
+
+
+// Comic copy is plain text. Count exactly what the template displays, including < and >.
+export function validateComicContent(comic) {
+  const errors = [];
+  const count = text => [...String(text ?? "")].length;
+  for (const [key, max] of [["diagram_title", 28], ["takeaway", COMIC_LIMITS.takeaway], ["fact", COMIC_LIMITS.fact], ["fact_title", 8]]) {
+    if (typeof comic[key] === "string" && count(comic[key]) > max) errors.push(`${key} ${count(comic[key])} 字，最多 ${max} 字`);
+  }
+  if (Array.isArray(comic.panels)) comic.panels.forEach((panel, i) => {
+    if (!panel || typeof panel !== "object") return;
+    if (count(panel.title) > 12) errors.push(`第 ${i + 1} 格小标题最多 12 字`);
+    const chars = Array.isArray(panel.chars) ? panel.chars : [];
+    const bubbles = Array.isArray(panel.bubbles) ? panel.bubbles : [];
+    const max = bubbles.length > 1 || chars.length > 1 ? COMIC_LIMITS.pair : COMIC_LIMITS.solo;
+    bubbles.forEach((bubble, j) => {
+      if (typeof bubble?.text !== "string") return;
+      if (/<\/?[a-z][^>]*>/i.test(bubble.text)) errors.push(`第 ${i + 1} 格第 ${j + 1} 个气泡必须是纯文本，不能使用 HTML 标签`);
+      if (count(bubble.text) > max) errors.push(`第 ${i + 1} 格第 ${j + 1} 个气泡 ${count(bubble.text)} 字，最多 ${max} 字`);
+    });
+    const specs = [...chars, ...bubbles.map(b => b?.who).filter(who => typeof who === "string" && who.includes(":"))];
+    specs.forEach(spec => {
+      const size = Number(String(spec).split(":")[2] ?? "110");
+      if (!Number.isFinite(size) || size <= 0 || size > COMIC_LIMITS.character) errors.push(`第 ${i + 1} 格角色尺寸必须在 1–${COMIC_LIMITS.character}px：${spec}`);
+    });
+  });
   return errors;
 }

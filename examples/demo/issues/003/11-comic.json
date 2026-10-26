@@ -57,7 +57,7 @@
         {
           "who": "mouse",
           "lang": "en",
-          "text": "One turn, still in the light!"
+          "text": "Still in the light!"
         },
         {
           "who": "dog",
@@ -80,7 +80,7 @@
     "https://pmel.noaa.gov/arctic-zone/gallery_np_seasons.html",
     "https://www.lpi.usra.edu/education/skytellers/day_night/"
   ],
-  "diagram_title": "跟着红点：它转一圈也没有离开亮面",
+  "diagram_title": "先看整球，再到放大窗跟着红点转一圈",
   "takeaway": "地球斜着转，让北极附近的夏天出现极昼。",
   "fact_title": "💡 再发现"
 }

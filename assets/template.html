@@ -35,14 +35,15 @@ const cards = [];
 // 照片封面：顶部刊名条 + 下方照片。刊名条的颜色取自照片顶部（见文末 coverStrip），照片顶端渐隐进刊名条
 // Keep Chinese words and number/unit phrases together while respecting editorial <br> breaks.
 const chineseSegmenter = new Intl.Segmenter("zh", { granularity: "word" });
+const escapeText = text => String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 const numberUnitPhrase = /((?:\d+(?:\.\d+)?|[零〇一二两三四五六七八九十百千万亿]+)\s*(?:公斤|千克|千米|公里|厘米|毫米|小时|分钟|点半|点|吨|米|度|岁|天|秒|年|月|日|个))/g;
-const wrapChineseWords = text => String(text).split(/<br\s*\/?>/i).map(line => {
+const wrapChineseWords = (text, allowBreaks = true) => (allowBreaks ? String(text).split(/<br\s*\/?>/i) : [String(text)]).map(line => {
   const words = [];
   line.split(numberUnitPhrase).flatMap((part, i) => i % 2 ? [part] : [...chineseSegmenter.segment(part)].map(x => x.segment)).forEach(word => {
     if (/^[，。！？、：；,.!?…）】》]+$/.test(word) && words.length) words[words.length - 1] += word;
     else words.push(word);
   });
-  return words.map(word => /^\s+$/.test(word) ? word : `<span class="word-group">${word.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</span>`).join("");
+  return words.map(word => /^\s+$/.test(word) ? word : `<span class="word-group">${escapeText(word)}</span>`).join("");
 }).join("<br>");
 const CV = D.cover;
 if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.strip ? ` style="--strip:${CV.strip}"` : ""}>
@@ -75,7 +76,7 @@ const chatRow = (b, bi, p, pi) => {
   const [whoKey, mood = "normal", size = "110", props = ""] = spec.split(":");
   const side = b.side || (p.bubbles.length > 1 ? (bi % 2 === 0 ? "left" : "right") : (pi % 2 === 0 ? "left" : "right"));
   const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, mood, Number(size), props)}</div>`;
-  const bub = `<div class="bub who-${whoKey} ${side} ${b.lang === "en" ? "en" : "fun"}">${b.lang === "en" ? b.text : wrapChineseWords(b.text)}</div>`;
+  const bub = `<div class="bub who-${whoKey} ${side} ${b.lang === "en" ? "en" : "fun"}"><span class="bubble-text">${b.lang === "en" ? escapeText(b.text) : wrapChineseWords(b.text, false)}</span></div>`;
   return `<div class="chat-row ${side}">${side === "left" ? ava + bub : bub + ava}</div>`;
 };
 const comicPanels = (panels, start) => panels.map((p, j) => {
@@ -87,7 +88,7 @@ cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} �
   <div class="h1 fun">${wrapChineseWords(C.title_zh || D.question.zh)}<span class="en">${C.title_en || D.question.en}</span></div>
   <div class="grid upper">${comicPanels(C.panels.slice(0, 2), 0)}</div>
   ${C.diagram ? `<div class="box diagram"><div class="dl fun">${C.diagram_title || "🦉 咕咕博士画给你看"}</div>${C.diagram}
-    ${C.takeaway ? `<div class="takeaway"><b>所以</b>${C.takeaway}</div>` : ""}</div>` : ""}
+    ${C.takeaway ? `<div class="takeaway"><b>所以</b><span>${escapeText(C.takeaway)}</span></div>` : ""}</div>` : ""}
   <div class="grid lower">${comicPanels(C.panels.slice(2), 2)}</div>
   <div class="fact"><b>${C.fact_title || "💡 再发现"}</b><span>${C.fact}</span></div>
   ${foot(C.host || "主持：团子狗 × 咕咕博士")}</section>`);
@@ -292,7 +293,18 @@ async function coverStrip() {
   const lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
   card.classList.add(lum > 0.6 ? "light" : "dark");
 }
-window.READY = Promise.all([coverStrip(), characterPackReady]);
+function fitComicDiagram() {
+  const card = document.querySelector("#c2"), svg = card?.querySelector(".diagram svg"), foot = card?.querySelector(".foot");
+  if (!svg || !foot || !card.getBoundingClientRect().height) return;
+  card.style.setProperty("--comic-diagram-height", "280px");
+  const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);
+  const excess = Math.max(0, Math.ceil(foot.getBoundingClientRect().bottom - limit));
+  card.style.setProperty("--comic-diagram-height", `${Math.max(200, 280 - excess)}px`);
+}
+window.READY = Promise.all([coverStrip(), characterPackReady]).then(async () => {
+  await document.fonts?.ready;
+  fitComicDiagram();
+});
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
     "stage": "50-narration",
     "by": "示例",
     "at": "2026-10-14T07:00:00+08:00",
-    "content_hash": "65d55b0a7e7bc447930d9ea777c406b77d1e2e6a9219a16a04026a5e05fd60e0"
+    "content_hash": "6f20f0d04b400d433434b52c681f0f11fa720599004ac220bc16658b4f014bdd"
   },
   "narration": [
     {
@@ -86,7 +86,7 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "看中间的图：太阳在左边，阳光照着地球的左半边。"
+          "text": "看图：太阳在左边，照亮地球的左半边。"
         },
         {
           "who": "owl",
@@ -101,7 +101,7 @@
         {
           "who": "owl",
           "lang": "zh",
-          "text": "看北极附近的红点，跟着它的路线走一圈。"
+          "text": "看右边放大窗，跟着红点的黄色路线走一圈。"
         },
         {
           "who": "owl",
@@ -116,7 +116,7 @@
         {
           "who": "mouse",
           "lang": "en",
-          "text": "One turn, still in the light!"
+          "text": "Still in the light!"
         },
         {
           "who": "narrator",

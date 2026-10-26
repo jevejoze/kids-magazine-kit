@@ -1,35 +1,40 @@
-<svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="北半球夏季：黄色椭圆示意北极附近的红点随地球转一圈的路线，整圈都在向着太阳的亮面。位置与比例经过简化。" font-family="ZCOOL KuaiLe, PingFang SC, sans-serif">
+<svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="北半球夏季：先看向着太阳的亮面，再看北极附近的放大窗。黄色椭圆示意红点转一圈的路线，整圈留在亮面。放大连线从亮面左侧绕过地球上方，不经过夜晚半球；比例经过夸张。" font-family="ZCOOL KuaiLe, PingFang SC, sans-serif">
   <defs>
-    <clipPath id="day-earth"><circle cx="505" cy="150" r="108"/></clipPath>
+    <clipPath id="day-earth"><circle cx="370" cy="160" r="104"/></clipPath>
     <marker id="light-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#E5A139"/></marker>
+    <marker id="zoom-turn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#A87C20"/></marker>
   </defs>
-  <g stroke="#E5A139" stroke-width="4" stroke-linecap="round"><path d="M90 60V42 M90 240v18 M0 150h18 M162 150h18 M26 86 13 73 M154 86l13-13 M26 214l-13 13 M154 214l13 13"/></g>
-  <circle cx="90" cy="150" r="54" fill="#FFE27A" stroke="#4A3B32" stroke-width="4"/>
-  <text x="90" y="160" text-anchor="middle" font-size="30" fill="#4A3B32">太阳</text>
-  <g stroke="#E5A139" stroke-width="4" marker-end="url(#light-arrow)"><path d="M174 100H370"/><path d="M174 150H370"/><path d="M174 200H370"/></g>
-  <text x="240" y="66" text-anchor="middle" font-size="28" fill="#986120">阳光</text>
-  <circle cx="505" cy="150" r="108" fill="#8EC5FF"/>
+  <g stroke="#E5A139" stroke-width="4" stroke-linecap="round"><path d="M68 72V55 M68 228v17 M0 150h14 M122 96l12-12 M122 204l12 12 M16 96 4 84 M16 204 4 216"/></g>
+  <circle cx="68" cy="150" r="44" fill="#FFE27A" stroke="#4A3B32" stroke-width="4"/>
+  <text x="68" y="160" text-anchor="middle" font-size="28" fill="#4A3B32">太阳</text>
+  <g stroke="#E5A139" stroke-width="4" marker-end="url(#light-arrow)"><path d="M125 112H236"/><path d="M125 160H236"/><path d="M125 208H236"/></g>
+  <text x="180" y="77" text-anchor="middle" font-size="28" fill="#986120">阳光</text>
+  <circle cx="370" cy="160" r="104" fill="#8EC5FF"/>
   <g clip-path="url(#day-earth)">
-    <path d="M404 117q28-36 57-6l-15 40-30 3 M482 172q45-25 69 20l-30 41-32-15" fill="#7FD3BC"/>
-    <rect x="505" y="40" width="120" height="220" fill="#253754" opacity=".72"/>
-    <g transform="rotate(-23.5 505 150)">
-      <ellipse cx="505" cy="47" rx="35" ry="6" fill="#FFE27A" stroke="#B5821C" stroke-width="3"/>
-      <circle cx="487" cy="52" r="10" fill="#FF6A6A" stroke="#fff" stroke-width="3"/>
-      <circle cx="470" cy="47" r="5" fill="#FF6A6A" opacity=".5"/>
-      <circle cx="505" cy="41" r="6" fill="#FF6A6A" opacity=".6"/>
-      <circle cx="540" cy="47" r="6" fill="#FF6A6A" opacity=".35"/>
-      <ellipse cx="505" cy="150" rx="108" ry="18" fill="none" stroke="#fff" stroke-width="2.5" opacity=".65"/>
+    <path d="M273 131q28-36 57-6l-15 40-30 3 M347 180q45-25 69 20l-30 41-32-15" fill="#7FD3BC"/>
+    <rect x="370" y="55" width="110" height="215" fill="#253754" opacity=".72"/>
+    <g transform="rotate(-23.5 370 160)">
+      <ellipse cx="370" cy="60" rx="34" ry="6" fill="none" stroke="#C99A25" stroke-width="4"/>
+      <circle cx="365" cy="66" r="7" fill="#FF6A6A" stroke="#fff" stroke-width="2"/>
+      <ellipse cx="370" cy="160" rx="104" ry="18" fill="none" stroke="#fff" stroke-width="2.5" opacity=".65"/>
     </g>
   </g>
-  <circle cx="505" cy="150" r="108" fill="none" stroke="#4A3B32" stroke-width="4"/>
-  <g transform="rotate(-23.5 505 150)"><path d="M505 16V284" stroke="#4A3B32" stroke-width="3.5" stroke-dasharray="9 6"/></g>
-  <path d="M458 39Q592 5 646 49" fill="none" stroke="#4A3B32" stroke-width="2.5"/>
-  <text x="664" y="55" font-size="28" fill="#4A3B32">地轴倾斜</text>
-  <text x="664" y="90" font-size="30" fill="#4A3B32">约 23.5°</text>
-  <path d="M449 67Q610 96 648 154" fill="none" stroke="#B5821C" stroke-width="2.5" stroke-dasharray="5 4"/>
-  <text x="664" y="164" font-size="28" fill="#986120">黄色圈：路线</text>
-  <text x="664" y="202" font-size="28" fill="#4A3B32">转一圈，</text>
-  <text x="664" y="240" font-size="28" fill="#4A3B32">都留在亮面。</text>
-  <text x="422" y="289" font-size="28" fill="#4A3B32">白天</text>
-  <text x="548" y="289" font-size="28" fill="#4A3B32">夜晚</text>
+  <circle cx="370" cy="160" r="104" fill="none" stroke="#4A3B32" stroke-width="4"/>
+  <g transform="rotate(-23.5 370 160)"><path d="M370 25V295" stroke="#4A3B32" stroke-width="3" stroke-dasharray="8 6"/></g>
+  <text x="392" y="43" text-anchor="middle" font-size="28" fill="#4A3B32">倾斜约 23.5°</text>
+  <rect x="291" y="57" width="68" height="51" rx="10" fill="none" stroke="#A87C20" stroke-width="2.5"/>
+  <!-- 放大连线只走亮面左侧和地球上方，绝不穿过夜晚。 -->
+  <path id="zoom-link" d="M291 82H251V10H565V25" fill="none" stroke="#A87C20" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <text x="288" y="290" font-size="28" fill="#4A3B32">白天</text><text x="401" y="290" font-size="28" fill="#4A3B32">夜晚</text>
+  <g id="polar-zoom">
+    <rect x="541" y="25" width="334" height="263" rx="18" fill="#FFF9E9" stroke="#C4AB73" stroke-width="2"/>
+    <text x="708" y="64" text-anchor="middle" font-size="30" fill="#4A3B32">北极附近 · 放大看</text>
+    <rect x="555" y="91" width="306" height="143" rx="18" fill="#FFF0B8"/>
+    <text x="576" y="122" font-size="28" fill="#986120">亮面</text>
+    <ellipse id="zoom-route" cx="708" cy="179" rx="111" ry="34" fill="none" stroke="#D1A234" stroke-width="6"/>
+    <path d="M708 213A111 34 0 0 0 819 179" fill="none" stroke="#A87C20" stroke-width="4" marker-end="url(#zoom-turn)"/>
+    <circle cx="597" cy="179" r="6" fill="#FF6A6A" opacity=".35"/><circle cx="708" cy="145" r="6" fill="#FF6A6A" opacity=".55"/>
+    <circle cx="708" cy="213" r="11" fill="#FF6A6A" stroke="#fff" stroke-width="3"/>
+    <text x="708" y="269" text-anchor="middle" font-size="30" fill="#4A3B32">转一圈，仍在亮面</text>
+  </g>
 </svg>
