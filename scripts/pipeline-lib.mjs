@@ -27,6 +27,17 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const { stages } = JSON.parse(readFileSync(join(here, "..", "pipeline", "stages.json"), "utf8"));
+// 50-narration.md「写法：错的和对的」里的例句，讲读稿照抄就报错
+const NARRATION_EXAMPLES = (() => {
+  const md = readFileSync(join(here, "..", "pipeline", "stages", "50-narration.md"), "utf8");
+  return md.split("\n").filter(l => /^- [❌✅]/.test(l))
+    .flatMap(l => l.replace(/^- [❌✅]\s*/, "").replace(/（[^）]*）/g, "").split("→"))
+    .map(t => t.replace(/`\w+`：/, "").replace(/[\s\p{P}\p{S}A-Za-z]/gu, "")).filter(t => t.length >= 8);
+})();
+// 讲读里带单位的数字、年份、日期；"十几年""几亿年"这类约数不算
+const NUM = "[零〇一二两三四五六七八九十百千万亿点几]";
+const NUM_UNIT = new RegExp(`${NUM}{2,}(?:多)?(?:克|千克|公斤|吨|毫米|厘米|公里|千米|米|光年|毫升|升|度|倍|岁|年|天|小时|分钟|秒|万|亿|个|只|种|次|颗|条)|百分之${NUM}+`, "g");
+const YEAR_DATE = new RegExp(`[零〇一二三四五六七八九]{4}年|${NUM}{1,2}月${NUM}{1,3}[日号]`);
 export function createPipeline(issueArg) {
   const issue = resolve(issueArg);
   const dataDir = resolve(issue, "..", "..");
@@ -306,6 +317,10 @@ export function createPipeline(issueArg) {
       const ROLE_NAMES = { dog: /团子狗/, mouse: /波波鼠/, owl: /咕咕博士/, raccoon: /捣蛋浣熊|浣熊/ };
       const OPENER_CLICHE = /看完|讲完|做完|听完|查完|弄懂|明白了|完了|合上/;
       let all = 0, narr = 0, zh = 0, calm = 0, cliche = 0;
+      const FAMILY = /爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人/g;
+      const sendTo = String(src("16-mailbox.json").send_note ?? "").match(FAMILY) ?? [];
+      const storyTbc = plain(src("13-story.json").tbc);
+      const newsWords = (src("17-news.json").items ?? []).map(i => i.word?.en).filter(Boolean);
       pages.forEach(p => {
         const kind = order[p.card - 1];
         need(p.thread && len(p.thread) <= 30, "50", `第 ${p.card} 页缺 thread（这一页的主线，≤ 30 字），先定主线再写台词`);
@@ -327,6 +342,25 @@ export function createPipeline(issueArg) {
           need(copied.length <= limit, "50", `第 ${p.card} 页有 ${copied.length} 句照着页面念（连续 10 字相同），最多 ${limit} 句，换成口语、拆给角色接：${copied.map(l => l.text).slice(0, 3).join(" / ")}`);
         }
         need(p.lines.filter(l => (l.pause ?? 0) >= 3).length <= 1, "50", `第 ${p.card} 页停顿 ≥ 3 秒的地方超过 1 处`);
+        const zhText = p.lines.filter(l => l.lang === "zh").map(l => l.text);
+        if (!["story", "challenge", "serial"].includes(kind)) {
+          const nums = new Set(zhText.flatMap(t => t.match(NUM_UNIT) ?? []).filter(m => !m.includes("几")));
+          const cap = kind === "news" ? 3 : 1;
+          need(nums.size <= cap, "50", `第 ${p.card} 页有 ${nums.size} 个数字（${[...nums].join("、")}），${kind === "news" ? "每条新闻" : "一页"}只留主线那一个，配一个摸得着的比较`);
+        }
+        if (kind !== "challenge") zhText.filter(t => YEAR_DATE.test(t)).forEach(t => problems.push(`[50] 第 ${p.card} 页念了年份或日期，删掉或改成"十几年前""上个星期"：${t}`));
+        const copiedEx = zhText.filter(t => NARRATION_EXAMPLES.some(e => shares(plain(t), e, 8)));
+        need(!copiedEx.length, "50", `第 ${p.card} 页照抄了 50-narration.md 的例句，例句只示范结构，用本期内容重新造句：${copiedEx.join(" / ")}`);
+        if (kind === "news") newsWords.forEach(w => need(p.lines.some(l => l.lang === "en" && new RegExp(`\\b${w}`, "i").test(l.text)), "50", `第 ${p.card} 页没讲到关键词 ${w} 那条新闻；三条新闻的关键词都由波波鼠放进英文短句里说`));
+        if (kind === "comic") {
+          const at = p.lines.findIndex(l => /试试|试一试/.test(l.text));
+          need(at < 0 || at >= p.lines.length - 2, "50", `第 ${p.card} 页"试试"后面还有 ${p.lines.length - 1 - at} 句，"你也可以试试"放在最后`);
+        }
+        if (kind === "mailbox") {
+          zhText.forEach(t => [...t.matchAll(/(?:说给|讲给|发给|告诉|拿给)(爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人)/g)]
+            .forEach(m => need(!sendTo.length || sendTo.includes(m[1]), "50", `第 ${p.card} 页说"${m[0]}"，send_note 写的是"${src("16-mailbox.json").send_note}"`)));
+          if (storyTbc) zhText.filter(t => shares(plain(t), storyTbc, 5)).forEach(t => problems.push(`[50] 第 ${p.card} 页的预告重复了小剧场的 tbc，换一个新悬念：${t}`));
+        }
         let run = 0;
         const noEmo = [];
         p.lines.forEach((l, i) => {
@@ -349,7 +383,8 @@ export function createPipeline(issueArg) {
             need(!META_SPOILER.test(l.text), "50", `${at} 讲读台词不得点破「思维本领/今天练」等课表字眼：${l.text}`);
           }
           run = i && p.lines[i - 1].who === l.who ? run + 1 : 1;
-          if (run === 4) problems.push(`[50] ${at} 起同一个角色连说超过 3 句，拆给别的角色接话`);
+          // 连载页按 serial-bible 可以全由旁白一个人念
+          if (run === 4 && !(kind === "serial" && l.who === "narrator")) problems.push(`[50] ${at} 起同一个角色连说超过 3 句，拆给别的角色接话`);
           total += len(l.text) * (l.repeat || 1);
         });
         need(!noEmo.length, "50", `第 ${p.card} 页第 ${noEmo.join("、")} 句是中文却没写 emotion`);

@@ -406,4 +406,12 @@ test("narration style rules catch stiff scripts", t => {
     const items = json(issue, "17-news.json").items;
     p[5].lines.forEach((l, i) => { if (l.lang === "zh" && !l.pause) l.text = items[i % 3].text.slice(0, 30); });
   }), /第 6 页有 \d+ 句照着页面念/);
+  const line = (who, text) => ({ who, lang: "zh", text, emotion: "开心" });
+  has(errors(p => { p[1].lines.splice(2, 0, line("owl", "这块冰三十五克，那块冰三百四十克。")); }), /第 2 页有 \d+ 个数字/);
+  has(errors(p => { p[0].lines.splice(1, 0, line("narrator", "这张照片是二零零九年拍的。")); }), /第 1 页念了年份或日期/);
+  has(errors(p => { p[1].lines.splice(2, 0, line("owl", "哈，哪来的袜子。它脚上的血管会互相取暖。")); }), /照抄了 50-narration.md 的例句/);
+  has(errors(p => { for (const l of p[5].lines) if (/help/i.test(l.text)) l.text = "What a big day!"; }), /没讲到关键词 help/);
+  has(errors(p => { p[1].lines.push(line("dog", "那我先去睡一觉。"), line("owl", "去吧去吧。")); }), /"试试"后面还有 2 句/);
+  has(errors(p => { p[8].lines.splice(1, 0, line("dog", "都说给爸爸听！")); }), /send_note 写的是/);
+  has(errors(p => { p[8].lines.splice(1, 0, line("mouse", "明天见，这次又是谁呢？")); }), /重复了小剧场的 tbc/);
 });
