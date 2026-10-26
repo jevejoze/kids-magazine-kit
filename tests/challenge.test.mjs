@@ -75,12 +75,23 @@ test("standard challenge samples omit optional English and each has one solution
     assert.ok(card.indexOf('class="clues"') < card.indexOf('class="question"'));
   }
   const perms = values => values.length ? values.flatMap((v, i) => perms(values.filter((_, j) => j !== i)).map(rest => [v, ...rest])) : [[]];
-  const queues = perms(["艾莎", "健太", "卢卡", "阿米尔"]).filter(p => ![0, 3].includes(p.indexOf("艾莎")) && p.indexOf("健太") === p.indexOf("阿米尔") + 1 && p[3] === "卢卡");
-  assert.equal(queues.length, 1); assert.equal(queues[0].join(" → "), samples.queue.answer);
-  const lights = perms(["红", "黄", "蓝", "绿", "紫"]).filter(p => p[2] === "黄" && p[3] === "蓝" && p[4] === "绿" && p.indexOf("紫") < p.indexOf("红"));
-  assert.equal(lights.length, 1); assert.equal(lights[0].join(" → "), samples.order.answer);
-  const boats = Array.from({ length: 37 }, (_, a) => [a, 36 - a]).filter(([a, b]) => a >= 4 && a - 4 === b + 4);
-  assert.deepEqual(boats, [[22, 14]]); assert.equal(`甲船${boats[0][0]}人，乙船${boats[0][1]}人。`, samples.math.answer);
+  // 唯一解，而且每条线索都用得上：去掉任何一条都不止一个解
+  const solve = (items, clues, answer) => {
+    const solutions = rules => perms(items).filter(p => rules.every(rule => rule(p)));
+    assert.deepEqual(solutions(clues).map(p => p.join(" → ")), [answer]);
+    clues.forEach((_, i) => assert.ok(solutions(clues.filter((__, j) => j !== i)).length > 1, `${answer}: 线索 ${i + 1} 多余`));
+  };
+  const at = (p, x) => p.indexOf(x);
+  solve(["艾莎", "健太", "卢卡", "阿米尔"], [
+    p => ![0, 3].includes(at(p, "艾莎")), p => p[0] !== "健太",
+    p => Math.abs(at(p, "阿米尔") - at(p, "艾莎")) === 1, p => at(p, "健太") < at(p, "卢卡"),
+  ], samples.queue.answer);
+  solve(["红", "黄", "蓝", "绿", "紫"], [
+    p => ![0, 4].includes(at(p, "红")), p => ![0, 4].includes(at(p, "黄")),
+    p => at(p, "绿") === at(p, "红") + 3, p => at(p, "黄") < at(p, "蓝"),
+  ], samples.order.answer);
+  const boats = Array.from({ length: 37 }, (_, a) => [a, 36 - a]).filter(([a, b]) => a >= 4 && b + 4 === 2 * (a - 4));
+  assert.deepEqual(boats, [[16, 20]]); assert.equal(`甲船${boats[0][0]}人，乙船${boats[0][1]}人。`, samples.math.answer);
 });
 
 const chrome = process.env.CHROME || ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome", "/usr/bin/chromium"].find(existsSync);
@@ -105,7 +116,7 @@ test("short and full-budget Chinese challenges fit both character modes with sma
       html = html.replace("</body>", `<script>window.READY.then(()=>{
         const c=document.querySelector('#c5'),r=c.getBoundingClientRect(),p=c.querySelector('.puz').getBoundingClientRect(),a=c.querySelector('.answer-key').getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
         const result={compact:c.classList.contains('challenge-compact'),footer:f.bottom<=r.bottom-56+1,answer:p.bottom+15<=a.top&&a.bottom<=f.top,
-          answerSmall:parseFloat(getComputedStyle(c.querySelector('.puzzle-key')).fontSize)<=16&&Number(getComputedStyle(c.querySelector('.puzzle-key')).fontWeight)<=400,
+          answerSmall:parseFloat(getComputedStyle(c.querySelector('.puzzle-key')).fontSize)<=20&&parseFloat(getComputedStyle(c.querySelector('.puzzle-key')).fontSize)<parseFloat(getComputedStyle(c.querySelector('.clues li')).fontSize)&&Number(getComputedStyle(c.querySelector('.puzzle-key')).fontWeight)<=400,
           text:[...c.querySelectorAll('.taunt-text,.puz h3,.body,.clues li>span,.question,.answer-content')].every(e=>e.scrollWidth<=e.clientWidth+1),
           flipped:getComputedStyle(c.querySelector('.answer-content')).transform.startsWith('matrix(-1, 0, 0, -1'),
           noEnglish:!c.querySelector('.route,.english-key,.taunt .en')};

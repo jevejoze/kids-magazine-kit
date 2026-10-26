@@ -27,4 +27,4 @@ node scripts/pipeline.mjs script <issue>
 - 背景音乐：若 `data/sfx/bgm.*` 存在，自动以 `-26 dB` 低音量循环铺底，并在首尾淡入淡出
 - 原子发布：先在临时目录完成编码并校验 `inputFingerprint(issue, "70-video")`，成功后再替换 `issue/70-final/` 并写入 `build.json`
 
-**自检**：`70-final/讲读版.mp4` 和 `<刊名>-第NNN期.pdf` 均非空；抽查开头、翻页处和结尾，音画同步、无破音或黑屏；将成品复制到 `data/成品/NNN/` 并上传网盘
+**自检**：`70-final/讲读版.mp4` 和 `<刊名>-第NNN期.pdf` 均非空；抽查开头、翻页处和结尾，音画同步、无破音或黑屏；将成品复制到 `data/成品/NNN/` 并上传网盘 `成品/NNN/`（视频不进 git，网盘上这一份是唯一的）；`sync.sh done` 推送 `70-final/build.json`

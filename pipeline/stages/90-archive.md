@@ -2,7 +2,7 @@
 
 **读**：`issue/30-issue.json`、`issue/13-story.json`（`bible_update`）、`issue/18-serial.json`（`bible_update`）、`issue/09-creature.json`（周一才有，`log_update`）、`issue/08-think.json`（周五才有，`log_update`）
 
-**助手脚本**：先运行下面的命令，它会只追加地更新 `vocab.json`、`story-bible.md`（本集摘要）、`serial-bible.md`、`creature-log.md`、`think-log.md`，按固定文件名把页图、PDF 和有效的讲读版复制到 `data/成品/NNN/`，最后打印一行归档回执。第 40 步未完成或已过期时脚本会停下。脚本不改"未回收伏笔"和 `profile.md`，也不碰网盘，这几件照下面的要求自己做。
+**助手脚本**：先运行下面的命令，它会只追加地更新 `vocab.json`、`story-bible.md`（本集摘要）、`serial-bible.md`、`creature-log.md`、`think-log.md`，按固定文件名把页图、PDF 和有效的讲读版复制到 `data/成品/NNN/`，最后打印一行归档回执。第 40 步未完成或已过期时脚本会停下。脚本不改"未回收伏笔"和 `profile.md`，也不碰 git 和网盘，这几件照下面的要求自己做。
 ```bash
 node scripts/pipeline.mjs archive <issue>
 ```
@@ -15,17 +15,16 @@ node scripts/pipeline.mjs archive <issue>
 - `data/think-log.md`：周五把 `08-think.json` 的 `log_update` 追加到「已用」（日期、话题、期号）
 - `data/profile.md`：本期调整过英文档位等设定时记一行，注明依据
 
-**上传核对**：对照网盘检查，缺的补传
-- `issues/NNN/`：00–50 步的 JSON、`11-diagram.svg`、`31-review.md`、`20-assets/` 全部图片和 `assets.json`、`60-audio/` 的音频和 `manifest.json`
-- `成品/NNN/`：全部 card-N.png（平时 8 张，周一、周五 9 张）、`<刊名>-第NNN期.pdf`、`<刊名>-第NNN期-讲读版.mp4`（文件名照抄，旧名字的文件改成这个名字）
-- 本步更新的 `vocab.json`、`story-bible.md`、`serial-bible.md`、`creature-log.md`、`think-log.md`、`profile.md`
+**推送和上传核对**
+- 数据仓库：`sync.sh done <期号> 90` 推送后，`sync.sh check` 返回 0；`issues/NNN/` 里 00–50 步的 JSON、`11-diagram.svg`、`31-review.md`、`20-assets/` 全部图片、`40-cards/`、`60-audio/` 都在提交里，`_claims/` 已清空
+- 网盘 `成品/NNN/`：全部 card-N.png（平时 8 张，周一、周五 9 张）、`<刊名>-第NNN期.pdf`、`<刊名>-第NNN期-讲读版.mp4`（文件名照抄，旧名字的文件改成这个名字）
 
 **规则**：只追加，不删除已有记录
 
-核对并更新完档案后，写 `issue/90-archive.json`，列出本期实际更新的档案（路径相对数据目录），用于流水线判断归档是否完成。不要提前写；文件清单检查不能替代上述网盘核对。
+核对并更新完档案后，写 `issue/90-archive.json`，列出本期实际更新的档案（路径相对数据目录），用于流水线判断归档是否完成。不要提前写；文件清单检查不能替代上述推送和网盘核对。
 
 ```json
 {"issue": 3, "content_hash": "<当前内容指纹>", "updated": ["story-bible.md", "serial-bible.md"]}
 ```
 
-**自检**：网盘上 `issues/NNN/` 和 `成品/NNN/` 的文件都齐了，告诉家长成品在网盘的哪个文件夹
+**自检**：`sync.sh check` 返回 0，网盘 `成品/NNN/` 的文件都齐了，告诉家长成品在网盘的哪个文件夹

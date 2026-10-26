@@ -40,6 +40,9 @@ if (!target) { console.error("用法: node tts_azure.mjs <issue 目录> [--dry] 
 
 const dataDir = audition ? resolve(target) : resolve(target, "..", "..");
 const voiceFile = join(dataDir, "voices", "azure.json");
+if (!audition && existsSync(join(dataDir, "voices", "mimo.json")) && !args.includes("--azure")) {
+  console.log("数据目录用 MiMo 语音（voices/mimo.json），请跑 node scripts/tts_mimo.mjs <issue>；确实要用 Azure 就加 --azure"); process.exit(0);
+}
 const voices = { ...DEFAULT_VOICES, ...(existsSync(voiceFile) ? JSON.parse(readFileSync(voiceFile, "utf8")) : {}) };
 delete voices._comment;
 

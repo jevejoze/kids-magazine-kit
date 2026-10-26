@@ -4,12 +4,12 @@
 
 ## 目录
 
-**数据目录**（下文写作 `data/`）放孩子的全部资料，推荐放在 Google Drive 这类各个 agent 都能访问的地方：
+**数据目录**（下文写作 `data/`）放孩子的全部资料，是家长的一个私有 git 仓库，各个 agent 都 clone 它来干活。网盘 `我的云端硬盘/<刊名>/成品/` 只放发给孩子的成品。
 
-**目录固定**：网盘上的数据目录固定为 `我的云端硬盘/<刊名>/`（如 `我的云端硬盘/小满早知道/`），下面的文件夹名和文件名都照抄。不新建别的文件夹、不改名、不按日期另起目录；期号一律三位数（`007`）。
+**目录固定**：下面的文件夹名和文件名都照抄。不新建别的文件夹、不改名、不按日期另起目录；期号一律三位数（`007`）。
 
 ```
-我的云端硬盘/<刊名>/          数据目录，下文写作 data/
+<私有数据仓库>/               数据目录，下文写作 data/
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
   story-bible.md  serial-bible.md  creature-log.md  think-log.md  thinking-plan.md  vocab.json  feedback.jsonl
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
@@ -27,15 +27,26 @@
       40-cards/              card-1..N.png（平时 8 张，周一、周五 9 张）、<刊名>-第007期.pdf
       50-narration.json
       60-audio/              c{card}_{序号}.wav、manifest.json
-      70-final/              <刊名>-第007期.pdf、讲读版.mp4
-  成品/
+      70-final/              <刊名>-第007期.pdf、讲读版.mp4（mp4 不进 git）
+      _claims/               sync.sh claim 写的认领，一步一个文件
+  成品/                      不进 git，上传到网盘 我的云端硬盘/<刊名>/成品/
     007/                     发给孩子的成品，文件名固定：
                              card-1.png … card-N.png
                              <刊名>-第007期.pdf
                              <刊名>-第007期-讲读版.mp4
 ```
 
-**素材和成品都要上传到网盘**：数据目录以网盘上的为准。在本地或云端会话里做的步骤，做完就把输出文件（包括 `20-assets/` 的图片、`60-audio/` 的音频）传到网盘 `issues/NNN/` 的同一位置；第 40、70 步出了成品，再按上面的文件名复制一份到网盘 `成品/NNN/`。
+**同步**：数据仓库是素材和进度的唯一来源，用 `scripts/sync.sh` 同步（在数据目录里运行）：
+
+```bash
+sh .engine/scripts/sync.sh start                     # 开工前：拉最新，打印最新一期的进度
+sh .engine/scripts/sync.sh claim 007 10 <agent 名>    # 认领第 10 步，status 里显示 🚧
+sh .engine/scripts/sync.sh done  007 10              # 做完：去掉认领，提交并推送这一步的文件
+sh .engine/scripts/sync.sh push "记一笔：……"          # 档案、反馈、随手记等其余改动
+sh .engine/scripts/sync.sh check                     # 有没提交或没推送的改动时返回 1
+```
+
+认领推送失败、或者 `status` 里那一步已经是 🚧，说明别的 agent 在做，换一步。第 40、70 步出了成品，按上面的文件名传到网盘 `成品/NNN/`。
 
 ## 步骤
 
@@ -72,12 +83,13 @@
 
 ## 接手一步的做法
 
+0. 在数据目录里跑 `sync.sh start` 拉最新，再 `sync.sh claim <期号> <步骤> <agent 名>` 认领
 1. 读 `pipeline/stages/<步骤>.md`（公开地址：`https://raw.githubusercontent.com/jevejoze/kids-magazine-kit/main/pipeline/stages/<步骤>.md`）
 2. 确认依赖步骤的输出文件都在 `issue/` 里；缺了就停下，告诉家长先做哪一步
 3. 读说明里列出的输入，写出说明里规定的输出文件，字段名照抄
 4. 每个输出 JSON 顶层写 `"_meta": {"stage": "13-story", "by": "<agent 名称>", "at": "<ISO 时间>"}`
 5. 按说明里的"自检"逐条检查
-6. 数据目录不在网盘上时（在本地或云端会话里干活），把这一步的输出文件传到网盘 `issues/NNN/` 的同一位置，再交付
+6. `sync.sh done <期号> <步骤>` 提交推送，再交付
 7. 只写自己这一步的输出；发现上游有错，写进自己输出的 `_meta.issues`，交给家长决定
 
 重做某一步：直接覆盖它的输出，再把依赖它的下游步骤重做一遍。
@@ -112,9 +124,11 @@ node scripts/pipeline.mjs fingerprint <issue> # 第 31、50 步记录当前内�
 node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40 步（版面溢出会打印警告）
 node scripts/tts_azure.mjs <issue> --pinyin  # 第 60 步之前：列出没注音的多音字
 node scripts/tts_azure.mjs <issue>           # 第 60 步（Azure 语音）
+node scripts/tts_voicestudio.mjs <issue>     # 第 60 步之后（可选）：数据目录有 voices/voicestudio.json 时换成克隆声音
+node scripts/tts_mimo.mjs <issue>           # 第 60 步（MiMo 语音）：数据目录有 voices/mimo.json 时用它代替 Azure，之后照样跑 tts_voicestudio.mjs
 python3 scripts/make_video.py <issue>        # 第 70 步
 node scripts/pipeline.mjs script   <issue>   # 没有语音合成时：导出 70-final/家长讲读稿.md
 node scripts/pipeline.mjs archive  <issue>   # 第 90 步助手：追加档案、整理 成品/NNN/
 ```
 
-第 60 步默认用 Azure 语音（`scripts/tts_azure.mjs`），需要环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`；换别的语音服务也行，按 `stages/60-audio.md` 的约定把音频放好即可。
+第 60 步默认用 Azure 语音（`scripts/tts_azure.mjs`），需要环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`scripts/tts_mimo.mjs`，环境变量 `MIMO_API_KEY`）；换别的语音服务也行，按 `stages/60-audio.md` 的约定把音频放好即可。
