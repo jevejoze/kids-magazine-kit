@@ -332,3 +332,20 @@ test("parent script export and archive helper respect render freshness", t => {
   put(issue, "90-archive.json", r1);
   assert.equal(p.done("90-archive"), true);
 });
+
+test("assembly carries tablet puzzle fields and drops stale mailbox answers", t => {
+  const issue = fixture(t), m = json(issue, "16-mailbox.json");
+  m.answers = "旧期遗留答案"; put(issue, "16-mailbox.json", m);
+  createPipeline(issue).assemble();
+  const data = json(issue, "30-issue.json");
+  assert.equal(data.challenge.puzzle.clues.length, 3);
+  assert.equal(data.challenge.puzzle.question, json(issue, "14-puzzle.json").question);
+  assert.equal(data.mailbox.answers, undefined);
+});
+
+test("mailbox narration cannot bring back prior-issue answers", t => {
+  const issue = fixture(t), narration = json(issue, "50-narration.json");
+  narration.narration.at(-1).lines[0].text = "先公布上期答案。";
+  put(issue, "50-narration.json", narration);
+  assert.ok(createPipeline(issue).check().some(e => e.includes("信箱不再公布上期答案")));
+});

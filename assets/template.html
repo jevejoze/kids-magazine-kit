@@ -151,17 +151,19 @@ cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · S
   ${renderStory(ST)}
   ${foot(ST.foot || `编辑部推理连载${NEXT("小剧场")}`)}</section>`);
 
-// 挑战卡
+// 挑战卡：平板阅读，题目分层，答案在本页底部倒印。
 const P = D.challenge;
-if (P) cards.push(`<section class="card" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
-  <div class="taunt">${ch("raccoon:smirk:160:" + (P.prop || ""))}<div class="bub fun">${P.taunt_zh}<br><span class="en">${P.taunt_en}</span></div></div>
-  <div class="box puz fun"><h3>${P.puzzle.title}</h3><div class="body">${P.puzzle.body}</div>
-    ${P.puzzle.slots ? `<div class="slots">${P.puzzle.slots.map(x => `<span>${x}</span>`).join("")}</div>` : ""}</div>
+const answerText = value => String(Array.isArray(value) ? value.join("；") : value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+if (P) cards.push(`<section class="card${P.english?.length ? " with-english" : ""}" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
+  <div class="taunt">${ch("raccoon:smirk:120:" + (P.prop || ""))}<div class="bub fun">${P.taunt_zh}<br><span class="en">${P.taunt_en}</span></div></div>
+  <div class="puz"><h3 class="fun">${P.puzzle.title}</h3><div class="body">${P.puzzle.body}</div>
+    ${P.puzzle.clues?.length ? `<ol class="clues">${P.puzzle.clues.map(clue => `<li>${clue}</li>`).join("")}</ol>` : ""}
+    ${P.puzzle.question ? `<div class="question"><b>请你判断</b>${P.puzzle.question}</div>` : ""}</div>
   ${P.english?.length ? `<div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
-    <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div>${e.stars === 3 ? lines(2) : ""}</div></div>`).join("")}</div>`
-    : `<div class="draft fun"><h3>✏️ 演算草稿手账 · 💡 浣熊锦囊：细心验算每一个线索哦！</h3><div class="stamp"><span>🏆 通关印</span><b>留念</b></div></div>
-  ${P.puzzle.slots ? "" : `<div class="box mine fun"><b>我的答案：</b>${lines(1)}</div>`}`}
-  ${foot("答案明天公布！")}</section>`);
+    <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div></div></div>`).join("")}</div>` : ""}
+  <div class="answer-key"><div class="answer-content"><b>参考答案 · 想好再看</b><p>${answerText(D._answers?.puzzle)}</p>
+    ${P.english?.length ? `<p class="english-key">英文：${(D._answers?.english || []).map((answer, i) => `${i + 1}. ${answerText(answer)}`).join("　")}</p>` : ""}</div></div>
+  ${foot("先想一想，再转动平板核对答案")}</section>`);
 
 // 环球小报（可选）：1 条头条 + 2 条小新闻
 const NW = D.news;
@@ -229,7 +231,6 @@ const picks = (items, many) => `<div class="pick${many ? " many" : ""}">${items.
 const PAGES = TOC.filter(([, t]) => t !== "信箱").map(([e, t]) => e + t);
 if (M) cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
   <div class="box letter fun">${M.hello || M.letter}</div>
-  ${M.answers ? `<div class="box answers fun"><b>🔓 上期答案</b>${M.answers}</div>` : ""}
   <div class="box checkin fun"><h3>📝 今天这期，告诉编辑部</h3>
     <div class="row"><b>👍 最喜欢哪一页？</b>${picks(PAGES, PAGES.length > 5)}</div>
     <div class="row"><b>👎 哪一页不太喜欢？</b>${picks(PAGES, PAGES.length > 5)}</div>

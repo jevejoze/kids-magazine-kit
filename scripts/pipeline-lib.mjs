@@ -210,6 +210,7 @@ export function createPipeline(issueArg) {
       const e = has("15-english.json") ? read("15-english.json") : {};
       fields({ ...e, ...p }, "14", ["title", "body", "answer", "solution", "taunt_zh", "taunt_en"]);
       need(len(p.body) <= 120, "14", `题干 ${len(p.body)} 字，超过 120`);
+      need(len([p.body, ...(p.clues ?? []), p.question ?? ""].join("")) <= 240, "14", "题目情境、条件和问题合计超过 240 字");
       if (p.taunt_zh) need(len(p.taunt_zh) <= 20, "14", `taunt_zh ${len(p.taunt_zh)} 字，超过 20`);
       if (p.taunt_en) need(words(p.taunt_en) <= 10, "14", `taunt_en ${words(p.taunt_en)} 个单词，超过 10`);
       checkProp(p.prop, "14");
@@ -223,7 +224,6 @@ export function createPipeline(issueArg) {
     "16-mailbox.json": m => {
       fields(m, "16", ["hello", "send_note"]);
       need(len(m.hello) <= 60, "16", `开头问候 ${len(m.hello)} 字，超过 60`);
-      need(len(m.answers) <= 100, "16", `上期答案 ${len(m.answers)} 字，超过 100`);
       need(len(m.ask_zh) <= 30, "16", `本期问题 ${len(m.ask_zh)} 字，超过 30`);
     },
     "17-news.json": n => {
@@ -298,6 +298,7 @@ export function createPipeline(issueArg) {
         let run = 0;
         p.lines.forEach((l, i) => {
           const at = `第 ${p.card} 页第 ${i + 1} 句`;
+          if (order[p.card - 1] === "mailbox") need(!/上期答案|上期.*谜题.*答案/.test(l.text), "50", `${at} 信箱不再公布上期答案`);
           need(SPEAKERS.includes(l.who), "50", `${at} who 不对：${l.who}`);
           need(["zh", "en"].includes(l.lang), "50", `${at} lang 不对：${l.lang}`);
           need(!l.emotion || EMOTIONS.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);
@@ -382,10 +383,10 @@ export function createPipeline(issueArg) {
       creature: cr ? { ...strip(cr), photo: asset(a.creature), credit: cr.photo_credit, legend: asset(a.creature_legend), legend_url: undefined, photo_url: undefined, photo_credit: undefined, sources: undefined, log_update: undefined } : undefined,
       words: w ? strip(w) : undefined,
       story: { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
-      challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, slots: p.slots }, english: e.english },
+      challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, clues: p.clues, question: p.question }, english: e.english },
       check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict, choices: ck.choices, tools: ck.tools } : undefined,
       think: th ? { title: th.title, title_en: th.title_en, story: th.story, photo: asset(a.think), photo_pos: th.photo_pos, credit: th.photo_credit, sides: th.sides, role: th.role, deeper: th.deeper } : undefined,
-      mailbox: strip(mb),
+      mailbox: { ...strip(mb), answers: undefined },
       _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { skill: ck.skill, truth: ck.truth ?? ck.answer, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
     };
     if (nw) {

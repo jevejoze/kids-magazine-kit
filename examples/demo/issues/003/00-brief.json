@@ -29,8 +29,5 @@
   },
   "creature": false,
   "think": false,
-  "last_answers": {
-    "puzzle": "金字塔搭 6 层剩 9 块，7 层还差 40 块"
-  },
   "last_feedback": "上期没有收到回复"
 }

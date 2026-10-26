@@ -141,13 +141,13 @@
     "prop": "sweat",
     "puzzle": {
       "title": "🌍 谜题：四国小客人",
-      "body": "挪威的艾莎、日本的健太、巴西的卢卡、埃及的阿米尔来编辑部做客，排队领奶茶。<br>① 艾莎不在第一个，也不在最后一个。<br>② 健太紧跟在阿米尔后面。<br>③ 卢卡是最后一个。<br>他们是怎么排的？",
-      "slots": [
-        "第1个",
-        "第2个",
-        "第3个",
-        "第4个"
-      ]
+      "body": "挪威的艾莎、日本的健太、巴西的卢卡、埃及的阿米尔，四人排成一队领奶茶。",
+      "clues": [
+        "艾莎不排在第一个，也不排在最后一个。",
+        "健太紧跟在阿米尔后面，两人之间没有其他人。",
+        "卢卡排在最后一个。"
+      ],
+      "question": "从队首到队尾，四人依次是谁？"
     },
     "english": [
       {
@@ -161,8 +161,8 @@
         "stars": 2
       },
       {
-        "cn": "用英文写 2 句，要用到 because",
-        "en": "Would you like to see the midnight sun? Write 2 sentences with because.",
+        "cn": "用英文说两句，要用到 because",
+        "en": "Would you like to see the midnight sun? Say two sentences with because.",
         "stars": 3
       }
     ]
@@ -179,7 +179,6 @@
   },
   "mailbox": {
     "hello": "小满早上好！团子狗爆料：我梦见喝奶茶，醒来枕头边真有吸管！梦游的人记得自己做过什么吗？",
-    "answers": "上期谜题：金字塔搭 6 层剩 9 块，搭 7 层还差 40 块",
     "ask_zh": "在挪威过没有黑夜的夏天，你最想做什么？",
     "send_note": "拍照发给妈妈"
   },

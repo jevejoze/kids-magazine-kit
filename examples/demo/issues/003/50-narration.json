@@ -3,7 +3,7 @@
     "stage": "50-narration",
     "by": "示例",
     "at": "2026-10-14T07:00:00+08:00",
-    "content_hash": "c0fa494812759e01ba661b11c4882c66981b98c17d0962dc95b9d87aba675f8a"
+    "content_hash": "91eb2207adf5476ac4315904216b576320cf40fc3ff97e53e032828fc3eb155b"
   },
   "narration": [
     {
@@ -390,7 +390,7 @@
           "text": "小提示：先把最确定的那个人放好。",
           "emotion": "温柔",
           "pause": 5,
-          "hold": "✏️ 写下你的答案"
+          "hold": "💭 想好后，口头说出顺序"
         },
         {
           "who": "mouse",
@@ -420,7 +420,13 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第三关，写两句，记得用上 because。",
+          "text": "第三关，说两句，记得用上 because。",
+          "emotion": "温柔"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "想好后，转动平板看本页底部的参考答案。",
           "emotion": "温柔"
         }
       ]
@@ -609,13 +615,6 @@
           "lang": "zh",
           "text": "最后一页，来拆今天的信箱！",
           "emotion": "开心"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "小满，先公布上期答案：金字塔搭六层剩九块，搭七层还差四十块。",
-          "emotion": "温柔",
-          "sfx": "ding"
         },
         {
           "who": "dog",

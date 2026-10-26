@@ -21,7 +21,7 @@ const contracts = {
   "11-comic.json": { title_zh: "string", title_en: "string", "panels[].bubbles[].text": "string", "panels[].chars[]": "string", fact: "string" },
   "12-words.json": { "items[].word": "string", "items[].example": "string" },
   "13-story.json": { ep: "number", "paragraphs[]": "string", "scene[]": "string", clue: "string" },
-  "14-puzzle.json": { title: "string", body: "string", solution: "string" },
+  "14-puzzle.json": { title: "string", body: "string", answer: "string", solution: "string" },
   "15-english.json": { "english[].en": "string" },
   "16-mailbox.json": { hello: "string", send_note: "string" },
   "17-news.json": { "items[].title": "string", "items[].text": "string", "items[].word.en": "string", "items[].word.zh": "string", "items[].sources[]": "string", "items[].talk.background": "string", "items[].talk.scale": "string", "items[].talk.follow_up": "string", "items[].photo_shows": "string" },
@@ -52,6 +52,7 @@ export function validateStructure(file, value, omit = []) {
     };
     visit(value, path.split("."), "");
   }
+  if (file === "14-puzzle.json") errors.push(...validatePuzzleLayout(value));
   return [...new Set(errors)];
 }
 
@@ -72,5 +73,16 @@ export function validateIssue(issue) {
     errors.push(...validateStructure(file, issue[key], omit));
   }
   if (!issue.challenge?.puzzle || typeof issue.challenge.puzzle.title !== "string" || typeof issue.challenge.puzzle.body !== "string") errors.push("整期缺少 challenge.puzzle 的标题或题干");
+  if (issue.challenge?.puzzle) errors.push(...validatePuzzleLayout(issue.challenge.puzzle));
+  if (typeof issue._answers?.puzzle !== "string" || !issue._answers.puzzle.trim()) errors.push("整期缺少本页倒印的谜题答案 _answers.puzzle");
+  if (issue.challenge?.english?.length && (!Array.isArray(issue._answers?.english) || issue._answers.english.length !== issue.challenge.english.length || issue._answers.english.some(a => typeof a !== "string" || !a.trim()))) errors.push("英文三关必须有逐关对应的本页答案 _answers.english");
+  return errors;
+}
+
+function validatePuzzleLayout(puzzle) {
+  if (puzzle.clues === undefined && puzzle.question === undefined) return [];
+  const errors = [];
+  if (!Array.isArray(puzzle.clues) || !puzzle.clues.length || puzzle.clues.some(c => typeof c !== "string" || !c.trim())) errors.push("谜题 clues 必须是非空字符串数组，每条条件单独写");
+  if (typeof puzzle.question !== "string" || !puzzle.question.trim()) errors.push("谜题 question 必须明确说明要求解的问题");
   return errors;
 }

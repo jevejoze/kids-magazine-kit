@@ -253,16 +253,31 @@ svg.ch{display:block}
   border-right:9px solid #FFF;
 }
 #c5 .puz{
-  padding:16px 28px 18px;margin-top:12px;font-size:29px;line-height:1.45;flex:none;
+  padding:24px 28px;margin-top:20px;flex:none;position:relative;
   background:#FFFDF9;border:4px solid var(--ink);border-radius:28px;box-shadow:0 7px 0 var(--ink);
 }
-#c5 .puz h3{font-size:36px;margin-bottom:8px;font-weight:400}
-#c5 .slots{display:flex;gap:14px;margin-top:14px}
-#c5 .slots span{
-  flex:1;border:3.5px solid var(--ink);border-radius:18px;background:#FFF;
-  height:62px;display:flex;align-items:center;justify-content:center;
-  font-size:26px;color:var(--ink);box-shadow:0 3px 0 var(--ink);
-}
+#c5 .puz h3{font-size:40px;line-height:1.25;margin-bottom:16px;font-weight:400}
+#c5 .puz .body{font-size:30px;line-height:1.6}
+#c5 .clues{list-style:none;counter-reset:clue;display:flex;flex-direction:column;gap:14px;margin-top:20px}
+#c5 .clues li{counter-increment:clue;display:flex;align-items:flex-start;gap:14px;font-size:30px;line-height:1.5}
+#c5 .clues li:before{content:counter(clue);flex:0 0 36px;height:36px;margin-top:5px;border-radius:50%;background:#E8DDFB;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600}
+#c5 .question{margin-top:22px;padding:16px 20px;border-radius:18px;background:#EEE7FC;font-size:32px;line-height:1.45}
+#c5 .question b{display:block;font-size:22px;color:var(--soft);margin-bottom:4px}
+#c5 .answer-key{position:relative;margin: auto 0 18px;padding:18px 24px;border:2px dashed #B7A9C7;border-radius:20px;background:#F9F5FF;flex:none}
+#c5 .foot{margin-top:0}
+#c5 .answer-content{transform:rotate(180deg);font-size:26px;line-height:1.45}
+#c5 .answer-content b{display:block;font-size:20px;color:var(--soft);margin-bottom:8px}
+#c5 .answer-content .english-key{font-size:23px;line-height:1.4;margin-top:8px}
+#c5.with-english .puz{padding:16px 24px;margin-top:16px}
+#c5.with-english .puz h3{font-size:34px;margin-bottom:8px}
+#c5.with-english .puz .body,#c5.with-english .clues li{font-size:26px;line-height:1.4}
+#c5.with-english .clues{gap:8px;margin-top:10px}
+#c5.with-english .clues li:before{flex-basis:30px;height:30px;margin-top:3px;font-size:21px}
+#c5.with-english .question{font-size:28px;margin-top:12px;padding:10px 16px}
+#c5.with-english .question b{display:none}
+#c5.with-english .taunt .bub{font-size:27px}
+#c5.with-english .taunt .bub .en{font-size:22px}
+#c5.with-english .answer-key{padding:12px 20px;margin-top:18px}
 #c5 .route{position:relative;margin-top:6px}
 #c5 .route:before{content:"";position:absolute;left:58px;top:20px;bottom:20px;border-left:6px dotted var(--lav)}
 #c5 .lv{display:flex;gap:20px;align-items:flex-start;margin-top:14px;padding:12px 24px;flex:none}
@@ -270,23 +285,8 @@ svg.ch{display:block}
 #c5 .lv .st b{display:block;font-size:22px;font-weight:400}
 #c5 .lv.l1 .st{background:#B9D9FF}#c5 .lv.l2 .st{background:#FFD45C}
 #c5 .lv .q{flex:1}
-#c5 .lv .cn{font-size:26px;color:var(--soft)}
-#c5 .lv .en{font-size:29px;line-height:1.35}
-#c5 .draft{
-  flex:1;margin:14px 0 16px;padding:14px 26px;border-radius:24px;border:4px solid var(--ink);
-  box-shadow:0 6px 0 var(--ink);
-  background:#FFF repeating-linear-gradient(0deg,#F7F4EB 0 46px,#EAE4D5 46px 48px);
-  display:flex;justify-content:space-between;align-items:center;
-}
-#c5 .draft h3{font-size:26px;font-weight:400;color:var(--ink);flex:1}
-#c5 .draft .stamp{
-  width:80px;height:80px;border:3px dashed #FF6B6B;border-radius:50%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:#FF6B6B;font-size:15px;transform:rotate(-8deg);flex-shrink:0;margin-left:14px;
-}
-#c5 .draft .stamp b{font-size:20px}
-#c5 .mine{margin-top:14px;padding:12px 30px;font-size:30px;flex:none}
-
+#c5 .lv .cn{font-size:23px;color:var(--soft)}
+#c5 .lv .en{font-size:26px;line-height:1.3}
 /* card 6 信箱 */
 #c6{background:#FFEFD9}
 #c6 .letter{padding:24px 34px;margin-top:20px;font-size:30px;line-height:1.6;background:#FFFDF7;flex:none}
@@ -300,8 +300,6 @@ svg.ch{display:block}
 #c6 .pick.many{gap:8px 8px;flex-wrap:wrap}
 #c6 .pick.many span{padding:3px 12px;font-size:22px;white-space:nowrap}
 #c6 .checkin .lines i{height:44px}
-#c6 .answers{margin-top:20px;padding:16px 30px;background:#FFF4C9;font-size:27px;line-height:1.5;flex:none}
-#c6 .answers b{display:block;font-weight:400;color:var(--tomato);font-size:30px}
 @page{size:1080px 1440px;margin:0}
 @media print{body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0;break-after:page}.card:last-of-type{break-after:auto}}
 
