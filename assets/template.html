@@ -38,9 +38,12 @@ if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.st
   <div class="photo" style="background-image:url('${CV.photo}');background-position:${CV.photo_pos || "center"}"></div><div class="shade"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
   <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
-  <div class="q">${CV.stamp ? `<div class="stamp en">${CV.stamp}</div>` : ""}${CV.asked_by ? `<div class="asked fun">💡 本期问题由${CV.asked_by}提出</div>` : ""}
-    <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div></div>
-  ${CV.crew ? `<div class="crew">${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}<div class="chs">${CV.crew.map(ch).join("")}</div></div>` : ""}
+  ${CV.stamp ? `<div class="cover-evidence"><span class="stamp en">${CV.stamp}</span></div>` : ""}
+  <div class="cover-bottom${CV.crew?.length ? " has-crew" : ""}">
+    <div class="q">${CV.asked_by ? `<div class="asked fun">本期问题由${CV.asked_by}提出</div>` : ""}
+      <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div></div>
+    ${CV.crew?.length ? `<div class="crew">${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}<div class="chs">${CV.crew.map(ch).join("")}</div></div>` : ""}
+  </div>
   <div class="credit en">${CV.credit}</div></section>`);
 else cards.push(`<section class="card" id="c1"><div class="dots"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>

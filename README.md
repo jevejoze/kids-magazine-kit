@@ -98,6 +98,8 @@ examples/demo/        虚构孩子「小满」的数据目录，issues/003/ 是�
 MIT
 
 
+封面排版预览：[前后对比](docs/cover-comparison.html) · [SVG 角色版](docs/cover-after-svg.png) · [PNG 角色版](docs/cover-after-png.png)。
+
 ## 试验：固定绘本角色素材库
 
 ![角色素材库](docs/characters-storybook-v1.png)
