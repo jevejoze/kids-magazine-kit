@@ -311,7 +311,7 @@ svg.ch{display:block}
 #cnews{background:#E8F1FF}
 #cnews .nw{overflow:hidden;margin-top:18px;flex:none}
 #cnews .pic{background-size:cover;border-bottom:5px solid var(--ink);position:relative}
-#cnews .lead .pic{height:320px}
+#cnews .lead .pic{height:clamp(240px,var(--news-lead-height,320px),320px)}
 #cnews .loc{font-size:24px;color:var(--soft)}
 #cnews .txt{padding:12px 28px 16px}
 #cnews h3{font-size:40px;line-height:1.2;color:#2F6FB5}
@@ -335,7 +335,7 @@ svg.ch{display:block}
 #cdeep{background:#0F2A4A;color:#fff}
 #cdeep .dots{opacity:.15}
 #cdeep .top .en{color:#9CD3FF}
-#cdeep .card-photo{height:380px;margin-top:22px;flex:none;display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;box-shadow:none;overflow:visible}
+#cdeep .card-photo{height:clamp(300px,var(--creature-photo-height,380px),380px);margin-top:22px;flex:none;display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;box-shadow:none;overflow:visible}
 #cdeep .card-photo .half{position:relative;overflow:hidden;border-color:#9CD3FF;box-shadow:0 10px 0 #061628}
 #cdeep .card-photo .legend{background:#F3E7C9}
 #cdeep .card-photo .legend .pic{background-size:contain;background-repeat:no-repeat}

@@ -293,17 +293,25 @@ async function coverStrip() {
   const lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
   card.classList.add(lum > 0.6 ? "light" : "dark");
 }
-function fitComicDiagram() {
-  const card = document.querySelector("#c2"), svg = card?.querySelector(".diagram svg"), foot = card?.querySelector(".foot");
-  if (!svg || !foot || !card.getBoundingClientRect().height) return;
-  card.style.setProperty("--comic-diagram-height", "280px");
-  const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);
-  const excess = Math.max(0, Math.ceil(foot.getBoundingClientRect().bottom - limit));
-  card.style.setProperty("--comic-diagram-height", `${Math.max(200, 280 - excess)}px`);
+// 正文偏长时，把这几页最大的那块图缩一点，让页脚回到版心里（卡片 id、元素、CSS 变量、最高、最低）
+const FIT = [
+  ["c2", ".diagram svg", "--comic-diagram-height", 280, 200],
+  ["cdeep", ".card-photo", "--creature-photo-height", 380, 300],
+  ["cnews", ".lead .pic", "--news-lead-height", 320, 240],
+];
+function fitCards() {
+  for (const [id, sel, prop, max, min] of FIT) {
+    const card = document.querySelector(`#${id}`), el = card?.querySelector(sel), foot = card?.querySelector(".foot");
+    if (!el || !foot || !card.getBoundingClientRect().height) continue;
+    card.style.setProperty(prop, `${max}px`);
+    const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);
+    const excess = Math.max(0, Math.ceil(foot.getBoundingClientRect().bottom - limit));
+    card.style.setProperty(prop, `${Math.max(min, max - excess)}px`);
+  }
 }
 window.READY = Promise.all([coverStrip(), characterPackReady]).then(async () => {
   await document.fonts?.ready;
-  fitComicDiagram();
+  fitCards();
 });
 </script>
 </body>
