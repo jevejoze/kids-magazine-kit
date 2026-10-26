@@ -1,0 +1,5 @@
+output/
+.DS_Store
+# 成品只放网盘；视频太大，也只放网盘
+成品/
+issues/*/70-final/*.mp4
