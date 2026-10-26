@@ -33,15 +33,28 @@ const cards = [];
 
 // 1 封面：有 cover.photo 用照片封面，否则用角色封面
 // 照片封面：顶部刊名条 + 下方照片。刊名条的颜色取自照片顶部（见文末 coverStrip），照片顶端渐隐进刊名条
+// Keep Chinese words and number/unit phrases together while respecting editorial <br> breaks.
+const coverSegmenter = new Intl.Segmenter("zh", { granularity: "word" });
+const coverNumberUnit = /((?:\d+(?:\.\d+)?|[零〇一二两三四五六七八九十百千万亿]+)\s*(?:公斤|千克|千米|公里|厘米|毫米|小时|分钟|点半|点|吨|米|度|岁|天|秒|年|月|日|个))/g;
+const coverQuestion = text => String(text).split(/<br\s*\/?>/i).map(line => {
+  const words = [];
+  line.split(coverNumberUnit).flatMap((part, i) => i % 2 ? [part] : [...coverSegmenter.segment(part)].map(x => x.segment)).forEach(word => {
+    if (/^[，。！？、：；,.!?…）】》]+$/.test(word) && words.length) words[words.length - 1] += word;
+    else words.push(word);
+  });
+  return words.map(word => /^\s+$/.test(word) ? word : `<span class="cover-word">${word.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</span>`).join("");
+}).join("<br>");
 const CV = D.cover;
 if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.strip ? ` style="--strip:${CV.strip}"` : ""}>
   <div class="photo" style="background-image:url('${CV.photo}');background-position:${CV.photo_pos || "center"}"></div><div class="shade"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
   <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
-  <div class="q">${CV.stamp ? `<div class="stamp en">${CV.stamp}</div>` : ""}${CV.asked_by ? `<div class="asked fun">💡 本期问题由${CV.asked_by}提出</div>` : ""}
-    <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div></div>
-  ${CV.crew ? `<div class="crew">${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}<div class="chs">${CV.crew.map(ch).join("")}</div></div>` : ""}
-  <div class="credit en">${CV.credit}</div></section>`);
+  <div class="cover-bottom${CV.crew?.length ? " has-crew" : ""}">
+    <div class="q"><div class="cover-labels">${CV.stamp ? `<span class="stamp en">${CV.stamp}</span>` : ""}${CV.asked_by ? `<span class="asked fun">💡 本期问题由${CV.asked_by}提出</span>` : ""}</div>
+      <div class="t fun">${coverQuestion(D.question.zh)}</div><div class="en">${D.question.en}</div></div>
+    ${CV.crew?.length ? `<div class="crew">${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}<div class="chs">${CV.crew.map(ch).join("")}</div></div>` : ""}
+    <div class="credit en">${CV.credit}</div>
+  </div></section>`);
 else cards.push(`<section class="card" id="c1"><div class="dots"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
   <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
