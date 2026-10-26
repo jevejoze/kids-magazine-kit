@@ -383,3 +383,27 @@ test("formal rendering rejects physical overflow and preserves previous output",
   assert.equal(readFileSync(join(target, "card-2.png"), "utf8"), "previous image");
   assert.deepEqual(readdirSync(issue).filter(name => name.startsWith(".kids-render-")), []);
 });
+
+test("narration style rules catch stiff scripts", t => {
+  const errors = edit => {
+    const issue = fixture(t), narration = json(issue, "50-narration.json");
+    edit(narration.narration, issue);
+    put(issue, "50-narration.json", narration);
+    return createPipeline(issue).check().filter(e => e.startsWith("[50]"));
+  };
+  const has = (list, re) => assert.ok(list.some(e => re.test(e)), list.join("\n") || "no [50] errors");
+  // 1 cover, 2 comic, 3 words, 4 story, 5 challenge, 6 news, 7 check, 8 serial, 9 mailbox
+  has(errors(p => { delete p[1].thread; }), /第 2 页缺 thread/);
+  has(errors(p => { p[1].lines.find(l => l.who === "dog").text = "团子狗觉得太阳在加班。"; }), /说了自己的名字/);
+  has(errors(p => { for (const l of p[1].lines) l.who = "narrator"; }), /第 2 页旁白 .*超过六成/);
+  has(errors(p => { for (const page of p) for (const l of page.lines) if (l.lang === "zh") l.emotion = "平静"; }), /"平静"语气/);
+  has(errors(p => { delete p[1].lines[0].emotion; }), /第 2 页第 1 句是中文却没写 emotion/);
+  has(errors(p => { p[1].lines.splice(3, 0, { ...p[1].lines[2], who: "dog" }); }), /第 2 页第 3、4 句说了同一件事/);
+  has(errors(p => { p[4].lines.push({ who: "raccoon", lang: "zh", text: "答案明天揭晓，哼！", emotion: "得意" }); }), /挑战的答案倒印在本页底部/);
+  has(errors(p => { p[5].lines.find(l => l.lang === "en").text = "record"; }), /英文只有单词/);
+  has(errors(p => { for (const page of p.slice(1, 4)) page.lines[0].text = "看完了，我们去下一页！"; }), /收尾式串词/);
+  has(errors((p, issue) => {
+    const items = json(issue, "17-news.json").items;
+    p[5].lines.forEach((l, i) => { if (l.lang === "zh" && !l.pause) l.text = items[i % 3].text.slice(0, 30); });
+  }), /第 6 页有 \d+ 句照着页面念/);
+});

@@ -102,6 +102,8 @@ export function createPipeline(issueArg) {
 
   // ---------- check ----------
   const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
+  const plain = s => String(s ?? "").replace(/<[^>]+>/g, "").replace(/[\s\p{P}\p{S}]/gu, "");
+  const shares = (a, b, k) => { for (let i = 0; i + k <= a.length; i++) if (b.includes(a.slice(i, i + k))) return true; return false; };
   const words = s => String(s ?? "").replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
   const problems = [];
   const need = (cond, where, msg) => { if (!cond) problems.push(`[${where}] ${msg}`); };
@@ -290,18 +292,58 @@ export function createPipeline(issueArg) {
       const MAX = { ...NARRATION_MAX_LINES, challenge: has("15-english.json") ? 18 : NARRATION_MAX_LINES.challenge };
       const max = c => (hasStages ? MAX[order[c - 1]] : undefined) ?? 30;
       let total = 0;
+      // 照页面念的检查：各页的叙述文字（引号里的角色对白不算）
+      const unquote = t => String(t ?? "").replace(/“[^”]*”|"[^"]*"/g, "");
+      const src = k => has(k) ? read(k) : {};
+      const pageText = {
+        comic: [src("11-comic.json").fact, src("11-comic.json").takeaway, src("11-comic.json").diagram_title],
+        creature: (src("09-creature.json").boxes ?? []).map(b => b.text),
+        story: (src("13-story.json").paragraphs ?? []).map(unquote),
+        news: (src("17-news.json").items ?? []).map(i => i.text),
+        serial: (src("18-serial.json").paragraphs ?? []).map(unquote),
+        think: [src("08-think.json").story],
+      };
+      const ROLE_NAMES = { dog: /团子狗/, mouse: /波波鼠/, owl: /咕咕博士/, raccoon: /捣蛋浣熊|浣熊/ };
+      const OPENER_CLICHE = /看完|讲完|做完|听完|查完|弄懂|明白了|完了|合上/;
+      let all = 0, narr = 0, zh = 0, calm = 0, cliche = 0;
       pages.forEach(p => {
-        need(p.lines.length <= max(p.card), "50", `第 ${p.card} 页（${order[p.card - 1]}）${p.lines.length} 句，最多 ${max(p.card)} 句`);
+        const kind = order[p.card - 1];
+        need(p.thread && len(p.thread) <= 30, "50", `第 ${p.card} 页缺 thread（这一页的主线，≤ 30 字），先定主线再写台词`);
+        need(p.lines.length <= max(p.card), "50", `第 ${p.card} 页（${kind}）${p.lines.length} 句，最多 ${max(p.card)} 句`);
+        if (kind !== "serial") {
+          const nn = p.lines.filter(l => l.who === "narrator").length;
+          all += p.lines.length; narr += nn;
+          need(nn <= p.lines.length * 0.6, "50", `第 ${p.card} 页旁白 ${nn}/${p.lines.length} 句，超过六成；对白交给角色说，旁白只串词、交代场景`);
+        }
+        if (p.card > 1 && p.lines[0] && OPENER_CLICHE.test(p.lines[0].text)) cliche++;
+        if (kind === "challenge") need(!p.lines.some(l => /答案.*(明天|下一期|信箱)|(明天|信箱).*答案/.test(l.text)), "50", `第 ${p.card} 页挑战的答案倒印在本页底部，不说"明天 / 信箱公布答案"`);
+        const plains = p.lines.map(l => l.lang === "zh" ? plain(l.text) : "");
+        for (let i = 0; i < plains.length; i++) for (let j = i + 1; j < plains.length; j++)
+          if (shares(plains[i], plains[j], 8)) problems.push(`[50] 第 ${p.card} 页第 ${i + 1}、${j + 1} 句说了同一件事（连续 8 字相同），只留一处`);
+        const srcs = (pageText[kind] ?? []).filter(Boolean).map(plain);
+        if (srcs.length) {
+          const copied = p.lines.filter((l, i) => l.lang === "zh" && !l.pause && srcs.some(t => shares(plains[i], t, 10)));
+          const limit = Math.max(2, Math.floor(p.lines.length / 4));
+          need(copied.length <= limit, "50", `第 ${p.card} 页有 ${copied.length} 句照着页面念（连续 10 字相同），最多 ${limit} 句，换成口语、拆给角色接：${copied.map(l => l.text).slice(0, 3).join(" / ")}`);
+        }
         need(p.lines.filter(l => (l.pause ?? 0) >= 3).length <= 1, "50", `第 ${p.card} 页停顿 ≥ 3 秒的地方超过 1 处`);
         let run = 0;
+        const noEmo = [];
         p.lines.forEach((l, i) => {
           const at = `第 ${p.card} 页第 ${i + 1} 句`;
           if (order[p.card - 1] === "mailbox") need(!/上期答案|上期.*谜题.*答案/.test(l.text), "50", `${at} 信箱不再公布上期答案`);
           need(SPEAKERS.includes(l.who), "50", `${at} who 不对：${l.who}`);
           need(["zh", "en"].includes(l.lang), "50", `${at} lang 不对：${l.lang}`);
           need(!l.emotion || EMOTIONS.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);
-          if (l.lang === "en") need(words(l.text) <= 12, "50", `${at} ${words(l.text)} 个英文单词，超过 12`);
+          if (ROLE_NAMES[l.who]) need(!ROLE_NAMES[l.who].test(l.text.replace(/我是\S{2,4}[，,！!。]?/, "")), "50", `${at} 角色说了自己的名字，叙述交给旁白：${l.text}`);
+          if (l.lang === "en") {
+            need(words(l.text) <= 12, "50", `${at} ${words(l.text)} 个英文单词，超过 12`);
+            if (kind === "news") need(words(l.text) >= 3, "50", `${at} 英文只有单词，放进一句 3–8 个词的短句里说：${l.text}`);
+          }
           else {
+            zh++;
+            if (!l.emotion) noEmo.push(i + 1);
+            if (l.emotion === "平静") calm++;
             need(len(l.text) <= 30, "50", `${at} ${len(l.text)} 字，超过 30`);
             need(!/[0-9%]/.test(l.text), "50", `${at} 中文台词含阿拉伯数字或 %，请写成中文读法（如"十八点五"、"百分之七"）：${l.text}`);
             need(!META_SPOILER.test(l.text), "50", `${at} 讲读台词不得点破「思维本领/今天练」等课表字眼：${l.text}`);
@@ -310,7 +352,11 @@ export function createPipeline(issueArg) {
           if (run === 4) problems.push(`[50] ${at} 起同一个角色连说超过 3 句，拆给别的角色接话`);
           total += len(l.text) * (l.repeat || 1);
         });
+        need(!noEmo.length, "50", `第 ${p.card} 页第 ${noEmo.join("、")} 句是中文却没写 emotion`);
       });
+      need(narr <= all * 0.4, "50", `旁白占 ${narr}/${all} 句（连载页除外），超过四成；叙述归旁白，说话归角色`);
+      need(calm <= zh * 0.4, "50", `"平静"语气 ${calm}/${zh} 句，超过四成；按台词换成惊讶、得意、神秘等`);
+      need(cliche <= 2, "50", `${cliche} 页用"看完了 / 讲完了"这类收尾式串词开场，最多 2 处；接住上一页的一个具体细节`);
       const [lo, hi] = [1800, 2800];
       need(total >= lo - 300 && total <= hi + 400, "50", `讲读稿共 ${total} 字，建议 ${lo}–${hi}`);
     },
