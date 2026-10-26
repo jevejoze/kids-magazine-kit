@@ -326,7 +326,7 @@ svg.ch{display:block}
 #c1.photo-cover .crew .chs{display:flex;align-items:flex-end;justify-content:center;gap:8px;width:100%}
 #c1.photo-cover .crew .ch{width:124px;height:124px;flex-shrink:0}
 #c1.photo-cover .crew .ch:only-child{width:170px;height:170px}
-#c1.photo-cover .crew .bub{color:var(--ink);text-shadow:none;width:100%;margin:0;font-size:25px;line-height:1.35;padding:12px 16px;border-width:3px;border-radius:22px;background:#FFF8EE;text-align:center;white-space:normal;box-shadow:0 4px 0 rgba(74,59,50,.65)}
+#c1.photo-cover .crew .bub{color:var(--ink);text-shadow:none;width:100%;margin:0;font-size:25px;line-height:1.35;padding:12px 16px;border-width:3px;border-radius:22px;background:#FFF8EE;text-align:center;white-space:normal;text-wrap:balance;box-shadow:0 4px 0 rgba(74,59,50,.65)}
 #c1.photo-cover .crew .bub:after{display:none}
 #c1.photo-cover .credit{position:absolute;left:64px;right:64px;bottom:28px;margin:0;font-size:16px;line-height:1.3;color:rgba(255,255,255,.8);text-shadow:0 1px 4px #000}
 
