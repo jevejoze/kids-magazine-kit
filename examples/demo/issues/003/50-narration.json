@@ -3,7 +3,7 @@
     "stage": "50-narration",
     "by": "示例",
     "at": "2026-10-14T07:00:00+08:00",
-    "content_hash": "91eb2207adf5476ac4315904216b576320cf40fc3ff97e53e032828fc3eb155b"
+    "content_hash": "6f20f0d04b400d433434b52c681f0f11fa720599004ac220bc16658b4f014bdd"
   },
   "narration": [
     {
@@ -61,92 +61,102 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "答案揭晓时间！咕咕博士，太阳为什么不下班？",
-          "emotion": "开心"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "秘密就一句话：地球是歪着身子转的。"
+          "text": "来看今天的问题：半夜了，太阳怎么还没下班？"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "歪着转？那不会晕吗？",
-          "emotion": "惊讶"
+          "text": "明明是半夜十二点，窗外怎么还亮着？"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "你玩过陀螺吧？转起来常常是斜的，地球也一样。",
-          "emotion": "温柔"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "它歪了二十三点五度。",
-          "rate": "slow"
+          "text": "先别急。不是太阳停住了，是地球斜着身子转。"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "就歪这么一点点，有什么关系？"
+          "text": "斜着转？像我歪着脑袋转圈？"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "看图。夏天，地球的北边正好歪向太阳。"
+          "text": "差不多。地轴倾斜约二十三点五度。"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "看图：太阳在左边，照亮地球的左半边。"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "黄色这一圈叫北极圈。地球转一整圈，它都照得到太阳。"
+          "text": "夏天，北极这一头朝着太阳。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "那地球转到背面的时候，不就该黑了吗？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "看右边放大窗，跟着红点的黄色路线走一圈。"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "它的位置很靠北，整圈都没有离开亮面。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "我懂了！转了一圈，还是晒得到太阳。"
         },
         {
           "who": "mouse",
           "lang": "en",
-          "text": "So the sun never goes to bed!",
-          "emotion": "开心"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "北角就在圈里面？所以半夜太阳也不落山！",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "对。那里夏天有七十六天，太阳一直不落。"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "那冬天呢？",
-          "emotion": "委屈"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "冬天正好反过来：北边背着太阳，整天黑乎乎的。"
+          "text": "Still in the light!"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "冷知识：斯瓦尔巴群岛不许养猫，怕猫伤害北极的鸟。",
-          "emotion": "神秘"
+          "text": "这就叫极昼：太阳一整天都不落到地平线下面。"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "听说那里的北极熊，比人还多！",
-          "emotion": "惊讶"
+          "text": "那北极的冬天呢？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "冬天反过来，北极附近也可能整天见不到太阳。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "是不是去了挪威，整个夏天都不用开灯？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "还要看你去哪里、什么季节，不是整个挪威都有极昼。"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "你也可以试试：拿手电筒当太阳，歪着转一个橙子。",
-          "emotion": "温柔"
+          "text": "北极附近是夏天时，南极附近正是冬天。"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "想亲眼看看？拿手电筒当太阳，照着倾斜的地球仪。"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "慢慢转一圈，找找哪些地方一直没有离开亮面！"
         }
       ]
     },

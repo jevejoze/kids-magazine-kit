@@ -172,10 +172,8 @@ export function createPipeline(issueArg) {
       need(c.panels?.length === 4, "11", "漫画要 4 格");
       c.panels?.forEach((p, i) => {
         need(p.bubbles.length <= 2, "11", `第 ${i + 1} 格气泡 ${p.bubbles.length} 个，最多 2 个`);
-        p.bubbles.forEach(b => need(len(b.text) <= 30, "11", `第 ${i + 1} 格气泡 ${len(b.text)} 字，超过 30 字`));
         (p.chars ?? []).forEach(x => checkChar(x, "11", `第 ${i + 1} 格角色`));
       });
-      need(len(c.fact) <= 60, "11", `冷知识 ${len(c.fact)} 字，超过 60 字`);
       const diagPath = c.diagram ? join(issue, c.diagram) : "";
       need(c.diagram && nonempty(diagPath), "11", `找不到非空图解 ${c.diagram}`);
       if (c.diagram && nonempty(diagPath) && String(c.diagram).endsWith(".svg")) {

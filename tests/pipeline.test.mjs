@@ -349,3 +349,37 @@ test("mailbox narration cannot bring back prior-issue answers", t => {
   put(issue, "50-narration.json", narration);
   assert.ok(createPipeline(issue).check().some(e => e.includes("信箱不再公布上期答案")));
 });
+
+test("source comic budgets block checking and assembly", t => {
+  const issue = fixture(t), comic = json(issue, "11-comic.json");
+  comic.panels[0].bubbles[0].text = "问".repeat(27);
+  comic.panels[2].bubbles[0].text = "问".repeat(21);
+  comic.takeaway = "答".repeat(29);
+  comic.fact = "证".repeat(46);
+  comic.panels[0].chars = ["dog:surprise:160"];
+  put(issue, "11-comic.json", comic);
+  const p = createPipeline(issue), errors = p.check().join("\n");
+  for (const limit of [26, 20, 28, 45, 130]) assert.match(errors, new RegExp(String(limit)));
+  assert.throws(() => p.assemble(), /11-comic/);
+});
+
+test("formal rendering rejects physical overflow and preserves previous output", { timeout: 60000 }, t => {
+  const chrome = process.env.CHROME || ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome", "/usr/bin/chromium"].find(existsSync);
+  if (!chrome) return t.skip("Chrome unavailable");
+  const issue = fixture(t), comic = json(issue, "11-comic.json");
+  comic.title_zh = Array(20).fill("这是一行标题").join("<br>");
+  put(issue, "11-comic.json", comic);
+  const p = createPipeline(issue);
+  p.assemble();
+  writeFileSync(join(issue, "31-review.md"), `结论：通过\n内容指纹：${p.fingerprint()}\n`);
+  const target = join(issue, "previous-output");
+  mkdirSync(target);
+  writeFileSync(join(target, "card-2.png"), "previous image");
+  const result = spawnSync(process.execPath, ["scripts/render.mjs", join(issue, "30-issue.json"), target, "--flat"], {
+    cwd: new URL("../", import.meta.url), env: { ...process.env, CHROME: chrome }, encoding: "utf8", timeout: 45000,
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /版面溢出，未发布成品/);
+  assert.equal(readFileSync(join(target, "card-2.png"), "utf8"), "previous image");
+  assert.deepEqual(readdirSync(issue).filter(name => name.startsWith(".kids-render-")), []);
+});

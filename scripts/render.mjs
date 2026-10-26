@@ -132,15 +132,18 @@ const once = method => new Promise((ok, fail) => {
       const r = c.getBoundingClientRect(), foot = c.querySelector('.foot'), prev = foot?.previousElementSibling;
       const clip = foot ? Math.round(foot.getBoundingClientRect().bottom - (r.bottom - 8)) : 0;
       const overlap = foot && prev ? Math.round(prev.getBoundingClientRect().bottom - foot.getBoundingClientRect().top) : 0;
-      return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, clip, overlap };
+      const spill = c.id === "c2" && [...c.querySelectorAll('.bubble-text,.takeaway,.fact,.h1')].some(el => el.scrollWidth > el.clientWidth + 1);
+      return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, clip, overlap, spill };
     }))`,
     returnByValue: true,
   }, s);
   const rects = JSON.parse(result.value);
   const expected = pageOrder(data).map(key => CARD_IDS[key]);
   if (JSON.stringify(rects.map(r => r.id)) !== JSON.stringify(expected)) throw new Error("渲染页面数量或顺序与数据契约不一致");
+  const overflow = rects.flatMap((r, i) => r.clip > 0 || r.overlap > 4 || r.spill
+    ? [`card-${i + 1}（#${r.id}）：${r.clip > 0 ? `页脚超出底边 ${r.clip}px` : r.overlap > 4 ? `正文与页脚重叠 ${r.overlap}px` : "文字横向越界"}`] : []);
+  if (overflow.length) throw new Error(`版面溢出，未发布成品：\n${overflow.join("\n")}`);
   for (const [i, r] of rects.entries()) {
-    if (r.clip > 0 || r.overlap > 4) console.warn(`⚠️ 版面溢出：card-${i + 1}（#${r.id}）${r.clip > 0 ? `页脚超出底边 ${r.clip}px` : `正文与页脚重叠 ${r.overlap}px`}`);
     const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, clip: { x: r.x, y: r.y, width: r.w, height: r.h, scale: 1 } }, s);
     writeFileSync(join(outDir, `card-${i + 1}.png`), Buffer.from(shot.data, "base64"));
   }

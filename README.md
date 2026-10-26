@@ -23,7 +23,7 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 | 页 | 内容 |
 |---|---|
 | 封面 | 顶部刊名条 + 大幅真实照片（刊名条取照片的颜色）+ 一个反直觉问题，编辑部成员按主题换表情和道具 |
-| 今日一问 | 4 格漫画讲清一个机制 + agent 画的原理图解 + 冷知识便利贴 |
+| 今日一问 | 两格对话 → 主图解释 → 两格追问，一句话结论与紧扣主问题的延伸 |
 | 小剧场 | 编辑部推理连载，中文，带"侦探笔记"提问 |
 | 挑战 | 情境、条件、问题分层呈现，答案在本页底部倒印 |
 | 环球小报 | 本周 3 条适合孩子的真实新闻，照片一眼看懂，交叉核实来源；讲读版讲得最丰富 |
@@ -31,7 +31,6 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 | 信箱（最后一页）| 问候 + 5 个打卡问题：最喜欢、不喜欢、难不难、想到的问题、看到的事 |
 | 讲读视频（可选）| 10–12 分钟的儿童电台节目：编辑部分角色、带情绪和音效把整期讲一遍，小剧场完整演出来，新闻配背景和尺度类比；语音默认用 Azure，也可以换成别的服务 |
 
-平板版预览：[中文挑战页](docs/characters-storybook-v1-challenge.png) · [带英文三关的挑战页](docs/challenge-tablet-english.png) · [编辑部信箱](docs/mailbox-tablet.png)。
 
 ## 快速开始
 
@@ -42,6 +41,8 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 3. 对 agent 说：**"按问卷给孩子建刊"**，再说 **"做第 00 步"**
 4. 之后每一步交给你指定的 agent：**"做第 10 步，数据目录在 ……"**。agent 会读 `pipeline/stages/10-cover.md` 照做
 5. 内容步骤做完后，让一个能跑脚本的 agent（如 Claude Code 云端会话）做 30、40、60、70 步，成品出现在 `issues/NNN/70-final/`。第 60 步默认用 Azure 语音，先在环境里设好 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`
+
+渲染图片、排版截图和对比页仅供本地预览，不提交到仓库；运行必需的现有版本化角色素材保留在 `assets/characters/`。
 
 本地预览示例期：
 
@@ -54,7 +55,8 @@ node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/iss
 
 示例 003 保留历史新闻，已包含经典连载和信息查证栏目，同时演示可选的单词屋与英文三关。默认渲染会检查内容步骤、审稿结论及内容指纹；审稿前或渲染旧格式 JSON 时加 `--preview`。运行回归测试：`node --test tests/*.test.mjs`。完成状态和阻断规则见 [流水线说明](pipeline/README.md#校验与完成状态)。
 
-封面排版预览：[前后对比](docs/cover-comparison.html) · [SVG 角色版](docs/cover-after-svg.png) · [PNG 角色版](docs/cover-after-png.png)。
+
+今日一问的[栏目样张、内容依据与复现说明](examples/comic-previews/README.md)。
 
 常用指令：
 
@@ -102,13 +104,9 @@ MIT
 
 ## 试验：固定绘本角色素材库
 
-![角色素材库](docs/characters-storybook-v1.png)
 
 新角色库 `storybook-v1` 包含 4 位成员、每位 9 种表情，直接重复使用固定的透明 PNG，不在每期重新生成。在 `00-brief.json` 中设置 `"character_pack": "storybook-v1"` 即可随整期保存；省略时继续使用原有 SVG。现有角色和道具写法不变。
 
-- [实际漫画页面](docs/characters-storybook-v1-comic.png)（已同步主分支无圆框布局）
-- [实际挑战页面](docs/characters-storybook-v1-challenge.png)
-- [道具定位核对：SVG 与 PNG 的各表情眼罩](docs/characters-props-fit.png)
 - [素材文件、版本约定与接入方式](assets/characters/storybook-v1/README.md)
 - 本地查看全部表情：`node scripts/preview-characters.mjs storybook-v1`
 
