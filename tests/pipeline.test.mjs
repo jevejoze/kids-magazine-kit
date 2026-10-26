@@ -414,4 +414,8 @@ test("narration style rules catch stiff scripts", t => {
   has(errors(p => { p[1].lines.push(line("dog", "那我先去睡一觉。"), line("owl", "去吧去吧。")); }), /"试试"后面还有 2 句/);
   has(errors(p => { p[8].lines.splice(1, 0, line("dog", "都说给爸爸听！")); }), /send_note 写的是/);
   has(errors(p => { p[8].lines.splice(1, 0, line("mouse", "明天见，这次又是谁呢？")); }), /重复了小剧场的 tbc/);
+  has(errors(p => { p[1].lines.splice(2, 0, { who: "mouse", lang: "en", text: "The volcano is waking up!" }, line("dog", "记住了，大火山！")); }), /第 2 页第 3 句英文没走完来回/);
+  has(errors(p => { p[3].lines.splice(1, 0, line("dog", "钥匙是开冰箱的吗？"), line("narrator", "桌上放着一把钥匙是开冰箱的。")); }), /第 4 页第 2 句先问了旁白后面才交代的事/);
+  has(errors((p, issue) => { const who = json(issue, "18-serial.json").crew.who.split(":")[0]; p[7].lines = p[7].lines.filter(l => l.who !== who); }), /认领角色的吐槽/);
+  has(errors(p => { p[8].lines.splice(1, 0, line("dog", "你猜，冰为什么会浮起来？")); }), /信箱不再出猜谜题/);
 });

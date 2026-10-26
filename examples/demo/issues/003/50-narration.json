@@ -158,7 +158,7 @@
         {
           "who": "owl",
           "lang": "zh",
-          "text": "还在亮光里！就是这个意思。",
+          "text": "light 就是亮光，太阳还在亮光里！",
           "emotion": "开心"
         },
         {
@@ -623,13 +623,19 @@
         {
           "who": "owl",
           "lang": "zh",
-          "text": "科学家帮它取下鱼钩，它扑扑翅膀飞走了。",
+          "text": "科学家取下鱼钩，它扑扑翅膀飞走了。",
           "emotion": "温柔"
         },
         {
           "who": "mouse",
           "lang": "en",
           "text": "It knocked to ask for help!"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "knock 是敲门，它是来敲门求救的！",
+          "emotion": "惊讶"
         },
         {
           "who": "narrator",
@@ -653,6 +659,12 @@
           "who": "mouse",
           "lang": "en",
           "text": "Dogs can read your face!"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "face 就是脸，狗狗看得懂你的脸色！",
+          "emotion": "开心"
         },
         {
           "who": "narrator",

@@ -321,6 +321,8 @@ export function createPipeline(issueArg) {
       const sendTo = String(src("16-mailbox.json").send_note ?? "").match(FAMILY) ?? [];
       const storyTbc = plain(src("13-story.json").tbc);
       const newsWords = (src("17-news.json").items ?? []).map(i => i.word?.en).filter(Boolean);
+      const serialSrc = src("18-serial.json");
+      const serialCrew = serialSrc.kind === "book" ? String(serialSrc.crew?.who ?? "").split(":")[0] || null : null;
       pages.forEach(p => {
         const kind = order[p.card - 1];
         need(p.thread && len(p.thread) <= 30, "50", `第 ${p.card} 页缺 thread（这一页的主线，≤ 30 字），先定主线再写台词`);
@@ -361,6 +363,22 @@ export function createPipeline(issueArg) {
             .forEach(m => need(!sendTo.length || sendTo.includes(m[1]), "50", `第 ${p.card} 页说"${m[0]}"，send_note 写的是"${src("16-mailbox.json").send_note}"`)));
           if (storyTbc) zhText.filter(t => shares(plain(t), storyTbc, 5)).forEach(t => problems.push(`[50] 第 ${p.card} 页的预告重复了小剧场的 tbc，换一个新悬念：${t}`));
         }
+        // 英文走完一个来回：波波鼠的英文句后 3 句内，有人用中文接住时把原词带上
+        if (["comic", "creature", "news"].includes(kind)) p.lines.forEach((l, i) => {
+          if (l.who !== "mouse" || l.lang !== "en") return;
+          const ws = (l.text.match(/[A-Za-z]{4,}/g) ?? []).map(w => w.toLowerCase());
+          const named = n => (n.text.match(/[A-Za-z]{3,}/g) ?? []).some(t => ws.some(w => w.startsWith(t.toLowerCase()) || t.toLowerCase().startsWith(w)));
+          need(p.lines.slice(i + 1, i + 4).some(n => n.lang === "zh" && n.who !== "mouse" && named(n)), "50",
+            `第 ${p.card} 页第 ${i + 1} 句英文没走完来回：团子狗听不懂或学舌，接着有人说出原词再给中文意思（如"volcano，火山"）：${l.text}`);
+        });
+        // 先交代再提起：角色问的事，后面旁白才交代
+        p.lines.forEach((l, i) => {
+          if (l.who === "narrator" || l.lang !== "zh" || !/[？?]/.test(l.text)) return;
+          const later = p.lines.slice(i + 1).find(n => n.who === "narrator" && n.lang === "zh" && !/[？?]/.test(n.text) && shares(plain(l.text), plain(n.text), 4));
+          if (later) problems.push(`[50] 第 ${p.card} 页第 ${i + 1} 句先问了旁白后面才交代的事，把交代挪到前面：${l.text} → ${later.text}`);
+        });
+        if (kind === "serial" && serialCrew) need(p.lines.some(l => l.who === serialCrew), "50", `第 ${p.card} 页认领角色的吐槽（crew.say）由 ${serialCrew} 自己说，旁白只用一句引出`);
+        if (kind === "mailbox") zhText.filter(t => /你猜/.test(t)).forEach(t => problems.push(`[50] 第 ${p.card} 页信箱不再出猜谜题，只念 ask_zh 和打卡问题：${t}`));
         let run = 0;
         const noEmo = [];
         p.lines.forEach((l, i) => {
