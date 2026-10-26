@@ -59,6 +59,10 @@ export function inputFingerprint(issue, stage) {
   // 用克隆声音时，配置和替换脚本也算输入
   if (stage === "60-audio" && existsSync(join(issue, "../../voices/voicestudio.json")))
     files.push(["voices/voicestudio.json", join(issue, "../../voices/voicestudio.json")], ...engineFiles("scripts/tts_voicestudio.mjs"));
+  // 用 MiMo 时，配置、克隆参照音频和脚本也算输入
+  const mimo = join(issue, "../../voices/mimo.json");
+  if (stage === "60-audio" && existsSync(mimo)) files.push(["voices/mimo.json", mimo], ...engineFiles("scripts/tts_mimo.mjs"),
+    ...Object.values(read(mimo)).flatMap(v => v?.clone ? [[`voices/${v.clone}`, join(issue, "../../voices", v.clone)]] : []));
   files.push(...engineFiles("scripts/build-state.mjs"));
   return hash(JSON.stringify(snapshot(files)));
 }

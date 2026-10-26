@@ -25,6 +25,7 @@ if (!target) { console.error("用法: node tts_voicestudio.mjs <issue 目录> [-
 const issue = resolve(target), dataDir = resolve(issue, "..", "..");
 const confFile = join(dataDir, "voices", "voicestudio.json");
 if (!existsSync(confFile)) { console.log("没有 voices/voicestudio.json，不用克隆声音"); process.exit(0); }
+if (existsSync(join(dataDir, "voices", "mimo.json"))) { console.log("数据目录用 MiMo 语音（voices/mimo.json），克隆声音已由 tts_mimo.mjs 合成，这一步跳过"); process.exit(0); }
 const conf = JSON.parse(readFileSync(confFile, "utf8"));
 const URL_ = (process.env.VOICESTUDIO_URL || "http://127.0.0.1:3900").replace(/\/$/, "");
 

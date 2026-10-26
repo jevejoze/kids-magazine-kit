@@ -29,9 +29,23 @@ node scripts/tts_voicestudio.mjs <issue>         # 替换；已替换、正文�
 - 每次重跑 Azure 之后都要再跑一次这一步：Azure 会复用克隆句的音频，但把声音说明改回 Azure 的，制作记录也由这一步来写
 - 克隆档案的参照音频是本人的声音，只放在私有数据目录 `voices/clone/`
 
+**MiMo 语音（可选）**：数据目录有 `voices/mimo.json` 时，用小米 MiMo 一步合成整期，代替 Azure 和 VoiceStudio（这时 `tts_azure.mjs`、`tts_voicestudio.mjs` 会直接退出）：
+
+```bash
+node scripts/tts_mimo.mjs --audition <数据目录>   # 每个角色合成一句试听，写到 voices/试听/mimo-*.wav
+node scripts/tts_mimo.mjs <issue> --dry           # 看要合成几句、每个角色用哪个声音
+node scripts/tts_mimo.mjs <issue>                 # 合成；已合成、内容和声音没变的句子跳过，可随时中断重跑
+```
+
+- 环境变量 `MIMO_API_KEY`（可选 `MIMO_BASE_URL`，默认 `https://api.xiaomimimo.com/v1`）
+- 配置写法：`{"narrator/zh": {"clone": "clone/parent/ref.wav"}, "narrator/zh@serial": {"clone": "clone/parent-reading/ref.wav"}, "dog/zh": {"voice": "苏打", "style": "憨憨的小男孩，慢悠悠的"}}`。键是"角色/语言"，加 `@serial` 只用于经典连载（读书）那一页；`voice` 是 MiMo 内置音色（中文 冰糖 茉莉 苏打 白桦，英文 Mia Chloe Milo Dean），`clone` 是相对 `voices/` 的参照音频（wav 或 mp3，base64 后 ≤ 10MB），用 `mimo-v2.5-tts-voiceclone` 克隆；`style` 是这个角色的语气说明，`pitch` 合成后升降半音（需要 ffmpeg）
+- `emotion` 写成句首的风格标签，如"(开心)"；MiMo 不支持注音，多音字读错时回第 50 步换个说法
+- 单句失败会重试 5 次，仍失败就退出码 1，重跑只补缺的句子
+- 克隆用的参照音频是本人的声音，只放在私有数据目录 `voices/clone/`
+
 换别的语音服务也可以，产出按下面的约定放好即可。
 
-**读**：`issue/50-narration.json`、`data/voices/azure.json`（可选）
+**读**：`issue/50-narration.json`、`data/voices/azure.json`（可选）、`data/voices/mimo.json`（可选）
 
 **写**：`issue/60-audio/` 下每句一个文件，命名 `c{card}_{序号}.wav`（序号是这句在该页 `lines` 里的位置，从 0 开始，两位数，如 `c3_04.wav`），外加 `issue/60-audio/manifest.json`：
 

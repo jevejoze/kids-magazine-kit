@@ -125,9 +125,10 @@ node scripts/render.mjs <issue>/30-issue.json <issue>/40-cards --flat   # 第 40
 node scripts/tts_azure.mjs <issue> --pinyin  # 第 60 步之前：列出没注音的多音字
 node scripts/tts_azure.mjs <issue>           # 第 60 步（Azure 语音）
 node scripts/tts_voicestudio.mjs <issue>     # 第 60 步之后（可选）：数据目录有 voices/voicestudio.json 时换成克隆声音
+node scripts/tts_mimo.mjs <issue>           # 第 60 步（MiMo 语音）：数据目录有 voices/mimo.json 时用它代替上面两步
 python3 scripts/make_video.py <issue>        # 第 70 步
 node scripts/pipeline.mjs script   <issue>   # 没有语音合成时：导出 70-final/家长讲读稿.md
 node scripts/pipeline.mjs archive  <issue>   # 第 90 步助手：追加档案、整理 成品/NNN/
 ```
 
-第 60 步默认用 Azure 语音（`scripts/tts_azure.mjs`），需要环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`；换别的语音服务也行，按 `stages/60-audio.md` 的约定把音频放好即可。
+第 60 步默认用 Azure 语音（`scripts/tts_azure.mjs`），需要环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`scripts/tts_mimo.mjs`，环境变量 `MIMO_API_KEY`）；换别的语音服务也行，按 `stages/60-audio.md` 的约定把音频放好即可。
