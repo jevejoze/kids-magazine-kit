@@ -206,7 +206,7 @@ export function createPipeline(issueArg) {
     },
     "14-puzzle.json": p => {
       const e = has("15-english.json") ? read("15-english.json") : {};
-      fields({ ...e, ...p }, "14", ["title", "body", "answer", "solution", "taunt_zh", "taunt_en"]);
+      fields({ ...e, ...p }, "14", ["title", "body", "answer", "solution", "taunt_zh"]);
       need(len(p.body) <= 120, "14", `题干 ${len(p.body)} 字，超过 120`);
       need(len([p.body, ...(p.clues ?? []), p.question ?? ""].join("")) <= 240, "14", "题目情境、条件和问题合计超过 240 字");
       if (p.taunt_zh) need(len(p.taunt_zh) <= 20, "14", `taunt_zh ${len(p.taunt_zh)} 字，超过 20`);

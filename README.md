@@ -56,7 +56,7 @@ node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/iss
 示例 003 保留历史新闻，已包含经典连载和信息查证栏目，同时演示可选的单词屋与英文三关。默认渲染会检查内容步骤、审稿结论及内容指纹；审稿前或渲染旧格式 JSON 时加 `--preview`。运行回归测试：`node --test tests/*.test.mjs`。完成状态和阻断规则见 [流水线说明](pipeline/README.md#校验与完成状态)。
 
 
-今日一问的[栏目样张、内容依据与复现说明](examples/comic-previews/README.md)。
+今日一问的[栏目样张、内容依据与复现说明](examples/comic-previews/README.md)，以及浣熊挑战的[纯中文样张与复现说明](examples/challenge-previews/README.md)。
 
 常用指令：
 

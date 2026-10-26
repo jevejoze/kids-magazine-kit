@@ -3,7 +3,7 @@
     "stage": "50-narration",
     "by": "示例",
     "at": "2026-10-14T07:00:00+08:00",
-    "content_hash": "6f20f0d04b400d433434b52c681f0f11fa720599004ac220bc16658b4f014bdd"
+    "content_hash": "d8501fa436886e6345601225d3e4943b893fcf963ae87bb8b2cd09b355164f9e"
   },
   "narration": [
     {
@@ -362,36 +362,36 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "奶茶案破了，捣蛋浣熊又来出难题啦！",
+          "text": "捣蛋浣熊在午夜观景台前，拦住了一支队伍。",
           "emotion": "紧张"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "哼，奶茶的事还没完！想过我这关？",
+          "text": "哼，三条线索，你能排对吗？",
           "emotion": "得意"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "四位小客人排队领奶茶：艾莎、健太、卢卡和阿米尔。"
+          "text": "艾莎、健太、卢卡、阿米尔，要排队登上观景台。"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "线索一：艾莎不在第一个，也不在最后一个。",
+          "text": "线索一：艾莎不在第一位，也不在第四位。",
           "pause": 1.5
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "线索二：健太紧跟在阿米尔后面。",
+          "text": "线索二：健太的前一位就是阿米尔。",
           "pause": 1.5
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "线索三：卢卡是最后一个。",
+          "text": "线索三：卢卡排在第四位。",
           "pause": 1.5
         },
         {

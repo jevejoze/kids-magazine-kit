@@ -383,3 +383,17 @@ test("formal rendering rejects physical overflow and preserves previous output",
   assert.equal(readFileSync(join(target, "card-2.png"), "utf8"), "previous image");
   assert.deepEqual(readdirSync(issue).filter(name => name.startsWith(".kids-render-")), []);
 });
+
+test("standard Chinese puzzle assembles without English dialogue or optional English stage", t => {
+  const issue = fixture(t), puzzle = json(issue, "14-puzzle.json");
+  rmSync(join(issue, "15-english.json"));
+  delete puzzle.taunt_en;
+  put(issue, "14-puzzle.json", puzzle);
+  const pipeline = createPipeline(issue);
+  assert.equal(pipeline.done("14-puzzle"), true);
+  pipeline.assemble();
+  const data = json(issue, "30-issue.json");
+  assert.equal(data.challenge.taunt_en, undefined);
+  assert.equal(data.challenge.english, undefined);
+  assert.equal(data._answers.english, undefined);
+});

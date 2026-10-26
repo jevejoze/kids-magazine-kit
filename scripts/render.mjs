@@ -132,7 +132,8 @@ const once = method => new Promise((ok, fail) => {
       const r = c.getBoundingClientRect(), foot = c.querySelector('.foot'), prev = foot?.previousElementSibling;
       const clip = foot ? Math.round(foot.getBoundingClientRect().bottom - (r.bottom - 8)) : 0;
       const overlap = foot && prev ? Math.round(prev.getBoundingClientRect().bottom - foot.getBoundingClientRect().top) : 0;
-      const spill = c.id === "c2" && [...c.querySelectorAll('.bubble-text,.takeaway,.fact,.h1')].some(el => el.scrollWidth > el.clientWidth + 1);
+      const textSelector = c.id === "c2" ? ".bubble-text,.takeaway,.fact,.h1" : c.id === "c5" ? ".taunt-text,.puz h3,.puz .body,.clues li>span,.question,.answer-content" : null;
+      const spill = Boolean(textSelector) && [...c.querySelectorAll(textSelector)].some(el => el.scrollWidth > el.clientWidth + 1);
       return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, clip, overlap, spill };
     }))`,
     returnByValue: true,

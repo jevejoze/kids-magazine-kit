@@ -171,19 +171,19 @@ cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · S
   ${renderStory(ST)}
   ${foot(ST.foot || `编辑部推理连载${NEXT("小剧场")}`)}</section>`);
 
-// 挑战卡：平板阅读，题目分层，答案在本页底部倒印。
+// 挑战卡：默认一道中文谜题；仅在明确启用时兼容旧英文三关。
 const P = D.challenge;
-const answerText = value => String(Array.isArray(value) ? value.join("；") : value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-if (P) cards.push(`<section class="card${P.english?.length ? " with-english" : ""}" id="c5">${topBar("🧩 捣蛋浣熊的挑战 · Brain Teaser")}
-  <div class="taunt">${ch("raccoon:smirk:120:" + (P.prop || ""))}<div class="bub fun">${P.taunt_zh}<br><span class="en">${P.taunt_en}</span></div></div>
-  <div class="puz"><h3 class="fun">${P.puzzle.title}</h3><div class="body">${P.puzzle.body}</div>
-    ${P.puzzle.clues?.length ? `<ol class="clues">${P.puzzle.clues.map(clue => `<li>${clue}</li>`).join("")}</ol>` : ""}
-    ${P.puzzle.question ? `<div class="question"><b>请你判断</b>${P.puzzle.question}</div>` : ""}</div>
+const answerText = value => escapeText(Array.isArray(value) ? value.join("；") : value ?? "");
+if (P) cards.push(`<section class="card${P.english?.length ? " with-english" : ""}" id="c5">${topBar("🧩 捣蛋浣熊的挑战")}
+  <div class="taunt">${ch("raccoon:smirk:136:" + (P.prop || ""))}<div class="bub"><span class="taunt-text">${wrapChineseWords(P.taunt_zh)}</span>${P.english?.length && P.taunt_en ? `<span class="en">${escapeText(P.taunt_en)}</span>` : ""}</div></div>
+  <div class="puz"><div class="puzzle-label">浣熊出题</div><h3 class="fun">${wrapChineseWords(P.puzzle.title)}</h3><div class="body">${wrapChineseWords(P.puzzle.body)}</div>
+    ${P.puzzle.clues?.length ? `<div class="clue-label">${P.puzzle.clues.length} 条线索 · 每条都要满足</div><ol class="clues">${P.puzzle.clues.map(clue => `<li><span>${wrapChineseWords(clue)}</span></li>`).join("")}</ol>` : ""}
+    ${P.puzzle.question ? `<div class="question"><b>你来判断</b><span>${wrapChineseWords(P.puzzle.question)}</span></div>` : ""}</div>
   ${P.english?.length ? `<div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
     <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div></div></div>`).join("")}</div>` : ""}
-  <div class="answer-key"><div class="answer-content"><b>参考答案 · 想好再看</b><p>${answerText(D._answers?.puzzle)}</p>
+  <div class="answer-key"><div class="answer-content"><b>参考答案 · 想好再看</b><p class="puzzle-key">${answerText(D._answers?.puzzle)}</p>
     ${P.english?.length ? `<p class="english-key">英文：${(D._answers?.english || []).map((answer, i) => `${i + 1}. ${answerText(answer)}`).join("　")}</p>` : ""}</div></div>
-  ${foot("先想一想，再转动平板核对答案")}</section>`);
+  ${foot("想好了？转动平板，核对本页答案")}</section>`);
 
 // 环球小报（可选）：1 条头条 + 2 条小新闻
 const NW = D.news;
@@ -301,9 +301,17 @@ function fitComicDiagram() {
   const excess = Math.max(0, Math.ceil(foot.getBoundingClientRect().bottom - limit));
   card.style.setProperty("--comic-diagram-height", `${Math.max(200, 280 - excess)}px`);
 }
+function fitChallengeLayout() {
+  const card = document.querySelector("#c5"), foot = card?.querySelector(".foot");
+  if (!foot || !card.getBoundingClientRect().height) return;
+  card.classList.remove("challenge-compact");
+  const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);
+  if (foot.getBoundingClientRect().bottom > limit + 1) card.classList.add("challenge-compact");
+}
 window.READY = Promise.all([coverStrip(), characterPackReady]).then(async () => {
   await document.fonts?.ready;
   fitComicDiagram();
+  fitChallengeLayout();
 });
 </script>
 </body>
