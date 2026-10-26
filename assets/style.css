@@ -229,8 +229,8 @@ svg.ch{display:block}
 #c5 .question b{display:block;font-size:21px;color:#75608D;margin-bottom:6px}
 #c5 .answer-key{position:relative;margin: auto 0 16px;padding:16px 22px;border:2px dashed #B7A9C7;border-radius:18px;background:#FAF7FD}
 #c5 .foot{margin-top:0;font-size:24px}
-#c5 .answer-content{transform:rotate(180deg);font-size:26px;line-height:1.4}
-#c5 .answer-content>b{display:block;font-size:20px;color:var(--soft);margin-bottom:8px}
+#c5 .answer-content{transform:rotate(180deg);font-size:22px;line-height:1.4}
+#c5 .answer-content>b{display:block;font-size:18px;color:var(--soft);margin-bottom:8px}
 #c5 .answer-content .puzzle-key{font-weight:600}
 #c5 .answer-content .english-key{font-size:23px;line-height:1.4;margin-top:8px}
 #c5.with-english .puz{padding:16px 24px;margin-top:16px}
