@@ -38,7 +38,7 @@ node scripts/tts_mimo.mjs <issue>                 # 合成；已合成、内容�
 ```
 
 - 环境变量 `MIMO_API_KEY`（可选 `MIMO_BASE_URL`，默认 `https://api.xiaomimimo.com/v1`）
-- 配置写法：`{"narrator/zh": {"clone": "clone/parent/ref.wav"}, "narrator/zh@serial": {"clone": "clone/parent-reading/ref.wav"}, "dog/zh": {"voice": "苏打", "style": "憨憨的小男孩，慢悠悠的"}}`。键是"角色/语言"，加 `@serial` 只用于经典连载（读书）那一页；`voice` 是 MiMo 内置音色（中文 冰糖 茉莉 苏打 白桦，英文 Mia Chloe Milo Dean），`clone` 是相对 `voices/` 的参照音频（wav 或 mp3，base64 后 ≤ 10MB），用 `mimo-v2.5-tts-voiceclone` 克隆；`style` 是这个角色的语气说明，`pitch` 合成后升降半音（需要 ffmpeg）
+- 配置写法：`{"narrator/zh": {"clone": "clone/parent/ref.wav"}, "narrator/zh@serial": {"clone": "clone/parent-reading/ref.wav"}, "dog/zh": {"voice": "苏打", "style": "憨憨的小男孩，慢悠悠的"}}`。键是"角色/语言"，加 `@serial` 只用于经典连载（读书）那一页；`voice` 是 MiMo 内置音色（中文 冰糖 茉莉 苏打 白桦，英文 Mia Chloe Milo Dean），`clone` 是相对 `voices/` 的参照音频（wav 或 mp3，base64 后 ≤ 10MB），用 `mimo-v2.5-tts-voiceclone` 克隆；`style` 是这个角色的语气说明，`pitch` 合成后升降半音，`speed` 合成后调语速（如 `1.1` 快一成，音高不变；都需要 ffmpeg）
 - `emotion` 写成句首的风格标签，如"(开心)"；MiMo 不支持注音，多音字读错时回第 50 步换个说法
 - 单句失败会重试 5 次，仍失败就退出码 1，重跑只补缺的句子
 - MiMo 自己的克隆（`clone`）音质不稳，家长的声音优先用 VoiceStudio
