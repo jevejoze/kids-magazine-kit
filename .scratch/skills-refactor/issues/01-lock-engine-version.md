@@ -4,10 +4,10 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] kit main 打 tag `v1` 并推送（推送前和家长确认）
-- [ ] `engine.ref` 写 `v1` 时，新会话的 `.engine` 停在 v1
-- [ ] `engine.ref` 写 `skills` 时检出分支并 fast-forward；写回 `v1` 再切回来
-- [ ] 没有 `engine.ref` 时保持现有行为（pull 当前分支）
-- [ ] fetch 失败时提示并沿用本地版本，会话照常启动
+- [x] kit main 打 tag `v1` 并推送（推送前和家长确认）
+- [x] `engine.ref` 写 `v1` 时，新会话的 `.engine` 停在 v1
+- [x] `engine.ref` 写 `skills` 时检出分支并 fast-forward；写回 `v1` 再切回来
+- [x] 没有 `engine.ref` 时保持现有行为（pull 当前分支）
+- [x] fetch 失败时提示并沿用本地版本，会话照常启动
