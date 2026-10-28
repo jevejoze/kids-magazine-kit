@@ -16,7 +16,7 @@ node scripts/pipeline.mjs archive <issue>
 - `data/profile.md`：本期调整过英文档位等设定时记一行，注明依据
 
 **推送和上传核对**
-- 数据仓库：`sync.sh done <期号> 90` 推送后，`sync.sh check` 返回 0；`issues/NNN/` 里 00–50 步的 JSON、`11-diagram.svg`、`31-review.md`、`20-assets/` 全部图片、`40-cards/`、`60-audio/` 都在提交里，`_claims/` 已清空
+- 数据仓库：写完 `90-archive.json` 后 `sync.sh push "NNN: 出刊"`，`sync.sh check` 返回 0；`issues/NNN/` 里 00–50 步的 JSON、`11-diagram.svg`、`31-review.md`、`20-assets/` 全部图片都在提交里
 - 网盘 `成品/NNN/`：全部 card-N.png（平时 8 张，周一、周五 9 张）、`<刊名>-第NNN期.pdf`、`<刊名>-第NNN期-讲读版.mp4`（文件名照抄，旧名字的文件改成这个名字）
 
 **规则**：只追加，不删除已有记录

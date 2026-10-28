@@ -2,4 +2,7 @@ output/
 .DS_Store
 # 成品只放网盘；视频太大，也只放网盘
 成品/
-issues/*/70-final/*.mp4
+# 渲染图、语音、视频是产物，留在本机；成品放网盘
+issues/*/40-cards/
+issues/*/60-audio/
+issues/*/70-final/

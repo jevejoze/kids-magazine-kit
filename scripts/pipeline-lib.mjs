@@ -510,12 +510,10 @@ export function createPipeline(issueArg) {
     for (const s of stages) {
       const ready = !state[s.id] && s.depends.every(d => state[d]);
       const outdated = !state[s.id] && s.outputs.some(p => existsSync(out(p)));
-      // sync.sh claim 写的认领：issue/_claims/<步骤>，内容是"agent 时间"
-      const claim = !state[s.id] && has(`_claims/${s.id}`) ? readFileSync(join(issue, "_claims", s.id), "utf8").trim() : "";
-      const mark = skipped(s) ? "➖" : state[s.id] ? "✅" : s.optional ? "➖" : claim ? "🚧" : ready ? "👉" : "⏳";
-      console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}${skipped(s) ? "（本期不出）" : s.optional && !state[s.id] ? "（可选，默认不做）" : claim ? `（${claim} 在做）` : outdated ? "（未完成、输出无效或已过期）" : ""}`);
+      const mark = skipped(s) ? "➖" : state[s.id] ? "✅" : s.optional ? "➖" : ready ? "👉" : "⏳";
+      console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}${skipped(s) ? "（本期不出）" : s.optional && !state[s.id] ? "（可选，默认不做）" : outdated ? "（未完成、输出无效或已过期）" : ""}`);
     }
-    const next = stages.filter(s => !s.optional && !state[s.id] && !has(`_claims/${s.id}`) && s.depends.every(d => state[d])).map(s => s.id);
+    const next = stages.filter(s => !s.optional && !state[s.id] && s.depends.every(d => state[d])).map(s => s.id);
     console.log(`\n现在可以做：${next.join("、") || "（无）"}`);
   }
 

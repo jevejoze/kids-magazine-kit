@@ -9,12 +9,12 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 
 ## 数据目录
 
-孩子的所有资料都放在**数据目录**里，下文写作 `data/`。数据目录是家长自己的一个**私有 git 仓库**，是全部素材和进度的唯一来源；各个 agent 都 clone 这个仓库来干活。网盘 `我的云端硬盘/<刊名>/成品/` 只放发给孩子的成品。引擎仓库下的 `data/` 已在 `.gitignore` 里。
+孩子的所有资料都放在**数据目录**里，下文写作 `data/`。数据目录是家长自己的一个**私有 git 仓库**，存每期的源稿（各步的 JSON、SVG、审稿、图片素材）和档案，一次由一个 agent 出刊。渲染图、语音、视频这些产物留在本机、不进 git，发给孩子的成品放网盘 `我的云端硬盘/<刊名>/成品/`。引擎仓库下的 `data/` 已在 `.gitignore` 里。
 
 **目录固定**：子文件夹和文件名照 `pipeline/README.md`「目录」一节的结构放，期号三位数（`issues/007/`、`成品/007/`），不新建别的文件夹、不改名
 
 - 引擎仓库只放代码和规则；孩子的名字、照片、来信、反馈只放在数据目录
-- **同步靠 `scripts/sync.sh`**（在数据目录里运行）。开工前 `sync.sh start`：拉最新，打印最新一期哪步做完、谁在做什么。做一步之前 `sync.sh claim <期号> <步骤> <agent 名>`，做完 `sync.sh done <期号> <步骤>`，这一步的文件（JSON、SVG、图片、音频）就提交推送上去了；改了档案、反馈、随手记，用 `sync.sh push "<说明>"`。别的 agent 只看得到推上去的内容，没推送就等于没做
+- **同步靠 `scripts/sync.sh`**（在数据目录里运行）。开工前 `sync.sh start`：拉最新，打印最新一期哪步做完。一期做完第 90 步，`sync.sh push "NNN: 出刊"` 提交推送一次；改了档案、反馈、随手记，也用 `sync.sh push "<说明>"`
 - **成品上传网盘**：第 40、70 步出了成品，把 card 图片、PDF、讲读视频按固定文件名传到网盘 `成品/NNN/`。讲读视频体积大，只放网盘，不进 git
 - 第一次使用：把 `templates/data/` 整个复制成数据目录
 - 示例数据在 `examples/demo/`，读者是虚构的孩子「小满」
@@ -41,11 +41,11 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 家长只说"出下一期""做第 N 期"、没有指定做哪一步时，由当前 agent 从第 00 步一直做到第 90 步：
 
 1. 按 `pipeline/stages.json` 的依赖顺序逐步做；能派子 agent 的环境，可以把 00 之后互不依赖的步骤（09、10、12、13、14、16、17、18、19）并行交出去
-2. 先跑 `sync.sh start`，按它打印的进度从缺的那一步接着做（家长可能已经让别的 agent 做了几步）；标着 🚧 的步骤别人在做，跳过。每步照常写中间文件、做自检，做完就 `sync.sh done`
+2. 先跑 `sync.sh start`，按它打印的进度从缺的那一步接着做（家长可能已经让 agent 做了几步）。每步照常写中间文件、做自检
 3. 第 31 步审核后记录 `pipeline.mjs fingerprint <issue>` 输出的内容指纹，第 50 步讲读稿也把同一指纹放进 `_meta.content_hash`；内容或图片变化后，旧审稿和下游制作记录自动失效，须重做。第 31 步审稿结论是"需修改"时，回到对应步骤改完，重新合并、再审，直到"通过"
 4. 脚本步骤（30、40、70）在当前环境里直接运行；环境缺 Node、Chrome 或 ffmpeg 时，做到能做的最后一步，告诉家长缺什么、剩下哪几步
 5. 第 60 步语音：默认用 Azure（`node scripts/tts_azure.mjs <issue>`，环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`，可选付费兜底 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`）；数据目录有 `voices/voicestudio.json` 时，Azure 跑完再跑 `node scripts/tts_voicestudio.mjs <issue>` 换成克隆声音（VoiceStudio 连不上就沿用 Azure 版）；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`node scripts/tts_mimo.mjs <issue>`，环境变量 `MIMO_API_KEY`），代替 Azure，跑完同样再跑 `tts_voicestudio.mjs` 把旁白换成克隆声音；数据目录有 `voices/elevenlabs.json` 时，在 `tts_voicestudio.mjs` 之前先跑 `node scripts/tts_elevenlabs.mjs <issue>` 把编辑部成员换成 ElevenLabs 声音（环境变量 `ELEVENLABS_API_KEY`，连不上就沿用原版）；没有密钥也没有别的语音合成时，跳过 60、70，把讲读稿整理成 `70-final/家长讲读稿.md`
-6. 最后做第 90 步，确认数据仓库已推送、网盘上成品传齐了，然后告诉家长：成品在网盘哪里、哪几步没做成以及原因、审稿里值得家长看一眼的地方
+6. 最后做第 90 步，`sync.sh push` 推送数据仓库、网盘上成品传齐了，然后告诉家长：成品在网盘哪里、哪几步没做成以及原因、审稿里值得家长看一眼的地方
 
 ## 编辑部角色
 

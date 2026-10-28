@@ -36,4 +36,4 @@ node scripts/assets.mjs slice <issue>/20-assets/serial-diagram.png <issue>/20-as
 - Wikimedia 图片下载要带 User-Agent，被限流就等几秒重试；缩略图宽度用 1280、1920 这类常用尺寸（`upload.wikimedia.org/.../thumb/.../1920px-<文件名>.png`；别的宽度可能返回网页）
 - 下载失败或尺寸不够时，换一张同样符合协议的图，并在 `_meta.issues` 里写明换成了什么，交给家长确认
 
-**自检**：每个文件都能打开；`assets.json` 里的文件名都存在；`sync.sh done` 推送后，`git status` 干净、图片和 `assets.json` 都在提交里（只推 JSON 不推图片，下游的 agent 就渲染不了）
+**自检**：每个文件都能打开；`assets.json` 里的文件名都存在
