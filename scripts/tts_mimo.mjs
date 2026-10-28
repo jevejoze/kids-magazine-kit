@@ -143,8 +143,8 @@ for (const page of nar) page.lines.forEach((line, i) => {
   const { v, body, hash } = request(line, serial);
   used[`${line.who}/${line.lang}${serial && voices[`${line.who}/${line.lang}@serial`] ? "（连载）" : ""}`] = `MiMo ${label(v)}${v.pitch ? ` ${v.pitch > 0 ? "+" : ""}${v.pitch} 半音` : ""}${v.speed && v.speed !== 1 ? ` 语速 ×${v.speed}` : ""}`;
   const prev = oldByFile[file], path = join(outDir, file);
-  // VoiceStudio 换过的克隆句也复用，和 Azure 一样
-  const cached = (prev?.by === "MiMo" || prev?.by?.startsWith("VoiceStudio-")) && prev.hash === hash && existsSync(path) ? readFileSync(path) : null;
+  // VoiceStudio、ElevenLabs 换过的句子也复用，和 Azure 一样
+  const cached = (prev?.by === "MiMo" || /^(VoiceStudio|ElevenLabs)-/.test(prev?.by ?? "")) && prev.hash === hash && existsSync(path) ? readFileSync(path) : null;
   if (cached?.length > 44 && prev.audio_hash === sha(cached)) { files.push(prev); skipped++; return; }
   const entry = { card: page.card, index: i, file };
   files.push(entry); jobs.push({ entry, body, hash, v, path });

@@ -43,9 +43,22 @@ node scripts/tts_mimo.mjs <issue>                 # 合成；已合成、内容�
 - 单句失败会重试 5 次，仍失败就退出码 1，重跑只补缺的句子
 - MiMo 自己的克隆（`clone`）音质不稳，家长的声音优先用 VoiceStudio
 
+**ElevenLabs 角色声音（可选）**：数据目录有 `voices/elevenlabs.json` 时，Azure 或 MiMo 跑完、`tts_voicestudio.mjs` 之前再跑一步，把列出的角色换成 ElevenLabs（Eleven v3）的声音：
+
+```bash
+node scripts/tts_elevenlabs.mjs <issue> --dry   # 看要替换几句、约多少字符
+node scripts/tts_elevenlabs.mjs <issue>         # 替换；已替换、正文和声音没变的句子跳过，跑完报告用了多少字符、套餐还剩多少
+```
+
+- 环境变量 `ELEVENLABS_API_KEY`
+- 配置写法：`{"model": "eleven_v3", "dog/zh": {"name": "tuanzi-dog", "voice_id": "…"}, "owl/zh": {"name": "gugu-owl", "voice_id": "…", "speed": 1.1}}`。键是"角色/语言"，加 `@serial` 只用于经典连载那一页；`name` 是 My Voices 里的声音名，`voice_id` 在 `GET /v1/voices` 里按名字查；`stability`（0 / 0.5 / 1，默认 0.5）、`pitch`、`speed` 可选；`tags` 可覆盖下面的标签对应
+- `emotion` 写成句首的 v3 音频标签：开心 [happy]、兴奋 [excited]、惊讶 [surprised]、神秘 [mysteriously]、紧张 [nervous]、困倦 [yawns]、得意 [proudly]、委屈 [sad]、温柔 [softly]，平静不加
+- 计费按接口返回的 `character-cost` 统计，中文一期角色台词约 800 字符；套餐余量不够这一期就不合成
+- 单句失败保留原版；没有密钥或连不上时退出码 3，原来的整期照样能用。重跑 Azure 或 MiMo 后要再跑一次这一步
+
 换别的语音服务也可以，产出按下面的约定放好即可。
 
-**读**：`issue/50-narration.json`、`data/voices/azure.json`（可选）、`data/voices/mimo.json`（可选）
+**读**：`issue/50-narration.json`、`data/voices/azure.json`（可选）、`data/voices/mimo.json`（可选）、`data/voices/elevenlabs.json`（可选）
 
 **写**：`issue/60-audio/` 下每句一个文件，命名 `c{card}_{序号}.wav`（序号是这句在该页 `lines` 里的位置，从 0 开始，两位数，如 `c3_04.wav`），外加 `issue/60-audio/manifest.json`：
 
