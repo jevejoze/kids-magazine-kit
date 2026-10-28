@@ -13,32 +13,38 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "叮咚！小满早上好，阁楼电台开播啦！",
+          "text": "叮咚！小满早上好，今天是世界各地日。",
           "emotion": "开心",
           "sfx": "chime"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "等等，快看封面上这张照片！金灿灿的！",
-          "emotion": "兴奋"
+          "text": "哈——欠……别吵，我戴着眼罩呢。",
+          "emotion": "困倦"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "别光看海面漂亮，瞧瞧右下角的时间——",
-          "emotion": "神秘"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "拍照时间：半夜零点四十四分！",
+          "text": "摘下来看看封面，这张照片能把你吓醒。",
           "emotion": "得意"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "这里是挪威最北边的北角，海面金灿灿的。",
+          "emotion": "平静"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "再看拍照的时间——零点四十四分。",
+          "emotion": "神秘"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "半夜十二点多？太阳怎么还不回家睡觉！",
+          "text": "半夜十二点多？太阳怎么还不下班！",
           "emotion": "惊讶"
         },
         {
@@ -49,19 +55,13 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "太阳要是天天不睡觉，那我不也不用睡了！",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "想得美！挪威的小朋友这时候可头疼呢。",
-          "emotion": "开心"
+          "text": "太阳不睡觉，我也睡不着啦……",
+          "emotion": "委屈"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "为什么那里的太阳半夜不睡觉？先按暂停，猜猜看！",
+          "text": "你觉得是为什么？先暂停猜一猜。",
           "emotion": "温柔",
           "pause": 5,
           "hold": "⏸ 先暂停猜一猜"
@@ -70,67 +70,79 @@
     },
     {
       "card": 2,
-      "thread": "地球歪着转，北极夏天转一圈都在光里",
+      "thread": "地球歪着转，北极的夏天转一圈都晒得到太阳",
       "lines": [
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "博士，挪威在哪？我今晚就想搬过去住！",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "搬去挪威？你连睡衣都没带齐呢。",
-          "emotion": "得意"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "半夜都有大太阳，妈妈就没理由催我关灯啦！",
-          "emotion": "开心"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "哈哈，其实太阳可没贪玩，秘密在地球身上。",
-          "emotion": "开心"
-        },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "看画面中间：地球仪不是直立的，而是斜着身子转。",
-          "emotion": "神秘"
+          "text": "太阳到底为什么不睡觉？咕咕博士，交给你啦！",
+          "emotion": "开心"
         },
         {
-          "who": "owl",
+          "who": "dog",
           "lang": "zh",
-          "text": "它整整歪了二十三度半。",
+          "text": "我知道！太阳半夜加班，忘了下山！",
           "emotion": "得意"
         },
         {
-          "who": "dog",
+          "who": "owl",
           "lang": "zh",
-          "text": "歪着身子？就像我喝汤时把碗端歪了一样！",
+          "text": "哈，太阳可没偷懒，秘密在地球身上。",
           "emotion": "开心"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "对！到了夏天，北极这一头正好朝太阳斜过去。",
-          "emotion": "开心"
+          "text": "地球转圈的时候，身子是歪着的。",
+          "emotion": "平静"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "可是地球自己在转呀，转到背后不就天黑了？",
+          "text": "歪着转？像我歪着脑袋转圈圈？",
           "emotion": "惊讶"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "你顺着图上的黄色虚线看——挪威就在北极圈边上。",
+          "text": "差不多！歪了二十三度半。",
+          "emotion": "得意"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "二十三度半……那是歪了多少？",
+          "emotion": "困倦"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "差不多是钟面上，指针从十二点走到一点那么斜。",
+          "emotion": "温柔"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "夏天，北极这一头一直朝着太阳歪过去。",
+          "emotion": "平静"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "等等，那地球转到背面，不就天黑了吗？",
+          "emotion": "紧张"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "看图右边那个红点，它就是北角。",
           "emotion": "神秘"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "它离北极太近，转一整圈都还在亮的那边。",
+          "emotion": "平静"
         },
         {
           "who": "mouse",
@@ -138,46 +150,46 @@
           "text": "Still in the light!"
         },
         {
+          "who": "dog",
+          "lang": "zh",
+          "text": "什么什么？斯蒂尔……莱特？",
+          "emotion": "惊讶"
+        },
+        {
           "who": "owl",
           "lang": "zh",
-          "text": "对！整整转一圈，它都泡在 light 亮光里！",
+          "text": "light 就是亮光，太阳还在亮光里！",
           "emotion": "开心"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "天哪！那半夜两点钟，路上岂不是还跟大白天一样！",
+          "text": "那我搬去挪威，夏天就永远不用关灯啦！",
           "emotion": "兴奋"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "没错，当地人晚上睡觉，得拉上特厚的黑窗帘。",
-          "emotion": "神秘"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "等等，那要是到了冬天呢？",
-          "emotion": "紧张"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "冬天正好反过来，整整两个月见不到太阳！",
+          "text": "别急，到了冬天就反过来，整天见不到太阳。",
           "emotion": "得意"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "啊？整整两个月摸黑？那我还是在被窝里躺着吧！",
+          "text": "啊？那我还是在家睡觉吧……",
           "emotion": "委屈"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "想看懂这个大秘密？在黑屋子里拿手电筒照着地球仪转一圈试试！",
-          "emotion": "温柔"
+          "text": "还有个怪事：北边亮着白天时，南极那头正黑着呢。",
+          "emotion": "神秘"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "拿手电筒当太阳，照着歪歪的地球仪转一圈试试！",
+          "emotion": "开心"
         }
       ]
     },
@@ -188,8 +200,8 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "刚才说到挪威的大白天——波波，你的秘密行李箱里装了什么？",
-          "emotion": "兴奋"
+          "text": "说到不睡觉的太阳——波波，你的单词屋开门没？",
+          "emotion": "开心"
         },
         {
           "who": "mouse",
@@ -199,8 +211,8 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "听懂了挪威！我们去北极探险！",
-          "emotion": "开心"
+          "text": "我只听懂了“挪威”……",
+          "emotion": "委屈"
         },
         {
           "who": "mouse",
@@ -211,8 +223,8 @@
         {
           "who": "owl",
           "lang": "zh",
-          "text": "mid 是中间，night 是夜里，合起来就是半夜十二点！",
-          "emotion": "开心"
+          "text": "半夜十二点。mid 是中间，night 是夜里。",
+          "emotion": "平静"
         },
         {
           "who": "mouse",
@@ -223,8 +235,8 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "半夜十二点，太阳还精神抖擞地挂在天上！",
-          "emotion": "兴奋"
+          "text": "半夜还挂着，就跟封面一样！",
+          "emotion": "惊讶"
         },
         {
           "who": "mouse",
@@ -235,7 +247,7 @@
         {
           "who": "owl",
           "lang": "zh",
-          "text": "太阳在地平线上绕着圈圈转，circle 就是转圈。",
+          "text": "转圈圈。上一期见过它，还记得吗？",
           "emotion": "开心"
         },
         {
@@ -247,7 +259,7 @@
         {
           "who": "mouse",
           "lang": "zh",
-          "text": "新词来啦，快看窗户！",
+          "text": "第三个，新词哦！",
           "emotion": "兴奋"
         },
         {
@@ -259,7 +271,7 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "窗帘！睡觉前必须把厚窗帘哗啦一下拉上！",
+          "text": "我猜到了，窗帘！太亮了就拉上它。",
           "emotion": "得意"
         },
         {
@@ -273,7 +285,7 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "轮到你啦：用 because 把两句话连起来，写在格子里！",
+          "text": "轮到你：用 because 把两句话连成一句，写在格子里。",
           "emotion": "温柔"
         }
       ]
@@ -285,45 +297,53 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "窗帘拉上了，阁楼里的一桩悬案开场啦！",
+          "text": "窗帘拉上了，阁楼里的案子还没破。小剧场开演！",
           "emotion": "神秘"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "一大早，大桌上整整齐齐摆着四个空杯子。",
+          "text": "一大早，桌上摆着四个空杯子，谁也不吭声。",
           "emotion": "紧张"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "都瞪着我干嘛？我昨晚一整夜都在阁楼顶上数星星！",
+          "text": "干嘛都盯着我？我昨晚可没出门！",
           "emotion": "得意"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "你们看，窗户可是开着一条缝呢！",
+          "text": "窗户开着呢，说不定是外面的人爬进来的！",
           "emotion": "得意"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "咕咕博士戴上眼镜，拿着放大镜围着窗台仔细瞧。",
-          "emotion": "神秘",
+          "text": "咕咕博士举着放大镜，凑到窗边。",
+          "emotion": "平静",
           "sfx": "footsteps"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "嗯……窗台上干干净净，窗外连个脚印都没有。",
+          "text": "嗯……窗台上没有脚印，窗外也没有。",
           "emotion": "神秘"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "要是真有外人爬进来，肯定会留下印子。",
-          "emotion": "开心"
+          "text": "真有人爬进来，一定会留下痕迹。",
+          "emotion": "平静",
+          "rate": "slow"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "波波鼠突然指着团子狗的尾巴尖大叫——",
+          "emotion": "惊讶",
+          "sfx": "drum"
         },
         {
           "who": "mouse",
@@ -333,26 +353,33 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "波波突然惊叫一声——团子的尾巴尖上，正粘着一颗黑糖珍珠！",
-          "emotion": "惊讶",
-          "sfx": "drum"
+          "text": "大家凑过去一瞧——尾巴尖上真粘着一颗黑糖珍珠！",
+          "emotion": "惊讶"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "哎？我昨晚做梦在奶茶里游泳呢，怎么真粘上了？",
-          "emotion": "惊讶"
+          "text": "我？我一直睡在沙发上啊……",
+          "emotion": "委屈"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "门从里面反锁得好好的，外人根本进不来。",
-          "emotion": "神秘"
+          "text": "门是从里面锁上的。",
+          "emotion": "平静",
+          "rate": "slow"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "只有本来就在屋里的，才喝得到奶茶。",
+          "emotion": "神秘",
+          "rate": "slow"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "哈哈！破案啦！昨晚梦游偷喝光四杯奶茶的，就是你！",
+          "text": "我知道了！是你梦游啦！",
           "emotion": "兴奋"
         },
         {
@@ -363,38 +390,38 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "嘿嘿……原来我梦里喝到的饱嗝是真的呀……",
+          "text": "嘿嘿……我梦见喝奶茶，原来是真喝了。",
           "emotion": "委屈"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "当天晚上，浣熊又买了四杯奶茶，每个杯子都写上了大名字。",
+          "text": "当天晚上，浣熊又买来四杯，杯子上都写好名字。",
           "emotion": "开心"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "半夜时分，黑漆漆的阁楼里，忽然又响起了吸溜声……",
+          "text": "可是到了半夜，阁楼里又响起：吸溜，吸溜……",
           "emotion": "神秘",
           "sfx": "slurp"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "喂！这次绝对不是我！",
-          "emotion": "紧张"
+          "text": "这次可不是我！",
+          "emotion": "委屈"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "也……也不可能是我吧？我的尾巴藏在被窝里呢！",
-          "emotion": "委屈"
+          "text": "也……也不是我吧？",
+          "emotion": "紧张"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "侦探笔记：哪条线索能证明，昨晚绝不是外人翻窗进来的？",
+          "text": "侦探笔记：哪条线索证明，不是有人从窗户爬进来的？",
           "emotion": "神秘",
           "pause": 5,
           "hold": "🔍 回头找一找线索"
@@ -406,40 +433,46 @@
       "thread": "四个人排队的顺序，从最确定的人下手",
       "lines": [
         {
-          "who": "raccoon",
-          "lang": "zh",
-          "text": "吸溜声是谁今晚再说，先来接本大侠的挑战书！",
-          "emotion": "得意"
-        },
-        {
           "who": "narrator",
           "lang": "zh",
-          "text": "四位小客人排队上挪威观景台：艾莎、健太、卢卡、阿米尔。",
+          "text": "吸溜声是谁，下一集再说，浣熊已经等不及了！",
           "emotion": "开心"
         },
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "第一条线索：艾莎不排第一，也不排最后！",
-          "emotion": "得意",
-          "pause": 1.5
+          "text": "哼，四条线索，你能排对吗？",
+          "emotion": "得意"
+        },
+        {
+          "who": "raccoon",
+          "lang": "zh",
+          "text": "四位小客人排队上观景台：艾莎、健太、卢卡、阿米尔。",
+          "emotion": "得意"
         },
         {
           "who": "narrator",
+          "lang": "zh",
+          "text": "第一条：艾莎不排第一，也不排最后。",
+          "emotion": "平静",
+          "pause": 1.5
+        },
+        {
+          "who": "raccoon",
           "lang": "zh",
           "text": "第二条：健太也不排第一。",
           "emotion": "神秘",
           "pause": 1.5
         },
         {
-          "who": "raccoon",
+          "who": "narrator",
           "lang": "zh",
-          "text": "第三条：阿米尔和艾莎挨着站！",
-          "emotion": "得意",
+          "text": "第三条：阿米尔和艾莎挨着站。",
+          "emotion": "平静",
           "pause": 1.5
         },
         {
-          "who": "narrator",
+          "who": "raccoon",
           "lang": "zh",
           "text": "第四条：健太排在卢卡前面。",
           "emotion": "神秘",
@@ -454,14 +487,14 @@
         {
           "who": "raccoon",
           "lang": "zh",
-          "text": "哼！健太必须排卢卡前头，卢卡怎么能抢第一！",
+          "text": "哼！健太在卢卡前面，卢卡怎么排第一？",
           "emotion": "得意"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "别急，艾莎一共就中间两个位置，挨个试一试！",
-          "emotion": "开心",
+          "text": "小提示：艾莎只能站两个位置，一个一个试。",
+          "emotion": "温柔",
           "pause": 5,
           "hold": "💭 想好后，口头说出顺序"
         },
@@ -473,8 +506,8 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第一关：半夜的太阳该选哪一个词？",
-          "emotion": "温柔"
+          "text": "英文第一关，两个词里选一个。",
+          "emotion": "平静"
         },
         {
           "who": "mouse",
@@ -484,8 +517,8 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第二关：想想当地人为什么要拉上厚窗帘。",
-          "emotion": "温柔"
+          "text": "第二关，要去小短文里找原因。",
+          "emotion": "平静"
         },
         {
           "who": "mouse",
@@ -495,55 +528,67 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第三关：用 because 说说你想不想去看极昼！",
+          "text": "第三关，说两句，记得用上 because。",
           "emotion": "温柔"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "全部想好了吗？轻轻转动平板看本页底部！",
-          "emotion": "开心"
+          "text": "想好了，就转动平板看本页底部。",
+          "emotion": "温柔"
         }
       ]
     },
     {
       "card": 6,
-      "thread": "女孩下棋创纪录，鹈鹕敲门与狗狗读脸",
+      "thread": "十一岁女孩看视频学棋，拿下最年轻纪录",
       "lines": [
         {
-          "who": "dog",
+          "who": "narrator",
           "lang": "zh",
-          "text": "观景台排好队了，快翻开环球小报看看新鲜事！",
-          "emotion": "兴奋"
+          "text": "排队的小客人来自四个国家，环球小报也走遍世界！",
+          "emotion": "开心"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第一条大新闻：摆着棋盘的照片上，白王后立在最前排。",
-          "emotion": "神秘"
+          "text": "照片上是一副摆好的国际象棋，白王后站在最前面。",
+          "emotion": "平静"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "伦敦一位十一岁的小女孩，拿下了女子国际象棋特级大师！",
+          "text": "英国伦敦，十一岁的 Bodhana 拿到了女子特级大师！",
           "emotion": "兴奋"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "全世界拿到这个最高头衔的棋手，总共还不到五百位呢！",
-          "emotion": "得意"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "五百位？那比我们整所小学的学生还要少！",
+          "text": "十一岁？比我会的东西多多了！",
           "emotion": "惊讶"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "她翻出爸爸旧袋子里的棋子当玩具，看视频自学成才！",
+          "text": "这个称号，全世界拿到的不到五百个人。",
+          "emotion": "平静"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "五百个？还没有一所学校的人多！",
+          "emotion": "惊讶"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "她是在爸爸的旧袋子里，翻出了一盒棋子。",
+          "emotion": "神秘"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "本来当玩具，后来跟着网上视频，自己学会了。",
           "emotion": "开心"
         },
         {
@@ -554,78 +599,90 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "太神了！十一岁就打破了世界 record 纪录！",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "第二条奇闻：美国实验室的大门忽然被咚咚敲响了。",
-          "emotion": "神秘",
-          "sfx": "door"
+          "text": "布……布瑞克？是打碎了什么吗？",
+          "emotion": "困倦"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "科学家推门一看，台阶上竟站着一只受伤的大鹈鹕！",
-          "emotion": "惊讶"
+          "text": "record 是纪录，她打破了最年轻的纪录。",
+          "emotion": "开心"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "你有没有哪样本领，也是看视频自己学会的？",
+          "emotion": "温柔"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "美国佛罗里达，实验室的门咚咚响了。",
+          "emotion": "神秘",
+          "sfx": "door"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "哇！鹈鹕嘴巴底下挂着大兜子，翅膀扎了鱼钩！",
+          "text": "谁呀？送快递的吗？",
           "emotion": "紧张"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "它一动不动站着，科学家花了几分钟帮它取下鱼钩。",
+          "text": "门外站着一只鹈鹕，翅膀上扎着鱼钩！",
+          "emotion": "惊讶"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "科学家取下鱼钩，它扑扑翅膀飞走了。",
           "emotion": "温柔"
         },
         {
           "who": "mouse",
           "lang": "en",
-          "text": "It knocked on the door to ask for help!"
+          "text": "It knocked to ask for help!"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "谁能想到，聪明的鸟儿也懂得敲门找人类 help 求救呢！",
+          "text": "knock 是敲门，它是来敲门求救的！",
           "emotion": "惊讶"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "第三条：奥地利的科学家给狗狗看人类各种表情的照片。",
-          "emotion": "神秘"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "仪器显示，狗狗一看到害怕的表情，大脑反应格外特别。",
-          "emotion": "开心"
+          "text": "奥地利维也纳，狗狗躺进大机器里看人脸照片。",
+          "emotion": "平静"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "那当然！主人一皱眉头，我尾巴早就夹紧啦！",
+          "text": "我就知道！我一眼看得出你害不害怕！",
           "emotion": "得意"
-        },
-        {
-          "who": "mouse",
-          "lang": "en",
-          "text": "Dogs can truly read your face!"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "平时多对宠物笑笑，它们真能读懂你的 face 脸庞！",
+          "text": "研究也这么说：看到害怕的脸，狗狗的大脑反应不一样。",
+          "emotion": "开心"
+        },
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Dogs can read your face!"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "face 就是脸，狗狗看得懂你的脸色！",
           "emotion": "开心"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "小满，你怎么看？受伤的鹈鹕为什么会找人类敲门？",
+          "text": "你怎么看？鹈鹕为什么会去敲人类的门？",
           "emotion": "温柔",
           "pause": 3,
           "hold": "💭 说说你的理由"
@@ -634,24 +691,30 @@
     },
     {
       "card": 7,
-      "thread": "极昼的太阳到底动不动，看延时摄影",
+      "thread": "极昼时太阳在不在动，要看连续拍的视频",
       "lines": [
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "网上有人发视频说：极昼时太阳挂在天上，一动不动！",
+          "text": "说到会看脸色的狗狗，网上还有条讲太阳的短视频。",
           "emotion": "神秘"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "视频里说：极昼的时候，太阳一直停在同一个位置！",
+          "emotion": "兴奋"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "我不信！天再亮，太阳公公也得伸个懒腰活动活动吧！",
+          "text": "我信！太阳不下班，肯定就待着不动了！",
           "emotion": "兴奋"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "快脑袋先选一个：真的、假的，还是说不清？",
+          "text": "你觉得呢？真的、假的，还是说不清？",
           "emotion": "温柔",
           "pause": 3,
           "hold": "⏸ 先选一个"
@@ -659,61 +722,61 @@
         {
           "who": "owl",
           "lang": "zh",
-          "text": "慢脑袋开始破案：单看一张抓拍照可不行。",
-          "emotion": "得意"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "对！必须看连续拍一整天的延时视频！",
-          "emotion": "开心"
+          "text": "先别急着点赞，我们一条一条查。",
+          "emotion": "平静"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "盯着地平线看，太阳像坐过山车一样波浪起伏。",
+          "text": "第一，找一段连着拍的极昼视频。",
+          "emotion": "平静"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "截一张图还不够吗？",
+          "emotion": "惊讶"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "一张图可看不出它动没动。第二，盯住太阳和地平线。",
+          "emotion": "得意"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "第三，再比比别的地方拍到的样子。",
           "emotion": "神秘"
-        },
-        {
-          "who": "dog",
-          "lang": "zh",
-          "text": "哈哈，原来太阳也在天上跳波浪舞呢！",
-          "emotion": "开心"
-        },
-        {
-          "who": "owl",
-          "lang": "zh",
-          "text": "再对比多几个地方的记录，真相就大白啦。",
-          "emotion": "得意"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "想看科学家的裁决结论？把平板倒过来看答案！",
+          "text": "查好了，就把页面倒过来看答案吧！",
           "emotion": "开心"
         }
       ]
     },
     {
       "card": 8,
-      "thread": "爱丽丝追着穿背心的兔子，掉进兔子洞",
+      "thread": "爱丽丝追着看表的兔子，掉进了洞",
       "lines": [
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "好啦，靠在软绵绵的抱枕上，听一段睡前故事吧。",
+          "text": "太阳的事查清楚了，钻进被窝，听爱丽丝的故事吧。",
           "emotion": "温柔"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "河岸边的草地上，爱丽丝正靠着姐姐打盹，无聊极了。",
+          "text": "爱丽丝坐在河边，姐姐在看书，她无聊得直打哈欠。",
           "emotion": "温柔"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "忽然，一只长着粉红眼睛的雪白兔子，从她身边飞奔而过！",
+          "text": "忽然，一只粉红眼睛的白兔，从她身边跑过去。",
           "emotion": "惊讶"
         },
         {
@@ -725,44 +788,56 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "兔子竟然一边跑一边喊：哎呀哎呀，我要迟到啦！",
+          "text": "哎呀哎呀，我要迟到了！",
+          "emotion": "平静"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "等等，兔子还会说话？",
+          "emotion": "惊讶"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "更怪的是，它还掏出一块怀表，皱着眉头看时间。",
           "emotion": "神秘"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "更奇妙的是，它居然从背心口袋里掏出一块大怀表！",
-          "emotion": "惊讶"
+          "text": "爱丽丝跳起来就追，看它钻进了树篱下面的大洞。",
+          "emotion": "兴奋"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "兔子居然也穿背心赶时间？它要去参加什么大派对呀！",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "爱丽丝跳起来就追，一眨眼跟着钻进了树篱下的大洞。",
-          "emotion": "兴奋"
-        },
-        {
-          "who": "narrator",
-          "lang": "zh",
-          "text": "谁知那洞忽然像深井一样直直往下，她脚下一空——",
+          "text": "别追啦，洞里黑乎乎的！",
           "emotion": "紧张"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "咕咚！爱丽丝整个人像片树叶一样，悠悠掉了下去……",
-          "emotion": "神秘",
-          "rate": "slow"
+          "text": "她也跟着钻进去，跑着跑着——脚下一空！",
+          "emotion": "紧张"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "猜一猜，深不见底的洞底下，会有些什么奇妙的东西？",
+          "text": "洞忽然直直往下，她来不及停，一路掉了下去……",
+          "emotion": "神秘",
+          "rate": "slow"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "兔子也要赶时间？那它要去哪儿呀！",
+          "emotion": "惊讶"
+        },
+        {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "猜一猜，洞底会有什么？",
           "emotion": "温柔",
           "pause": 3,
           "hold": "⏸ 猜一猜"
@@ -776,25 +851,25 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "掉进洞里的爱丽丝先等等，本汪必须自首！",
+          "text": "掉进洞里的爱丽丝先等等，我要爆料！",
           "emotion": "兴奋"
         },
         {
           "who": "dog",
           "lang": "zh",
-          "text": "昨晚我以为在做梦，醒来枕头底下真塞着一根吸管！",
+          "text": "我梦见喝奶茶，醒来枕头边真有根吸管！",
           "emotion": "得意"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "哈哈，小满，你有没有半夜梦见吃大餐的搞笑事？",
-          "emotion": "开心"
+          "text": "小满，梦游的人记得自己做过什么吗？",
+          "emotion": "神秘"
         },
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "在挪威没有黑夜的夏天，你最想玩什么游戏？",
+          "text": "还有一个问题：在挪威过没有黑夜的夏天，你最想做什么？",
           "emotion": "温柔",
           "pause": 3,
           "hold": "💭 想一想"
@@ -802,13 +877,13 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "今天最喜欢哪一页、难不难，记得说给妈妈听！",
+          "text": "最喜欢哪页、哪页不喜欢、难不难，都说给妈妈听！",
           "emotion": "开心"
         },
         {
           "who": "owl",
           "lang": "zh",
-          "text": "明天是数学日，带你去看蜜蜂神奇的六边形城堡！",
+          "text": "明天是数学日，我们去看蜜蜂的六边形小房子。",
           "emotion": "神秘"
         },
         {
@@ -819,8 +894,8 @@
         {
           "who": "dog",
           "lang": "zh",
-          "text": "挥挥小爪，我去被窝里抓兔子去啦！",
-          "emotion": "开心"
+          "text": "拜拜！我去补觉了……",
+          "emotion": "困倦"
         }
       ]
     }
