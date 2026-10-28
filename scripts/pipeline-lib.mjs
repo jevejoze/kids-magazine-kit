@@ -471,10 +471,8 @@ export function createPipeline(issueArg) {
     }
     return errors;
   }
-  function assemble() {
-    const errors = assemblyErrors();
-    const inputs = inputFingerprint(issue, "30-assemble");
-    if (errors.length) throw new Error(errors.join("\n"));
+  // 只按源稿拼出整期 JSON，不校验、不写文件；回归比对也用它
+  function buildIssue() {
     const b = read("00-brief.json"), c = read("10-cover.json"), m = read("11-comic.json"),
       s = read("13-story.json"), p = read("14-puzzle.json"), mb = read("16-mailbox.json"),
       a = read("20-assets/assets.json");
@@ -510,6 +508,13 @@ export function createPipeline(issueArg) {
       const r = read("18-serial.json");
       issueJson.serial = { ...strip(r), photo: asset(a.serial), diagram: asset(a.serial_diagram), steps: a.serial_steps?.map(asset), photo_url: undefined, diagram_url: undefined, bible_update: undefined };
     }
+    return issueJson;
+  }
+  function assemble() {
+    const errors = assemblyErrors();
+    const inputs = inputFingerprint(issue, "30-assemble");
+    if (errors.length) throw new Error(errors.join("\n"));
+    const issueJson = buildIssue();
     const structural = validateIssue(issueJson);
     if (structural.length) throw new Error(structural.join("\n"));
     atomicWrite(join(issue, "30-issue.json"), JSON.stringify(issueJson, null, 2));
@@ -636,5 +641,5 @@ export function createPipeline(issueArg) {
     return receipt;
   }
 
-  return { status, check, assemble, script, archive, assemblyErrors, reviewPassed, fingerprint: () => contentFingerprint(issue), done: id => done(stages.find(s => s.id === id)) };
+  return { status, check, assemble, buildIssue, script, archive, assemblyErrors, reviewPassed, fingerprint: () => contentFingerprint(issue), done: id => done(stages.find(s => s.id === id)) };
 }

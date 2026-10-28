@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 用法: node render.mjs <issue.json> [输出目录] [--flat] [--preview]
+// 用法: node render.mjs <issue.json> [输出目录] [--flat] [--preview [--allow-overflow]]
 // 产出: 输出目录/issue-NNN/{issue.html, card-1..N.png, <刊名>-第NNN期.pdf}；加 --flat 直接写进输出目录
 // JSON 里以 .jpg/.jpeg/.png/.webp/.svg 结尾、且相对 JSON 所在目录存在的路径，会内嵌进 HTML；comic.diagram 的 SVG 按原文内联。
 // 截图走 Chrome DevTools 协议，按每张卡片的实际位置裁切，需要 Node 22+（内置 WebSocket）。
@@ -16,8 +16,10 @@ import { loadCharacterPack } from "./character-pack.mjs";
 const args = process.argv.slice(2);
 const flat = args.includes("--flat");
 const preview = args.includes("--preview");
-const [jsonPath, outRoot = "."] = args.filter(x => !["--flat", "--preview"].includes(x));
-if (!jsonPath) { console.error("用法: node render.mjs <issue.json> [输出目录] [--flat] [--preview]"); process.exit(1); }
+// --allow-overflow：版面溢出只提示、照常截图，给回归比对渲染旧期用；只能和 --preview 一起用
+const allowOverflow = preview && args.includes("--allow-overflow");
+const [jsonPath, outRoot = "."] = args.filter(x => !["--flat", "--preview", "--allow-overflow"].includes(x));
+if (!jsonPath) { console.error("用法: node render.mjs <issue.json> [输出目录] [--flat] [--preview [--allow-overflow]]"); process.exit(1); }
 
 const here = dirname(fileURLToPath(import.meta.url));
 const assets = join(here, "..", "assets");
@@ -143,7 +145,8 @@ const once = method => new Promise((ok, fail) => {
   if (JSON.stringify(rects.map(r => r.id)) !== JSON.stringify(expected)) throw new Error("渲染页面数量或顺序与数据契约不一致");
   const overflow = rects.flatMap((r, i) => r.clip > 0 || r.overlap > 4 || r.spill
     ? [`card-${i + 1}（#${r.id}）：${r.clip > 0 ? `页脚超出底边 ${r.clip}px` : r.overlap > 4 ? `正文与页脚重叠 ${r.overlap}px` : "文字横向越界"}`] : []);
-  if (overflow.length) throw new Error(`版面溢出，未发布成品：\n${overflow.join("\n")}`);
+  if (overflow.length && !allowOverflow) throw new Error(`版面溢出，未发布成品：\n${overflow.join("\n")}`);
+  if (overflow.length) console.error(`版面溢出（--allow-overflow，照常截图）：\n${overflow.join("\n")}`);
   for (const [i, r] of rects.entries()) {
     const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, clip: { x: r.x, y: r.y, width: r.w, height: r.h, scale: 1 } }, s);
     writeFileSync(join(outDir, `card-${i + 1}.png`), Buffer.from(shot.data, "base64"));

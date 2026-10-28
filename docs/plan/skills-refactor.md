@@ -23,7 +23,7 @@
 
 ### M1 回归基线
 
-- `scripts/regress.mjs <data> <out>`：对每个目录格式的期，用当前引擎渲染 `30-issue.json` 到 `<out>/NNN/`，再逐张比对。比对用 ffmpeg 解码后的像素 md5（`ffmpeg -i card.png -f md5 -`），不加新依赖
+- `scripts/regress.mjs baseline <data> <base>` 出基线，`compare <data> <base> <out>` 再渲染一遍和基线比对：对每个目录格式的期，用当前引擎渲染 `30-issue.json` 到 `<out>/NNN/`，再逐张比对。比对用 ffmpeg 解码后的像素 md5（`ffmpeg -i card.png -f md5 -`），不加新依赖。旧期有版面溢出的，用 `render.mjs --preview --allow-overflow` 照常截图
 - 先在同一引擎上连渲两遍，确认渲染本身可复现；有浮动（字体、动画、时间戳）先修掉
 - 第二层回归：旧 `assemble` 和新 `assemble` 产出的 `30-issue.json` 做结构比对
 - 基线和对比图只放本地 `output/`，含新闻原图，不进任何仓库
