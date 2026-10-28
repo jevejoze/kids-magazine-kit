@@ -44,7 +44,7 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 2. 先跑 `sync.sh start`，按它打印的进度从缺的那一步接着做（家长可能已经让别的 agent 做了几步）；标着 🚧 的步骤别人在做，跳过。每步照常写中间文件、做自检，做完就 `sync.sh done`
 3. 第 31 步审核后记录 `pipeline.mjs fingerprint <issue>` 输出的内容指纹，第 50 步讲读稿也把同一指纹放进 `_meta.content_hash`；内容或图片变化后，旧审稿和下游制作记录自动失效，须重做。第 31 步审稿结论是"需修改"时，回到对应步骤改完，重新合并、再审，直到"通过"
 4. 脚本步骤（30、40、70）在当前环境里直接运行；环境缺 Node、Chrome 或 ffmpeg 时，做到能做的最后一步，告诉家长缺什么、剩下哪几步
-5. 第 60 步语音：默认用 Azure（`node scripts/tts_azure.mjs <issue>`，环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`，可选付费兜底 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`）；数据目录有 `voices/voicestudio.json` 时，Azure 跑完再跑 `node scripts/tts_voicestudio.mjs <issue>` 换成克隆声音（VoiceStudio 连不上就沿用 Azure 版）；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`node scripts/tts_mimo.mjs <issue>`，环境变量 `MIMO_API_KEY`），代替 Azure，跑完同样再跑 `tts_voicestudio.mjs` 把旁白换成克隆声音；没有密钥也没有别的语音合成时，跳过 60、70，把讲读稿整理成 `70-final/家长讲读稿.md`
+5. 第 60 步语音：默认用 Azure（`node scripts/tts_azure.mjs <issue>`，环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`，可选付费兜底 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`）；数据目录有 `voices/voicestudio.json` 时，Azure 跑完再跑 `node scripts/tts_voicestudio.mjs <issue>` 换成克隆声音（VoiceStudio 连不上就沿用 Azure 版）；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`node scripts/tts_mimo.mjs <issue>`，环境变量 `MIMO_API_KEY`），代替 Azure，跑完同样再跑 `tts_voicestudio.mjs` 把旁白换成克隆声音；数据目录有 `voices/elevenlabs.json` 时，在 `tts_voicestudio.mjs` 之前先跑 `node scripts/tts_elevenlabs.mjs <issue>` 把编辑部成员换成 ElevenLabs 声音（环境变量 `ELEVENLABS_API_KEY`，连不上就沿用原版）；没有密钥也没有别的语音合成时，跳过 60、70，把讲读稿整理成 `70-final/家长讲读稿.md`
 6. 最后做第 90 步，确认数据仓库已推送、网盘上成品传齐了，然后告诉家长：成品在网盘哪里、哪几步没做成以及原因、审稿里值得家长看一眼的地方
 
 ## 编辑部角色
