@@ -339,6 +339,13 @@
           "rate": "slow"
         },
         {
+          "who": "narrator",
+          "lang": "zh",
+          "text": "波波鼠突然指着团子狗的尾巴尖大叫——",
+          "emotion": "惊讶",
+          "sfx": "drum"
+        },
+        {
           "who": "mouse",
           "lang": "en",
           "text": "Look! A pearl on his tail!"
@@ -346,9 +353,8 @@
         {
           "who": "narrator",
           "lang": "zh",
-          "text": "大家一看——团子的尾巴尖上，粘着一颗珍珠！",
-          "emotion": "惊讶",
-          "sfx": "drum"
+          "text": "大家凑过去一瞧——尾巴尖上真粘着一颗黑糖珍珠！",
+          "emotion": "惊讶"
         },
         {
           "who": "dog",

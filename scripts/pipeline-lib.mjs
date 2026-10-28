@@ -369,7 +369,7 @@ export function createPipeline(issueArg) {
           const ws = (l.text.match(/[A-Za-z]{4,}/g) ?? []).map(w => w.toLowerCase());
           const named = n => (n.text.match(/[A-Za-z]{3,}/g) ?? []).some(t => ws.some(w => w.startsWith(t.toLowerCase()) || t.toLowerCase().startsWith(w)));
           need(p.lines.slice(i + 1, i + 4).some(n => n.lang === "zh" && n.who !== "mouse" && named(n)), "50",
-            `第 ${p.card} 页第 ${i + 1} 句英文没走完来回：团子狗听不懂或学舌，接着有人说出原词再给中文意思（如"volcano，火山"）：${l.text}`);
+            `第 ${p.card} 页第 ${i + 1} 句英文没走完来回：波波鼠说出英文短句后，后 3 句内要有同伴自然接住，带上核心英文词结合语境回应（如"对，volcano 火山要喷发啦！"）：${l.text}`);
         });
         // 先交代再提起：角色问的事，后面旁白才交代
         p.lines.forEach((l, i) => {

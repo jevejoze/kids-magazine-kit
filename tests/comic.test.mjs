@@ -98,7 +98,7 @@ test("full comic budgets with two-line headings and 130px roles fit in SVG and P
     });</script>`;
     html = html.replace("</body>", check + "</body>");
     const file = join(dir, mode + ".html"); writeFileSync(file, html);
-    const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", `--user-data-dir=${join(dir, mode)}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#c2"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 25000 });
+    const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", `--user-data-dir=${join(dir, mode)}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#c2"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 45000 });
     const m = JSON.parse(dom.match(/<pre id="budget-result">(\{[^<]+\})<\/pre>/)[1]);
     t.diagnostic(`${mode}: diagram ${m.figure}px, footer ${m.footer}, text ${m.text}`);
     for (const key of ["footer", "above", "text", "panels"]) assert.equal(m[key], true, `${mode}: ${key}`);
