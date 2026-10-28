@@ -77,7 +77,7 @@
 - **图片**：各 skill 在自己那一步用共享下载模块下到 `20-assets/<skill-id>/`；第 20 步取消；manifest 的授权策略（`free-only` / `private-ok`）和杂志 image_policy 对照检查；折纸图式拆分成为动手做的私有逻辑
 - **讲读**：整期稿仍由一个 agent 写；按 `pages.json` 和各栏目 narrate.md 拼骨架；句数上限按总长等比缩放；整期检查留在讲读能力里
 - **审稿**：读已声明规则的并集，加跨栏目撞题检查
-- **命名**：期内文件用 skill id 命名，去掉数字前缀；brief、review、narration、audio、video、archive 是保留名；同步脚本的 claim/done 认 skill id
+- **命名**：期内文件用 skill id 命名，去掉数字前缀；brief、review、narration、audio、video、archive 是保留名
 - **反馈**：favorite、dislike 存 skill id，原话放 quote；旧记录随迁移一次性映射
 - **版本锁定**：数据仓库的 `engine.ref` 写 tag 或分支；会话启动脚本 fetch 后检出该版本（分支再 fast-forward）；文件不存在时保持现有行为。kit main 当前状态打 `v1`
 - **迁移**：一次性、可重复运行的迁移脚本：期内文件改名、反馈页名映射、四份 markdown 档案拆成各栏目的 config 和 log、profile 开头和 voices 配置并入 magazine.yaml、思维课表移入 curriculum；单文件旧期和 legacy 归档保持原样
