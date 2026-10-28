@@ -68,7 +68,7 @@
 - 讲读：从 `pages.json` 和各栏目的 `narrate.md` 拼出整期骨架；句数上限按 10–12 分钟等比缩放；按页检查调各栏目的 `check.mjs`，整期检查留在讲读能力里
 - 审稿：读已声明规则的并集，加上跨栏目撞题检查
 - 归档：写各栏目的 `log.jsonl` 和状态变更
-- 删掉第 20 步；`stages.json` 改成由注册表和保留名生成；`sync.sh` 认 skill id
+- 删掉第 20 步；`stages.json` 改成由注册表和保留名生成
 - 根 `SKILL.md` 改成路由，`CLAUDE.md`、`AGENTS.md`、`pipeline/README.md` 跟着改
 
 ### M7 数据迁移脚本
