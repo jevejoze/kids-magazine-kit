@@ -10,7 +10,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { spawn } from "node:child_process";
 import { inputFingerprint, recordBuild, publishDirectory } from "./build-state.mjs";
 import { createPipeline } from "./pipeline-lib.mjs";
-import { CARD_IDS, pageOrder, validateIssue } from "./contracts.mjs";
+import { validateIssue } from "./contracts.mjs";
+import { loadSections, sectionOrder, sectionDomId, issueHtml } from "./sections.mjs";
 import { loadCharacterPack } from "./character-pack.mjs";
 
 const args = process.argv.slice(2);
@@ -61,13 +62,12 @@ const timers = new Set();
 const timed = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); fn(); }, ms); timers.add(t); return t; };
 try {
 
-const html = readFileSync(join(assets, "template.html"), "utf8")
-  .replace("{{TITLE}}", `${data.masthead.zh} 第${N}期`)
-  .replace("{{STYLE}}", () => readFileSync(join(assets, "style.css"), "utf8"))
-  .replace("{{CHARACTER_PACK}}", () => JSON.stringify(characterPack))
-  .replace("{{CHARACTERS}}", () => readFileSync(join(assets, "characters.js"), "utf8"))
-  .replace("{{CARD_IDS}}", () => JSON.stringify(pageOrder(data).map(key => CARD_IDS[key])))
-  .replace("{{DATA}}", () => JSON.stringify(data));
+// 栏目注册表：引擎和数据仓库的 sections/；注册了的栏目走自己的 page.js，其余走模板里的旧代码
+const registry = loadSections({ engine: resolve(here, ".."), data: resolve(jsonDir, "..", "..") });
+if (registry.errors.length) throw new Error(`栏目注册表有错：\n${registry.errors.join("\n")}`);
+const sections = registry.sections;
+const order = sectionOrder(data, sections), expected = order.map(key => sectionDomId(key, sections));
+const html = issueHtml({ data, sections, characterPack, title: `${data.masthead.zh} 第${N}期` });
 const htmlPath = join(outDir, "issue.html");
 writeFileSync(htmlPath, html);
 
@@ -136,13 +136,12 @@ const once = method => new Promise((ok, fail) => {
       const overlap = foot && prev ? Math.round(prev.getBoundingClientRect().bottom - foot.getBoundingClientRect().top) : 0;
       const textSelector = c.id === "c2" ? ".bubble-text,.takeaway,.fact,.h1" : c.id === "c5" ? ".taunt-text,.puz h3,.puz .body,.clues li>span,.question,.answer-content" : null;
       const spill = Boolean(textSelector) && [...c.querySelectorAll(textSelector)].some(el => el.scrollWidth > el.clientWidth + 1);
-      return { id: c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, clip, overlap, spill };
+      return { id: c.closest('.section')?.id ?? c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, clip, overlap, spill };
     }))`,
     returnByValue: true,
   }, s);
   const rects = JSON.parse(result.value);
-  const expected = pageOrder(data).map(key => CARD_IDS[key]);
-  if (JSON.stringify(rects.map(r => r.id)) !== JSON.stringify(expected)) throw new Error("渲染页面数量或顺序与数据契约不一致");
+  if (JSON.stringify(rects.map(r => r.id).filter((id, i, all) => id !== all[i - 1])) !== JSON.stringify(expected)) throw new Error("渲染页面数量或顺序与数据契约不一致");
   const overflow = rects.flatMap((r, i) => r.clip > 0 || r.overlap > 4 || r.spill
     ? [`card-${i + 1}（#${r.id}）：${r.clip > 0 ? `页脚超出底边 ${r.clip}px` : r.overlap > 4 ? `正文与页脚重叠 ${r.overlap}px` : "文字横向越界"}`] : []);
   if (overflow.length && !allowOverflow) throw new Error(`版面溢出，未发布成品：\n${overflow.join("\n")}`);
@@ -168,8 +167,11 @@ const once = method => new Promise((ok, fail) => {
   await send("IO.close", { handle: stream }, s);
   rmSync(pdfHtml);
   writeFileSync(join(outDir, `${data.masthead.zh}-第${N}期.pdf`), Buffer.concat(chunks));
+  // pages.json：第几张图是哪个栏目，讲读稿按它对页
+  const keyOf = Object.fromEntries(order.map((key, i) => [expected[i], key]));
+  writeFileSync(join(outDir, "pages.json"), JSON.stringify(rects.map((r, i) => ({ card: i + 1, section: keyOf[r.id], id: r.id })), null, 2) + "\n");
   if (!preview) recordBuild(jsonDir, "40-render", inputs, readdirSync(outDir).map(f => join(outDir, f)), outDir);
-  publishDirectory(outDir, targetDir, name => name === "issue.html" || name === "build.json" || /^card-\d+\.png$/.test(name) || /-第\d+期\.pdf$/.test(name));
+  publishDirectory(outDir, targetDir, name => name === "issue.html" || name === "build.json" || name === "pages.json" || /^card-\d+\.png$/.test(name) || /-第\d+期\.pdf$/.test(name));
 } finally {
   for (const t of timers) clearTimeout(t);
   if (ws && ws.readyState < 2) ws.close();

@@ -7,6 +7,7 @@ import { pathToFileURL } from "node:url";
 import vm from "node:vm";
 import { loadCharacterPack } from "../scripts/character-pack.mjs";
 import { CARD_IDS, pageOrder } from "../scripts/contracts.mjs";
+import { issueHtml } from "../scripts/sections.mjs";
 
 const source = readFileSync(new URL("../assets/characters.js", import.meta.url), "utf8");
 const names = ["dog", "mouse", "owl", "raccoon"];
@@ -86,14 +87,10 @@ test("comic speaker names inherit their configured expression and accessories", 
   issue.comic.panels[0].bubbles[0].who = "dog";
   const root = { outerHTML: "" }, ids = pageOrder(issue).map(key => CARD_IDS[key]);
   const context = vm.createContext({
-    document: { body: { insertAdjacentHTML() {} }, getElementById: () => root, querySelector: () => null, querySelectorAll: () => ids.map(id => ({ id })) },
+    document: { body: { insertAdjacentHTML() {} }, getElementById: () => root, querySelector: () => null, querySelectorAll: () => ids.map(id => ({ id, closest: () => null })) },
     Image: class { decode() { return Promise.resolve(); } }, location: { hash: "" }, window: {},
   });
-  const template = readFileSync(new URL("../assets/template.html", import.meta.url), "utf8")
-    .replace("{{CHARACTER_PACK}}", () => JSON.stringify(loadCharacterPack("storybook-v1")))
-    .replace("{{CHARACTERS}}", () => source)
-    .replace("{{CARD_IDS}}", () => JSON.stringify(ids))
-    .replace("{{DATA}}", () => JSON.stringify(issue));
+  const template = issueHtml({ data: issue, characterPack: loadCharacterPack("storybook-v1"), characters: source });
   vm.runInContext(template.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   const comic = root.outerHTML.match(/<section class="card" id="c2">[\s\S]*?<\/section>/)[0];
   assert.match(comic, /data-character="dog" data-expression="surprise"/);

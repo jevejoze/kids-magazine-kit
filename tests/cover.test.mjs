@@ -3,10 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
-const template = readFileSync(new URL("../assets/template.html", import.meta.url), "utf8");
-const context = vm.createContext({});
-vm.runInContext(template.match(/const chineseSegmenter[\s\S]*?(?=const CV =)/)[0], context);
-const format = text => vm.runInContext(`wrapChineseWords(${JSON.stringify(text)})`, context);
+const context = vm.createContext({ draw: () => "" });
+vm.runInContext(`${readFileSync(new URL("../assets/kit.js", import.meta.url), "utf8")}\nthis.kit = makeKit({ issue: 1 });`, context);
+const format = text => context.kit.wrapChineseWords(text);
 
 test("cover questions keep numbers and their units on the same line", () => {
   for (const phrase of ["十二点", "12 点", "2 吨", "23.5度"]) {

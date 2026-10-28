@@ -6,14 +6,15 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
 import { loadCharacterPack } from "../scripts/character-pack.mjs";
+import { issueHtml } from "../scripts/sections.mjs";
 import vm from "node:vm";
 import { pageOrder, CARD_IDS, validateStructure, validateIssue, validateComicContent } from "../scripts/contracts.mjs";
 const read = file => readFileSync(new URL(file, import.meta.url), "utf8");
 const issue = () => JSON.parse(read("../examples/demo/issues/003/30-issue.json"));
 function render(data) {
   const root = { outerHTML: "" }, ids = pageOrder(data).map(key => CARD_IDS[key]);
-  const context = vm.createContext({ document: { body: { insertAdjacentHTML() {} }, getElementById: () => root, querySelector: () => null, querySelectorAll: () => ids.map(id => ({ id })) }, Image: class {}, location: { hash: "" }, window: {} });
-  const html = read("../assets/template.html").replace("{{CHARACTER_PACK}}", "null").replace("{{CHARACTERS}}", () => read("../assets/characters.js")).replace("{{CARD_IDS}}", () => JSON.stringify(ids)).replace("{{DATA}}", () => JSON.stringify(data));
+  const context = vm.createContext({ document: { body: { insertAdjacentHTML() {} }, getElementById: () => root, querySelector: () => null, querySelectorAll: () => ids.map(id => ({ id, closest: () => null })) }, Image: class {}, location: { hash: "" }, window: {} });
+  const html = issueHtml({ data });
   vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   return root.outerHTML.match(/<section class="card" id="c2">[\s\S]*?<\/section>/)[0];
 }
@@ -81,11 +82,7 @@ test("full comic budgets with two-line headings and 130px roles fit in SVG and P
   });
   assert.deepEqual(validateIssue(data), []);
   for (const mode of ["svg", "png"]) {
-    const ids = pageOrder(data).map(k => CARD_IDS[k]);
-    let html = read("../assets/template.html").replace("{{STYLE}}", () => read("../assets/style.css"))
-      .replace("{{CHARACTER_PACK}}", () => JSON.stringify(mode === "png" ? loadCharacterPack("storybook-v1") : null))
-      .replace("{{CHARACTERS}}", () => read("../assets/characters.js"))
-      .replace("{{CARD_IDS}}", () => JSON.stringify(ids)).replace("{{DATA}}", () => JSON.stringify(data));
+    let html = issueHtml({ data, characterPack: mode === "png" ? loadCharacterPack("storybook-v1") : null });
     const check = `<script>window.READY.then(()=>{
       const c=document.querySelector('#c2'),r=c.getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
       const result={footer:f.bottom<=r.bottom-parseFloat(getComputedStyle(c).paddingBottom)+1,

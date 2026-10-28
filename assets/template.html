@@ -15,38 +15,38 @@ const CHARACTER_PACK = {{CHARACTER_PACK}};
 {{CHARACTERS}}
 const D = {{DATA}};
 
-const N = String(D.issue).padStart(3, "0");
-const ch = spec => { const [n, m = "normal", s = 180, p = ""] = spec.split(":"); return draw(n, m, +s, p); };
-const bub = b => `<div class="bub ${b.lang === "en" ? "en" : "fun"}">${b.text}</div>`;
-const topBar = (tag, right) => `<div class="dots"></div><div class="top"><span class="tag fun">${tag}</span><span class="en">${right ?? N}</span></div>`;
-let pg = 0;
-const foot = left => `<div class="foot"><span class="fun">${left}</span><span class="page en">${++pg} / {{TOTAL}}</span></div>`;
-// 页脚的"往后翻"提示：指向下一页；后面没有页了就是空串
-const NEXT = name => { const t = TOC.map(x => x[1]), nx = t[t.indexOf(name) + 1]; return nx ? ` · 往后翻：${nx} →` : ""; };
-const coverFoot = left => `<div class="foot"><span class="fun">${left}</span></div>`;
-// 目录 = 本期实际有的页，顺序和页序一致：今日一问 → (怪物档案) → (单词屋) → 小剧场 → 挑战 → 环球小报 → 真的假的 → 连载 → 信箱
-const SERIAL = { book: ["📚", "经典连载", "Story Classics"], music: ["🎵", "音乐盒", "Music Box"], film: ["🎬", "放映室", "Movie Time"], make: ["✂️", "动手做", "Make It"] }[D.serial?.kind];
-const TOC = [["🤔", "今日一问"], D.creature && ["🐙", "怪物档案"], D.words && ["🔤", "单词屋"], ["📖", "小剧场"], ["🧩", "挑战"], D.news && ["🌏", "环球小报"], D.check && ["🕵️", "真的假的"], SERIAL?.slice(0, 2), D.think && ["🗣️", "周末思辨"], D.mailbox && ["💌", "信箱"]].filter(Boolean);
-const GANG = ["owl:happy:230", "dog:happy:290", "mouse:wave:260", "raccoon:smirk:220"];
+{{KIT}}
+const kit = makeKit(D);
+const { N, ch, bub, topBar, foot, coverFoot, next: NEXT, serial: SERIAL, toc: TOC, cast: GANG, escapeText, wrapChineseWords } = kit;
+// 注册了的栏目（sections/<id>/page.js）登记在这里；有数据时按页序调用 render(data, kit)，返回一页或几页的内容
+const SECTIONS = {};
+{{SECTIONS}}
+const PAGE_ORDER = {{PAGE_ORDER}};
 
 const cards = [];
+// 按页序走到 key 这一页：先渲染排在它前面、还没渲染的注册栏目；key 自己注册了就走它的 page.js，返回 false，旧代码跳过这一页
+const rendered = new Set();
+const put = key => {
+  rendered.add(key);
+  const pages = [].concat(SECTIONS[key].render(D[key], kit));
+  cards.push(`<div class="section" id="${key}">${pages.map(html => `<section class="card" data-section="${key}">${html}</section>`).join("")}</div>`);
+};
+// 本期没有的页（没数据）不用先补前面的栏目，等下一个有的页再补
+const upTo = key => {
+  const stop = key === null ? PAGE_ORDER.length : PAGE_ORDER.indexOf(key);
+  for (const k of PAGE_ORDER.slice(0, Math.max(stop, 0))) if (SECTIONS[k] && !rendered.has(k)) put(k);
+};
+const legacy = key => {
+  upTo(key);
+  if (!SECTIONS[key]) return true;
+  if (PAGE_ORDER.includes(key) && !rendered.has(key)) put(key);
+  return false;
+};
 
 // 1 封面：有 cover.photo 用照片封面，否则用角色封面
 // 照片封面：顶部刊名条 + 下方照片。刊名条的颜色取自照片顶部（见文末 coverStrip），照片顶端渐隐进刊名条
-// Keep Chinese words and number/unit phrases together while respecting editorial <br> breaks.
-const chineseSegmenter = new Intl.Segmenter("zh", { granularity: "word" });
-const escapeText = text => String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-const numberUnitPhrase = /((?:\d+(?:\.\d+)?|[零〇一二两三四五六七八九十百千万亿]+)\s*(?:公斤|千克|千米|公里|厘米|毫米|小时|分钟|点半|点|吨|米|度|岁|天|秒|年|月|日|个))/g;
-const wrapChineseWords = (text, allowBreaks = true) => (allowBreaks ? String(text).split(/<br\s*\/?>/i) : [String(text)]).map(line => {
-  const words = [];
-  line.split(numberUnitPhrase).flatMap((part, i) => i % 2 ? [part] : [...chineseSegmenter.segment(part)].map(x => x.segment)).forEach(word => {
-    if (/^[，。！？、：；,.!?…）】》]+$/.test(word) && words.length) words[words.length - 1] += word;
-    else words.push(word);
-  });
-  return words.map(word => /^\s+$/.test(word) ? word : `<span class="word-group">${escapeText(word)}</span>`).join("");
-}).join("<br>");
 const CV = D.cover;
-if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.strip ? ` style="--strip:${CV.strip}"` : ""}>
+if (legacy("cover") && CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.strip ? ` style="--strip:${CV.strip}"` : ""}>
   <div class="photo" style="background-image:url('${CV.photo}');background-position:${CV.photo_pos || "center"}"></div><div class="shade"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
   <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
@@ -56,7 +56,7 @@ if (CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.st
     ${CV.crew?.length ? `<div class="crew">${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}<div class="chs">${CV.crew.map(ch).join("")}</div></div>` : ""}
     <div class="credit en">${CV.credit}</div>
   </div></section>`);
-else cards.push(`<section class="card" id="c1"><div class="dots"></div>
+else if (legacy("cover")) cards.push(`<section class="card" id="c1"><div class="dots"></div>
   <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
   <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
   ${D.badge ? `<div class="badge fun">${D.badge.zh}<small class="en">${D.badge.en}</small></div>` : ""}
@@ -84,7 +84,7 @@ const comicPanels = (panels, start) => panels.map((p, j) => {
   return `<div class="box panel p${i}"><div class="panel-head"><span class="n en">${i + 1}</span>${p.title ? `<span>${p.title}</span>` : ""}</div>
     <div class="bubs ${p.bubbles.length > 1 ? "pair" : "solo"}">${p.bubbles.map((b, bi) => chatRow(b, bi, p, i)).join("")}</div></div>`;
 }).join("");
-cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} 今日一问 · Big Question`, C.tool ? `<span class="toolpill fun">🧰 ${C.tool}</span>` : undefined)}
+if (legacy("comic")) cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} 今日一问 · Big Question`, C.tool ? `<span class="toolpill fun">🧰 ${C.tool}</span>` : undefined)}
   <div class="h1 fun">${wrapChineseWords(C.title_zh || D.question.zh)}<span class="en">${C.title_en || D.question.en}</span></div>
   <div class="grid upper">${comicPanels(C.panels.slice(0, 2), 0)}</div>
   ${C.diagram ? `<div class="box diagram"><div class="dl fun">${C.diagram_title || "🦉 咕咕博士画给你看"}</div>${C.diagram}
@@ -96,7 +96,7 @@ cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} �
 // 传说怪物档案（每周一张，有 creature 时）：一张可收集的卡片——传说、科学家怎么说、真实原型
 const CR = D.creature;
 const meter = (n, icon) => `<span class="meter">${icon.repeat(n)}<i>${icon.repeat(5 - n)}</i></span>`;
-if (CR) cards.push(`<section class="card" id="cdeep">${topBar(CR.series || "🐙 传说怪物档案 · Legend Files", `No.${String(CR.no).padStart(3, "0")}`)}
+if (legacy("creature") && CR) cards.push(`<section class="card" id="cdeep">${topBar(CR.series || "🐙 传说怪物档案 · Legend Files", `No.${String(CR.no).padStart(3, "0")}`)}
   <div class="card-photo"><div class="box half legend"><div class="pic" style="background-image:url('${CR.legend}');background-position:${CR.legend_pos || "center"}"></div>
       <div class="lab fun">📜 传说里的样子</div><div class="credit3 en">${CR.legend_credit}</div></div>
     <div class="box half real"><div class="pic" style="background-image:url('${CR.photo}');background-position:${CR.photo_pos || "center"}"></div>
@@ -111,7 +111,7 @@ if (CR) cards.push(`<section class="card" id="cdeep">${topBar(CR.series || "🐙
     <div class="br slow">${ch("owl:think:120:magnifier")}<div class="bub fun"><small>慢脑袋：</small>${CR.slow}</div></div></div>` : ""}
   ${foot(CR.foot || `收集怪物卡，凑齐一本档案！${NEXT("怪物档案")}`)}</section>`);
 const W = D.words;
-if (W) cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
+if (legacy("words") && W) cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
   <div class="intro">${ch("mouse:wave:190")}<div class="bub en">${W.intro}</div></div>
   ${W.items.map((w, i) => `<div class="box w c${i}"><div class="ico">${w.icon}</div><div class="wd">
     <div class="word en">${w.word}${w.new ? `<em class="fun">新词</em>` : ""}</div>
@@ -166,7 +166,7 @@ const renderStory = ST => {
     <div class="story ${ST.lang === "en" ? "en" : ""}">${ST.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
     <div class="tbc fun"><span>${ST.tbc}</span>${ST.clue ? `<span class="clue">🔍 ${ST.clue}</span>` : ""}</div>`;
 };
-cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · Story Time", "EP." + ST.ep)}
+if (legacy("story")) cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · Story Time", "EP." + ST.ep)}
   <div class="h1 fun">第${ST.ep}集　${ST.title_zh}<span class="en">${ST.title_en}</span></div>
   ${renderStory(ST)}
   ${foot(ST.foot || `编辑部推理连载${NEXT("小剧场")}`)}</section>`);
@@ -174,7 +174,7 @@ cards.push(`<section class="card" id="c4">${topBar("📖 编辑部小剧场 · S
 // 挑战卡：默认一道中文谜题；仅在明确启用时兼容旧英文三关。
 const P = D.challenge;
 const answerText = value => escapeText(Array.isArray(value) ? value.join("；") : value ?? "");
-if (P) cards.push(`<section class="card${P.english?.length ? " with-english" : ""}" id="c5">${topBar("🧩 捣蛋浣熊的挑战")}
+if (legacy("challenge") && P) cards.push(`<section class="card${P.english?.length ? " with-english" : ""}" id="c5">${topBar("🧩 捣蛋浣熊的挑战")}
   <div class="taunt">${ch("raccoon:smirk:136:" + (P.prop || ""))}<div class="bub"><span class="taunt-text">${wrapChineseWords(P.taunt_zh)}</span>${P.english?.length && P.taunt_en ? `<span class="en">${escapeText(P.taunt_en)}</span>` : ""}</div></div>
   <div class="puz"><div class="puzzle-label">浣熊出题</div><h3 class="fun">${wrapChineseWords(P.puzzle.title)}</h3><div class="body">${wrapChineseWords(P.puzzle.body)}</div>
     ${P.puzzle.clues?.length ? `<div class="clue-label">${P.puzzle.clues.length} 条线索 · 每条都要满足</div><ol class="clues">${P.puzzle.clues.map(clue => `<li><span>${wrapChineseWords(clue)}</span></li>`).join("")}</ol>` : ""}
@@ -189,7 +189,7 @@ if (P) cards.push(`<section class="card${P.english?.length ? " with-english" : "
 const NW = D.news;
 const story = (n, cls) => `<div class="box nw ${cls}"><div class="pic" style="background-image:url('${n.photo}');background-position:${n.photo_pos || "center"}"></div>
   <div class="txt"><div class="loc fun">${n.flag} ${n.place}</div><h3 class="fun">${n.title}</h3><p>${n.text}${n.word ? `<span class="kw en">🔑 ${n.word.en} <small class="fun">${n.word.zh}</small></span>` : ""}</p></div></div>`;
-if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报 · World News", NW.week)}
+if (legacy("news") && NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报 · World News", NW.week)}
   ${story(NW.items[0], "lead")}
   <div class="pair">${NW.items.slice(1, 3).map(n => story(n, "")).join("")}</div>
   <div class="box ask2 fun">💬 ${NW.ask_zh}<br><span class="en">${NW.ask_en}</span></div>
@@ -200,7 +200,7 @@ if (NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报
 const CK = D.check;
 const CK_CHOICES = CK?.choices ?? ["✅ 真的", "❌ 假的", "🤔 说不清"];
 const CK_TOOLS = CK?.tools ?? [["👤 谁说的？", "他怎么知道的"], ["🧪 有证据吗？", "实验、照片、数字"], ["📚 别处怎么说？", "再找一个来源"]];
-if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
+if (legacy("check") && CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
   <div class="box post${CK.photo ? " has-pic" : ""}"><div class="txt"><div class="ph fun">📱 ${CK.where}</div><div class="claim fun">${CK.claim}</div><div class="likes en">👍 ${CK.likes || "10万+"}　💬 ${CK.comments || "2,333"}</div></div>
     ${CK.photo ? `<div class="pic" style="background-image:url('${CK.photo}');background-position:${CK.photo_pos || "center"}"></div>` : ""}</div>
   <div class="vote fun">你的快脑袋说：${CK_CHOICES.map(c => `<span>${c}</span>`).join("")}</div>
@@ -213,7 +213,7 @@ if (CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的�
 
 // 经典连载（可选）：书一期一回；周五换成音乐盒 / 放映室 / 动手做
 const SR = D.serial;
-if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SERIAL[0]} ${SERIAL[1]} · ${SERIAL[2]}`, SR.kind === "book" ? `第 ${SR.ep} 回` : undefined)}
+if (legacy("serial") && SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SERIAL[0]} ${SERIAL[1]} · ${SERIAL[2]}`, SR.kind === "book" ? `第 ${SR.ep} 回` : undefined)}
   <div class="h1 fun">${SR.kind === "book" ? `《${SR.book_zh}》` : ""}${SR.title_zh}<span class="en">${SR.kind === "book" ? `${SR.book_en} · ${SR.title_en}` : SR.title_en}</span></div>
   <div class="meta fun">${SR.kind === "book" ? `${SR.chapter}　·　${SR.author}` : SR.by}</div>
   ${(SR.diagram || SR.steps) && SR.photo ? `<div class="box done"><div class="img" style="background-image:url('${SR.photo}');background-position:${SR.photo_pos || "center"}"></div><div class="lb fun">做好是这样</div><div class="credit3 en">${SR.photo_credit}</div></div>` : ""}
@@ -234,7 +234,7 @@ if (SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SE
 
 // 周末思辨（周五）：一个两边都有道理的话题，孩子先写下想法，周六和家人聊
 const TK = D.think;
-if (TK) cards.push(`<section class="card" id="cthink">${topBar("🗣️ 周末思辨 · Big Talk", "周六聊一聊")}
+if (legacy("think") && TK) cards.push(`<section class="card" id="cthink">${topBar("🗣️ 周末思辨 · Big Talk", "周六聊一聊")}
   <div class="h1 fun">${TK.title}${TK.title_en ? `<span class="en">${TK.title_en}</span>` : ""}</div>
   <div class="box story fun${TK.photo ? " has-pic" : ""}">${TK.photo ? `<div class="pic" style="background-image:url('${TK.photo}');background-position:${TK.photo_pos || "center"}"></div>` : ""}<p>${TK.story}</p></div>
   <div class="sides">${TK.sides.map((x, i) => `<div class="side s${i}"><div class="bub fun">${x.say}</div><div class="char-stage">${ch(x.who)}</div></div>`).join(`<div class="vs-emblem en">VS</div>`)}</div>
@@ -249,7 +249,7 @@ if (TK) cards.push(`<section class="card" id="cthink">${topBar("🗣️ 周末�
 const M = D.mailbox;
 const picks = (items, many) => `<div class="pick${many ? " many" : ""}">${items.map(x => `<span>${x}</span>`).join("")}</div>`;
 const PAGES = TOC.filter(([, t]) => t !== "信箱").map(([e, t]) => e + t);
-if (M) cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
+if (legacy("mailbox") && M) cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
   <div class="box letter fun">${M.hello || M.letter}</div>
   <div class="box checkin fun"><h3>📝 今天这期，告诉编辑部</h3>
     <div class="row"><b>👍 最喜欢哪一页？</b>${picks(PAGES, PAGES.length > 5)}</div>
@@ -260,12 +260,15 @@ if (M) cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 
     ${M.ask_zh ? `<div class="row"><b>❓ ${M.ask_zh}</b>${lines(1)}</div>` : ""}</div>
   ${foot((M.send_note || "说给家长听") + " · 明天见！See you tomorrow!")}</section>`);
 
-document.getElementById("root").outerHTML = cards.join("\n").replaceAll("{{TOTAL}}", pg);
+upTo(null);
+document.getElementById("root").outerHTML = cards.join("\n").replaceAll("{{TOTAL}}", kit.pages());
 // The renderer and narration validator share the same page contract.
 const CARD_IDS = {{CARD_IDS}};
-const actualIds = [...document.querySelectorAll(".card")].map(c => c.id);
-if (JSON.stringify(actualIds) !== JSON.stringify(CARD_IDS)) throw new Error("页面顺序与数据契约不一致");
-if (location.hash) { document.body.classList.add("single"); document.querySelector(location.hash).classList.add("on"); }
+// 一个注册栏目可以出几页，几页连在一起算一个 id
+const cardId = c => c.closest(".section")?.id ?? c.id;
+const actualIds = [...document.querySelectorAll(".card")].map(cardId).filter((id, i, all) => id !== all[i - 1]);
+if (JSON.stringify(actualIds) !== JSON.stringify(CARD_IDS)) throw new Error(`页面顺序与数据契约不一致：${actualIds.join(",")}，应为 ${CARD_IDS.join(",")}`);
+if (location.hash) { document.body.classList.add("single"); const el = document.querySelector(location.hash); (el.matches(".card") ? el : el.querySelector(".card")).classList.add("on"); }
 
 // 刊名条取色：照片可见区域最上面 5% 的平均色；太灰就提一点亮度。JSON 写了 cover.strip 就用它。
 // 刊名用深字还是白字，按刊名条的亮度定。render.mjs 截图前会等 window.READY

@@ -27,6 +27,15 @@ function sources(issue) {
   return [...new Set(files)].sort().map(p => [p, join(issue, p)]);
 }
 
+// 两处 sections/ 里的栏目包：增删改任何一个文件，渲染都要重做
+function sectionFiles(issue) {
+  return [["engine", engine], ["data", join(issue, "../..")]].flatMap(([origin, root]) => {
+    const dir = join(root, "sections");
+    if (!existsSync(dir)) return [];
+    return readdirSync(dir, { recursive: true }).filter(f => statSync(join(dir, f)).isFile()).sort().map(f => [`${origin}/sections/${f}`, join(dir, f)]);
+  });
+}
+
 function snapshot(files) {
   return Object.fromEntries(files.map(([key, path]) => [key, digestFile(path)]));
 }
@@ -42,7 +51,7 @@ export function inputFingerprint(issue, stage) {
   let files;
   if (stage === "30-assemble") files = [...sources(issue), ...engineFiles("scripts/pipeline-lib.mjs", "scripts/contracts.mjs", "pipeline/stages.json")];
   else if (stage === "40-render") files = [...sources(issue), ...local("30-issue.json", "31-review.md"),
-    ...engineFiles("scripts/render.mjs", "scripts/contracts.mjs", "scripts/character-pack.mjs", "assets/template.html", "assets/style.css", "assets/characters.js"),
+    ...engineFiles("scripts/render.mjs", "scripts/contracts.mjs", "scripts/character-pack.mjs", "scripts/sections.mjs", "assets/template.html", "assets/style.css", "assets/characters.js", "assets/kit.js"), ...sectionFiles(issue),
     ...characterPackFiles(read(join(issue, "30-issue.json")).character_pack).map(p => ["engine/" + relative(engine, p), p])];
   else if (stage === "60-audio") files = [...local("50-narration.json"),
     ["voices/azure.json", join(issue, "../../voices/azure.json")], ["voices/polyphones.json", join(issue, "../../voices/polyphones.json")],

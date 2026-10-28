@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
 import { loadCharacterPack } from "../scripts/character-pack.mjs";
+import { issueHtml } from "../scripts/sections.mjs";
 import vm from "node:vm";
 import { validateIssue, validateStructure, pageOrder, CARD_IDS } from "../scripts/contracts.mjs";
 
@@ -14,13 +15,9 @@ function render(data) {
   const root = { outerHTML: "" }, ids = pageOrder(data).map(key => CARD_IDS[key]);
   const context = vm.createContext({ document: {
     body: { insertAdjacentHTML() {} }, getElementById: () => root, querySelector: () => null,
-    querySelectorAll: () => ids.map(id => ({ id })),
+    querySelectorAll: () => ids.map(id => ({ id, closest: () => null })),
   }, Image: class {}, location: { hash: "" }, window: {} });
-  const template = readFileSync(new URL("../assets/template.html", import.meta.url), "utf8")
-    .replace("{{CHARACTER_PACK}}", "null")
-    .replace("{{CHARACTERS}}", () => readFileSync(new URL("../assets/characters.js", import.meta.url), "utf8"))
-    .replace("{{CARD_IDS}}", () => JSON.stringify(ids))
-    .replace("{{DATA}}", () => JSON.stringify(data));
+  const template = issueHtml({ data });
   vm.runInContext(template.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   return id => root.outerHTML.match(new RegExp(`<section class="[^"]*" id="${id}">[\\s\\S]*?<\\/section>`))[0];
 }
@@ -109,10 +106,7 @@ test("short and full-budget Chinese challenges fit both character modes with sma
   for (const [name, challenge] of [["short", { taunt_zh: short.taunt_zh, prop: short.prop, puzzle: short.puzzle }], ["full", full]]) {
     data.challenge = challenge;
     for (const mode of ["svg", "png"]) {
-      let html = read("../assets/template.html").replace("{{STYLE}}", () => read("../assets/style.css"))
-        .replace("{{CHARACTER_PACK}}", () => JSON.stringify(mode === "png" ? loadCharacterPack("storybook-v1") : null))
-        .replace("{{CHARACTERS}}", () => read("../assets/characters.js"))
-        .replace("{{CARD_IDS}}", () => JSON.stringify(pageOrder(data).map(k => CARD_IDS[k]))).replace("{{DATA}}", () => JSON.stringify(data));
+      let html = issueHtml({ data, characterPack: mode === "png" ? loadCharacterPack("storybook-v1") : null });
       html = html.replace("</body>", `<script>window.READY.then(()=>{
         const c=document.querySelector('#c5'),r=c.getBoundingClientRect(),p=c.querySelector('.puz').getBoundingClientRect(),a=c.querySelector('.answer-key').getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
         const result={compact:c.classList.contains('challenge-compact'),footer:f.bottom<=r.bottom-56+1,answer:p.bottom+15<=a.top&&a.bottom<=f.top,

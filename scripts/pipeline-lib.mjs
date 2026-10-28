@@ -14,6 +14,7 @@ import {
   validateStructure,
   validateIssue,
   pageOrder as issuePageOrder,
+  PAGE_KEYS,
   serialCardOf,
   cloneProfile,
   CHARS,
@@ -305,7 +306,11 @@ export function createPipeline(issueArg) {
       need(reviewPassed() && n._meta?.content_hash === contentFingerprint(issue), "50", "讲读稿未绑定当前已审稿内容，请重写并记录 _meta.content_hash");
       const pages = n.narration ?? [];
       const hasStages = has("10-cover.json") || has("30-issue.json");
-      const order = pageOrder(), cards = order.length;
+      // 渲染过就按 40-cards/pages.json 对页：它记着每张图是哪个栏目（注册的新栏目也在里面）
+      const pagesFile = join(issue, "40-cards", "pages.json");
+      const rendered = existsSync(pagesFile) ? JSON.parse(readFileSync(pagesFile, "utf8")).map(p => p.section) : null;
+      if (rendered) need(JSON.stringify(rendered.filter(k => PAGE_KEYS.includes(k))) === JSON.stringify(pageOrder()), "40", "40-cards/pages.json 的页序和本期栏目对不上，请重新渲染");
+      const order = rendered ?? pageOrder(), cards = order.length;
       if (hasStages) need(pages.length === cards && pages.every((p, i) => p.card === i + 1), "50", `${cards} 页都要按顺序讲读，不可重复或遗漏`);
       // 每页最多几句，按页的种类定；card 编号和渲染出来的 card-N.png 顺序一致（有英文三关时挑战页多 6 句）
       const MAX = { ...NARRATION_MAX_LINES, challenge: has("15-english.json") ? 18 : NARRATION_MAX_LINES.challenge };
