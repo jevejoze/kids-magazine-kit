@@ -25,7 +25,8 @@ node scripts/tts_voicestudio.mjs <issue>         # 替换；已替换、正文�
 
 - 配置写法：`{"narrator/zh": "parent", "narrator/zh@serial": "parent-reading", "profiles": {"parent": ["本机 id", "另一台机器的 id"]}}`。键是"角色/语言"，加 `@serial` 只用于经典连载（读书）那一页；`profiles` 列出档案在各台 VoiceStudio 上的 id，脚本按顺序试
 - 环境变量 `VOICESTUDIO_URL`，默认 `http://127.0.0.1:3900`；远程机器用 `ssh -L 3900:127.0.0.1:3900` 转到本地
-- VoiceStudio 在 CPU 上很慢（一句一两分钟），可以随时中断重跑；单句失败保留 Azure 版，连不上时退出码 3，Azure 版整期照样能用
+- VoiceStudio 在 CPU 上很慢（一句一两分钟），可以随时中断重跑
+- **连不上或有句子没换成就报错停下**（退出码 1），不写制作记录。有 `voices/voicestudio.json` 时，配了克隆档案的句子必须是 VoiceStudio 合成的，第 60 步才算完成，第 70 步不会拿 Azure、MiMo 的替身出视频；接上 VoiceStudio 后重跑同一命令，已换好的句子跳过
 - 每次重跑 Azure 或 MiMo 之后都要再跑一次这一步：它们会复用克隆句的音频，但把声音说明改回 Azure 的，制作记录也由这一步来写
 - 克隆档案的参照音频是本人的声音，只放在私有数据目录 `voices/clone/`
 

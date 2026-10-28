@@ -14,6 +14,8 @@ import {
   validateStructure,
   validateIssue,
   pageOrder as issuePageOrder,
+  serialCardOf,
+  cloneProfile,
   CHARS,
   PROP_HOLDERS,
   MOODS,
@@ -72,9 +74,15 @@ export function createPipeline(issueArg) {
         if (validateStructure("50-narration.json", narration).length) return false;
         const pages = narration.narration;
         const manifest = read("60-audio/manifest.json");
-        return pages.length > 0 && pages.every(p => p.lines.length > 0 && p.lines.every((_, i) => {
+        // 有 voices/voicestudio.json 时，配了克隆档案的句子必须真是 VoiceStudio 合成的，不认 Azure、MiMo 的替身
+        const vsFile = join(dataDir, "voices", "voicestudio.json");
+        const vs = existsSync(vsFile) ? JSON.parse(readFileSync(vsFile, "utf8")) : null;
+        const serialCard = vs ? serialCardOf(read("30-issue.json")) : 0;
+        return pages.length > 0 && pages.every(p => p.lines.length > 0 && p.lines.every((line, i) => {
           const file = `c${p.card}_${String(i).padStart(2, "0")}.wav`;
-          return manifest.files?.some(f => f.file === file && f.card === p.card && f.index === i) && nonempty(join(issue, "60-audio", file));
+          const entry = manifest.files?.find(f => f.file === file && f.card === p.card && f.index === i);
+          const profile = vs && cloneProfile(vs, line, p.card, serialCard);
+          return entry && nonempty(join(issue, "60-audio", file)) && (!profile || entry.by === `VoiceStudio-${profile}`);
         }));
       }
       if (s.id === "70-video") {

@@ -8,13 +8,14 @@
 //    "profiles": {"parent": ["本机 id", "另一台机器的 id"], "parent-reading": ["本机 id"]}}
 //   键是 角色/语言，加 @serial 表示只用于经典连载（读书）那一页；值是档案名。
 //   profiles 写每个档案在各台 VoiceStudio 上的 id，按顺序试，哪台机器上有就用哪个；参照音频在 voices/clone/<档案名>/
-// 单句失败保留原来合成的版本，不阻塞出刊；VoiceStudio 连不上时退出码 3，原来的整期照样可用
+// VoiceStudio 连不上或有句子没换成，就报错停下（退出码 1），不写制作记录：第 60 步算没完成，第 70 步不会拿 Azure、MiMo 的替身出视频。
+// 已经换好的句子留着，接上 VoiceStudio 后重跑同一命令补齐
 import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createHash } from "node:crypto";
-import { pageOrder } from "./contracts.mjs";
+import { serialCardOf, cloneProfile } from "./contracts.mjs";
 import { inputFingerprint, recordBuild, atomicWrite } from "./build-state.mjs";
 
 const args = process.argv.slice(2);
@@ -36,13 +37,12 @@ const inputs = inputFingerprint(issue, "60-audio");
 const man = JSON.parse(readFileSync(manPath, "utf8"));
 const nar = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
 const data = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
-// 连载页按渲染顺序定位；周五的音乐盒、放映室、动手做不算
-const serialCard = data.serial && (data.serial.kind ?? "book") === "book" ? pageOrder(data).indexOf("serial") + 1 : 0;
+const serialCard = serialCardOf(data);
 
 const plain = s => s.replace(/<[^>]+>/g, "");
 const sha1 = s => createHash("sha1").update(s).digest("hex").slice(0, 12);
 const audioHash = wav => createHash("sha256").update(wav).digest("hex");
-const profileOf = (line, card) => (card === serialCard && conf[`${line.who}/${line.lang}@serial`]) || conf[`${line.who}/${line.lang}`];
+const profileOf = (line, card) => cloneProfile(conf, line, card, serialCard);
 
 const byFile = Object.fromEntries(man.files.map(f => [f.file, f]));
 const todo = [];
@@ -64,7 +64,7 @@ if (dry || !todo.length) { if (!dry) finish(); process.exit(0); }
 try {
   const res = await fetch(`${URL_}/health`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-} catch (e) { console.error(`VoiceStudio 连不上（${URL_}）：${e.message}。原来合成的音频照样可用`); process.exit(3); }
+} catch (e) { console.error(`VoiceStudio 连不上（${URL_}）：${e.message}。第 60 步没完成：${todo.length} 句旁白还不是克隆声音，接上 VoiceStudio 后重跑`); process.exit(1); }
 
 const ids = {};  // 档案名 → 这台机器上能用的 id
 async function generate(profile, lang, text) {
@@ -105,10 +105,11 @@ for (const t of todo) {
     save(false);
     const left = (Date.now() - started) / n * (todo.length - n) / 60000;
     console.log(`${n}/${todo.length} ${t.file} ${t.profile}，预计还要 ${left.toFixed(0)} 分钟`);
-  } catch (e) { failed++; console.warn(`${n}/${todo.length} ${t.file} 失败，保留原版：${e.message}`); }
+  } catch (e) { failed++; console.warn(`${n}/${todo.length} ${t.file} 失败：${e.message}`); }
 }
+if (failed) { console.error(`${failed} 句没换成克隆声音，第 60 步没完成；重跑同一命令补齐`); process.exit(1); }
 finish();
-console.log(`完成：替换 ${todo.length - failed} 句，跳过 ${kept} 句${failed ? `，${failed} 句失败保留原版（重跑可补）` : ""}`);
+console.log(`完成：替换 ${todo.length} 句，跳过 ${kept} 句`);
 
 function save(complete) {
   atomicWrite(manPath, JSON.stringify({ ...man, _meta: { ...man._meta, by: `${(man._meta.by ?? "Azure 语音").replace(/ \+ VoiceStudio$/, "")} + VoiceStudio`, at: new Date().toISOString(), complete } }, null, 2));

@@ -103,6 +103,27 @@ test("audio completion requires every line in manifest and on disk", t => {
   assert.equal(p.done("60-audio"), false);
 });
 
+test("with voicestudio.json, cloned lines must come from VoiceStudio", t => {
+  const issue = fixture(t), p = createPipeline(issue), files = [];
+  mkdirSync(join(issue, "../../voices"), { recursive: true });
+  writeFileSync(join(issue, "../../voices/voicestudio.json"), JSON.stringify({ "narrator/zh": "parent" }));
+  mkdirSync(join(issue, "60-audio"), { recursive: true });
+  for (const page of json(issue, "50-narration.json").narration) page.lines.forEach((line, i) => {
+    const file = `c${page.card}_${String(i).padStart(2, "0")}.wav`;
+    files.push({ card: page.card, index: i, file, by: line.who === "narrator" && line.lang === "zh" ? "MiMo" : "Azure" });
+    writeFileSync(join(issue, "60-audio", file), "audio");
+  });
+  const record = () => {
+    put(issue, "60-audio/manifest.json", { files });
+    stamp(issue, "60-audio", ["60-audio/manifest.json", ...files.map(f => "60-audio/" + f.file)]);
+  };
+  record();
+  assert.equal(p.done("60-audio"), false);
+  for (const f of files) if (f.by === "MiMo") f.by = "VoiceStudio-parent";
+  record();
+  assert.equal(p.done("60-audio"), true);
+});
+
 test("disabled weekly columns are not merged even if stale files remain", t => {
   const issue = fixture(t);
   put(issue, "09-creature.json", { invalid: true });

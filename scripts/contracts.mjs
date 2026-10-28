@@ -12,6 +12,10 @@ export const SPEAKER_NAMES = { narrator: "🎙 旁白", dog: "🐶 团子狗", m
 export const COMIC_LIMITS = Object.freeze({ solo: 26, pair: 20, takeaway: 28, fact: 45, character: 130 });
 export const EMOTIONS = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
 export const pageOrder = issue => PAGE_KEYS.filter(key => issue[key] != null);
+// 经典连载（读书）页在渲染顺序里是第几张；周五的音乐盒、放映室、动手做不算，返回 0
+export const serialCardOf = issue => issue.serial && (issue.serial.kind ?? "book") === "book" ? pageOrder(issue).indexOf("serial") + 1 : 0;
+// voices/voicestudio.json 里这句该用哪个克隆档案：键是 角色/语言，加 @serial 只用于连载页；不用克隆返回 undefined
+export const cloneProfile = (conf, line, card, serialCard) => (card === serialCard && conf[`${line.who}/${line.lang}@serial`]) || conf[`${line.who}/${line.lang}`];
 
 // Paths with [] validate every array item, as well as the array itself.
 const contracts = {
