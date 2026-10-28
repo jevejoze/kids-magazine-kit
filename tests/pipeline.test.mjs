@@ -453,4 +453,6 @@ test("narration style rules catch stiff scripts", t => {
   has(errors(p => { p[3].lines.splice(1, 0, line("dog", "钥匙是开冰箱的吗？"), line("narrator", "桌上放着一把钥匙是开冰箱的。")); }), /第 4 页第 2 句先问了旁白后面才交代的事/);
   has(errors((p, issue) => { const who = json(issue, "18-serial.json").crew.who.split(":")[0]; p[7].lines = p[7].lines.filter(l => l.who !== who); }), /认领角色的吐槽/);
   has(errors(p => { p[8].lines.splice(1, 0, line("dog", "你猜，冰为什么会浮起来？")); }), /信箱不再出猜谜题/);
+  has(errors(p => { p[0].lines.splice(1, 0, line("dog", "等等，等等！")); }), /全期"等等"出现 \d+ 次/);
+  has(errors(p => { p[1].lines.splice(2, 0, line("dog", "fossil 就是化石！")); }), /团子狗台词解释了英文词/);
 });

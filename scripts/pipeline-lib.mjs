@@ -324,7 +324,8 @@ export function createPipeline(issueArg) {
       };
       const ROLE_NAMES = { dog: /团子狗/, mouse: /波波鼠/, owl: /咕咕博士/, raccoon: /捣蛋浣熊|浣熊/ };
       const OPENER_CLICHE = /看完|讲完|做完|听完|查完|弄懂|明白了|完了|合上/;
-      let all = 0, narr = 0, zh = 0, calm = 0, cliche = 0;
+      const DOG_TRANSLATION = /[A-Za-z]{3,}\s*(?:[，,：:]\s*(?:就是|是)?|就是|意思是?|指(?:的是)?|是(?!什么|啥|哪))\s*[\u4e00-\u9fa5]/;
+      let all = 0, narr = 0, zh = 0, calm = 0, cliche = 0, waitCount = 0;
       const FAMILY = /爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人/g;
       const sendTo = String(src("16-mailbox.json").send_note ?? "").match(FAMILY) ?? [];
       const storyTbc = plain(src("13-story.json").tbc);
@@ -407,7 +408,10 @@ export function createPipeline(issueArg) {
             need(len(l.text) <= 30, "50", `${at} ${len(l.text)} 字，超过 30`);
             need(!/[0-9%]/.test(l.text), "50", `${at} 中文台词含阿拉伯数字或 %，请写成中文读法（如"十八点五"、"百分之七"）：${l.text}`);
             need(!META_SPOILER.test(l.text), "50", `${at} 讲读台词不得点破「思维本领/今天练」等课表字眼：${l.text}`);
+            if (l.who === "dog" && DOG_TRANSLATION.test(l.text))
+              problems.push(`[50] ${at} 团子狗台词解释了英文词（${l.text}）；团子狗不懂英文，只负责学舌或好奇发问，释义由咕咕博士解释`);
           }
+          if (l.text.includes("等等")) waitCount++;
           run = i && p.lines[i - 1].who === l.who ? run + 1 : 1;
           // 连载页按 serial-bible 可以全由旁白一个人念
           if (run === 4 && !(kind === "serial" && l.who === "narrator")) problems.push(`[50] ${at} 起同一个角色连说超过 3 句，拆给别的角色接话`);
@@ -418,6 +422,7 @@ export function createPipeline(issueArg) {
       need(narr <= all * 0.4, "50", `旁白占 ${narr}/${all} 句（连载页除外），超过四成；叙述归旁白，说话归角色`);
       need(calm <= zh * 0.4, "50", `"平静"语气 ${calm}/${zh} 句，超过四成；按台词换成惊讶、得意、神秘等`);
       need(cliche <= 2, "50", `${cliche} 页用"看完了 / 讲完了"这类收尾式串词开场，最多 2 处；接住上一页的一个具体细节`);
+      need(waitCount <= 1, "50", `全期"等等"出现 ${waitCount} 次（最多 1 次），换成"咦？""慢着！""不对呀！"等生动口吻`);
       const [lo, hi] = [1800, 2800];
       need(total >= lo - 300 && total <= hi + 400, "50", `讲读稿共 ${total} 字，建议 ${lo}–${hi}`);
     },

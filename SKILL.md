@@ -141,7 +141,7 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 {"narration": [
   {"card": 1, "thread": "半夜的太阳还挂在天上", "lines": [
     {"who": "narrator", "lang": "zh", "text": "叮咚！小满早上好，《小满早知道》开播啦！", "emotion": "开心", "sfx": "chime"},
-    {"who": "dog", "lang": "zh", "text": "等等，这张照片……是半夜拍的？太阳怎么还挂在天上！", "emotion": "惊讶"},
+    {"who": "dog", "lang": "zh", "text": "咦？这张照片……真是半夜拍的？太阳怎么还挂在天上！", "emotion": "惊讶"},
     {"who": "narrator", "lang": "zh", "text": "你选哪个？先按暂停，想一想再继续。", "emotion": "温柔", "pause": 5, "hold": "⏸ 先暂停猜一猜"}
   ]},
   {"card": 6, "thread": "鼹鼠第一次坐船", "lines": [
