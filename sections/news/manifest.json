@@ -1,0 +1,10 @@
+{
+  "id": "news",
+  "title": "环球小报",
+  "consumes": [],
+  "params": {},
+  "rules": ["images", "english-level"],
+  "image_policy": "private-ok",
+  "narration": { "lines": 24 },
+  "state": null
+}

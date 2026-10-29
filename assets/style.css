@@ -134,68 +134,8 @@ svg.ch{display:block}
 @page{size:1080px 1440px;margin:0}
 @media print{body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0;break-after:page}.card.is-last{break-after:auto}}
 
-/* news card */
-#cnews{background:#E8F1FF}
-#cnews .nw{overflow:hidden;margin-top:18px;flex:none}
-#cnews .pic{background-size:cover;border-bottom:5px solid var(--ink);position:relative}
-#cnews .lead .pic{height:clamp(240px,var(--news-lead-height,320px),320px)}
-#cnews .loc{font-size:24px;color:var(--soft)}
-#cnews .txt{padding:12px 28px 16px}
-#cnews h3{font-size:40px;line-height:1.2;color:#2F6FB5}
-#cnews p{font-size:29px;line-height:1.5;margin-top:6px}
-#cnews .kw{display:inline-block;margin-left:8px;background:#FFF4C9;border-radius:14px;padding:2px 14px;font-size:27px}
-#cnews .kw small{font-size:24px;color:var(--soft)}
-#cnews .pair{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-#cnews .pair .pic{height:250px}
-#cnews .pair .txt{padding:10px 22px 14px}
-#cnews .pair h3{font-size:32px}
-#cnews .pair p{font-size:25px;line-height:1.45}
-#cnews .pair .kw{font-size:24px}
-#cnews .ask2{flex:none;margin-top:18px;padding:12px 30px;background:var(--tomato);color:#fff;font-size:29px;line-height:1.4}
-#cnews .ask2 .en{font-size:24px;opacity:.9}
-#cnews .credit2{font-size:15px;color:var(--soft);margin-top:10px;position:relative;line-height:1.3}
-
 /* 今日一问：本周思考工具 */
 .toolpill{display:inline-block;font-size:26px;background:var(--butter);color:var(--ink);border:4px solid var(--ink);border-radius:999px;padding:4px 18px;box-shadow:0 4px 0 var(--ink)}
-
-/* 传说怪物档案：每周一张、可收集的怪物卡 */
-#cdeep{background:#0F2A4A;color:#fff}
-#cdeep .dots{opacity:.15}
-#cdeep .top .en{color:#9CD3FF}
-#cdeep .card-photo{height:clamp(300px,var(--creature-photo-height,380px),380px);margin-top:22px;flex:none;display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;box-shadow:none;overflow:visible}
-#cdeep .card-photo .half{position:relative;overflow:hidden;border-color:#9CD3FF;box-shadow:0 10px 0 #061628}
-#cdeep .card-photo .legend{background:#F3E7C9}
-#cdeep .card-photo .legend .pic{background-size:contain;background-repeat:no-repeat}
-#cdeep .card-photo .pic{position:absolute;inset:0;background-size:cover}
-#cdeep .card-photo .lab{position:absolute;left:14px;top:14px;background:rgba(6,22,40,.8);color:#FFD45C;border-radius:14px;padding:4px 14px;font-size:26px}
-#cdeep .card-photo .legend .lab{color:#FFE9A8}
-#cdeep .card-photo .depth{position:absolute;left:14px;top:66px;background:rgba(6,22,40,.75);color:#9CD3FF;border-radius:14px;padding:2px 12px;font-size:22px;font-weight:800}
-#cdeep .card-photo .credit3{position:absolute;right:16px;bottom:10px;font-size:15px;color:#fff;text-shadow:0 1px 3px #000}
-#cdeep .name{margin-top:14px;position:relative;display:flex;align-items:baseline;gap:24px}
-#cdeep .name .zh{font-size:60px;line-height:1.1}
-#cdeep .name .en{display:flex;align-items:center;gap:12px;margin-top:0;font-size:36px}
-#cdeep .name .en span{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05}
-#cdeep .name .en b{color:#FFD45C}
-#cdeep .name .en small{font-size:22px;color:#9CD3FF}
-#cdeep .name .en em{font-style:normal;color:#9CD3FF}
-#cdeep .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px;position:relative}
-#cdeep .st{padding:10px 16px;color:var(--ink);text-align:center}
-#cdeep .st small{display:block;font-size:22px;color:var(--soft)}
-#cdeep .st b{display:block;font-size:30px;font-weight:400;line-height:1.2}
-#cdeep .meters{margin-top:14px;padding:10px 24px;color:var(--ink);font-size:28px;display:flex;justify-content:space-between;flex:none}
-#cdeep .meter{letter-spacing:2px;margin-left:6px}
-#cdeep .meter i{font-style:normal;opacity:.18}
-#cdeep .power{margin-top:12px;padding:10px 24px;color:var(--ink);font-size:25px;line-height:1.4;background:#FFFDF2;flex:none}
-#cdeep .power b{display:block;font-weight:400;color:var(--tomato)}
-#cdeep .power.b1{background:#E9FFF6}
-#cdeep .power.b1 b{color:#2E8C72}
-#cdeep .brains{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px;position:relative}
-#cdeep .br{display:flex;align-items:flex-end;gap:6px}
-#cdeep .br .bub{font-size:24px;line-height:1.35;padding:10px 14px;color:var(--ink);margin:0 0 14px;position:relative}
-#cdeep .br .bub:after{bottom:auto;top:50%;margin-top:-10px;left:-22px;margin-left:0;border:11px solid transparent;border-top-color:transparent;border-right-color:var(--ink)}
-#cdeep .br .bub small{display:block;font-size:20px;color:var(--soft)}
-#cdeep .br.slow .bub{background:#E9FFF6}
-#cdeep .foot{color:#9CD3FF}
 
 /* 真的假的 */
 #ccheck{background:#FFF4E0}

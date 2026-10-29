@@ -49,23 +49,6 @@ const legacy = key => {
 const hl = (text, word) => word ? text.replace(new RegExp(`\\b(${word}\\w*)`, "i"), "<b>$1</b>") : text;
 const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
 
-// 传说怪物档案（每周一张，有 creature 时）：一张可收集的卡片——传说、科学家怎么说、真实原型
-const CR = D.creature;
-const meter = (n, icon) => `<span class="meter">${icon.repeat(n)}<i>${icon.repeat(5 - n)}</i></span>`;
-if (legacy("creature") && CR) cards.push(`<section class="card" id="cdeep">${topBar(CR.series || "🐙 传说怪物档案 · Legend Files", `No.${String(CR.no).padStart(3, "0")}`)}
-  <div class="card-photo"><div class="box half legend"><div class="pic" style="background-image:url('${CR.legend}');background-position:${CR.legend_pos || "center"}"></div>
-      <div class="lab fun">📜 传说里的样子</div><div class="credit3 en">${CR.legend_credit}</div></div>
-    <div class="box half real"><div class="pic" style="background-image:url('${CR.photo}');background-position:${CR.photo_pos || "center"}"></div>
-      <div class="lab fun">📷 可能的真身</div>${CR.tag ? `<div class="depth fun">${CR.tag}</div>` : ""}<div class="credit3 en">${CR.credit}</div></div></div>
-  <div class="name"><div class="zh fun">${CR.name_zh}</div>
-    <div class="en">${CR.parts.map(p => `<span><b>${p.en}</b><small class="fun">${p.zh}</small></span>`).join("<em>+</em>")}</div></div>
-  <div class="stats">${CR.stats.map(s => `<div class="box st"><small class="fun">${s.k}</small><b class="fun">${s.v}</b></div>`).join("")}</div>
-  <div class="box meters fun">${CR.meters.map(m => `<div>${m.label} ${meter(m.n, m.icon)}</div>`).join("")}</div>
-  ${CR.boxes.map((x, i) => `<div class="box power fun b${i}"><b>${x.title}</b>${x.text}</div>`).join("")}
-  ${CR.fast ? `<div class="brains">
-    <div class="br">${ch("dog:surprise:120")}<div class="bub fun"><small>快脑袋：</small>${CR.fast}</div></div>
-    <div class="br slow">${ch("owl:think:120:magnifier")}<div class="bub fun"><small>慢脑袋：</small>${CR.slow}</div></div></div>` : ""}
-  ${foot(CR.foot || `收集怪物卡，凑齐一本档案！${NEXT("怪物档案")}`)}</section>`);
 const W = D.words;
 if (legacy("words") && W) cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
   <div class="intro">${ch("mouse:wave:190")}<div class="bub en">${W.intro}</div></div>
@@ -88,17 +71,6 @@ if (legacy("challenge") && P) cards.push(`<section class="card${P.english?.lengt
   <div class="answer-key"><div class="answer-content"><b>参考答案 · 想好再看</b><p class="puzzle-key">${answerText(D._answers?.puzzle)}</p>
     ${P.english?.length ? `<p class="english-key">英文：${(D._answers?.english || []).map((answer, i) => `${i + 1}. ${answerText(answer)}`).join("　")}</p>` : ""}</div></div>
   ${foot("想好了？转动平板，核对本页答案")}</section>`);
-
-// 环球小报（可选）：1 条头条 + 2 条小新闻
-const NW = D.news;
-const story = (n, cls) => `<div class="box nw ${cls}"><div class="pic" style="background-image:url('${n.photo}');background-position:${n.photo_pos || "center"}"></div>
-  <div class="txt"><div class="loc fun">${n.flag} ${n.place}</div><h3 class="fun">${n.title}</h3><p>${n.text}${n.word ? `<span class="kw en">🔑 ${n.word.en} <small class="fun">${n.word.zh}</small></span>` : ""}</p></div></div>`;
-if (legacy("news") && NW) cards.push(`<section class="card" id="cnews">${topBar("🌏 环球小报 · World News", NW.week)}
-  ${story(NW.items[0], "lead")}
-  <div class="pair">${NW.items.slice(1, 3).map(n => story(n, "")).join("")}</div>
-  <div class="box ask2 fun">💬 ${NW.ask_zh}<br><span class="en">${NW.ask_en}</span></div>
-  <div class="credit2 en">${NW.credits}</div>
-  ${foot(NW.foot || `新闻来源已交叉核实${NEXT("环球小报")}`)}</section>`);
 
 // 真的假的（每天一页）：一条网上流传的说法，快脑袋先投票，慢脑袋按线索查，答案倒着印；有思维课表时选项和查证工具跟着本周换
 const CK = D.check;
@@ -160,8 +132,8 @@ if (location.hash) { document.body.classList.add("single"); const el = document.
 // 正文偏长时，把这几页最大的那块图缩一点，让页脚回到版心里（卡片或栏目包 id、元素、CSS 变量、最高、最低）
 const FIT = [
   ["comic", ".diagram svg", "--comic-diagram-height", 280, 200],
-  ["cdeep", ".card-photo", "--creature-photo-height", 380, 300],
-  ["cnews", ".lead .pic", "--news-lead-height", 320, 240],
+  ["creature", ".card-photo", "--creature-photo-height", 380, 300],
+  ["news", ".lead .pic", "--news-lead-height", 320, 240],
 ];
 function fitCards() {
   for (const [id, sel, prop, max, min] of FIT) {

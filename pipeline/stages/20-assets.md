@@ -8,9 +8,9 @@
 {
   "_meta": {"stage": "20-assets", "by": "", "at": ""},
   "cover": "cover.jpg",
-  "creature": "creature.jpg",
-  "creature_legend": "creature-legend.jpg",
-  "news": ["news-1.jpg", "news-2.jpg", "news-3.jpg"],
+  "creature": "creature/creature.jpg",
+  "creature_legend": "creature/creature-legend.jpg",
+  "news": ["news/news-1.jpg", "news/news-2.jpg", "news/news-3.jpg"],
   "serial": "serial.jpg",
   "check": "check.jpg",
   "think": "think.jpg"
@@ -26,7 +26,8 @@
 **工具脚本**（推荐直接调用 `scripts/assets.mjs`，栏目包也用这个共享模块，自动带上 Wikimedia User-Agent、429 重试、尺寸校验与 `cropdetect` 裁边）：
 ```bash
 node scripts/assets.mjs fetch <url> <issue>/20-assets/cover.jpg --min 1200 --max 2000
-node scripts/assets.mjs fetch <url> <issue>/20-assets/news-1.jpg --min 800 --max 1600
+node sections/news/fetch.mjs <issue> [<直链 1> <直链 2> <直链 3>]      # 3 张进 20-assets/news/
+node sections/creature/fetch.mjs <issue> [<传说图直链> <照片直链>]       # 周一，进 20-assets/creature/
 node scripts/assets.mjs fetch <url> <issue>/20-assets/serial-book/serial.jpg --min 800 --max 1600
 node sections/serial-make/split.mjs <issue> 图式.png <x:y:w:h> …    # 折纸图式裁边、一步切一张
 ```

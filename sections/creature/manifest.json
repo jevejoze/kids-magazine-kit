@@ -1,0 +1,10 @@
+{
+  "id": "creature",
+  "title": "传说怪物档案",
+  "consumes": [],
+  "params": {},
+  "rules": ["images"],
+  "image_policy": "free-only",
+  "narration": { "lines": 14 },
+  "state": { "file": "state/creature/config.md", "log": "state/creature/log.jsonl" }
+}

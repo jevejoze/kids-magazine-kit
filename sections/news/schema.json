@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "环球小报 17-news.json",
+  "type": "object",
+  "required": ["week", "items", "ask_zh", "ask_en", "credits"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "week": { "type": "string", "minLength": 1 },
+    "items": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["flag", "place", "title", "text", "word", "photo_url", "photo_credit", "photo_shows", "talk", "sources"],
+        "properties": {
+          "flag": { "type": "string" },
+          "place": { "type": "string" },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "word": { "type": "object", "required": ["en", "zh"], "properties": { "en": { "type": "string" }, "zh": { "type": "string" } } },
+          "photo_url": { "type": "string" },
+          "photo_credit": { "type": "string" },
+          "photo_pos": { "type": "string" },
+          "photo_shows": { "type": "string" },
+          "talk": { "type": "object", "required": ["background", "scale", "follow_up"], "properties": { "background": { "type": "string" }, "scale": { "type": "string" }, "follow_up": { "type": "string" } } },
+          "sources": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+        }
+      }
+    },
+    "ask_zh": { "type": "string" },
+    "ask_en": { "type": "string" },
+    "credits": { "type": "string" },
+    "foot": { "type": "string" }
+  }
+}

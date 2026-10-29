@@ -1,0 +1,38 @@
+/* 传说怪物档案 · 页面 id 是 #creature，卡片在里面的 .card */
+#creature .card{background:#0F2A4A;color:#fff}
+#creature .dots{opacity:.15}
+#creature .top .en{color:#9CD3FF}
+#creature .card-photo{height:clamp(300px,var(--creature-photo-height,380px),380px);margin-top:22px;flex:none;display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;box-shadow:none;overflow:visible}
+#creature .card-photo .half{position:relative;overflow:hidden;border-color:#9CD3FF;box-shadow:0 10px 0 #061628}
+#creature .card-photo .legend{background:#F3E7C9}
+#creature .card-photo .legend .pic{background-size:contain;background-repeat:no-repeat}
+#creature .card-photo .pic{position:absolute;inset:0;background-size:cover}
+#creature .card-photo .lab{position:absolute;left:14px;top:14px;background:rgba(6,22,40,.8);color:#FFD45C;border-radius:14px;padding:4px 14px;font-size:26px}
+#creature .card-photo .legend .lab{color:#FFE9A8}
+#creature .card-photo .depth{position:absolute;left:14px;top:66px;background:rgba(6,22,40,.75);color:#9CD3FF;border-radius:14px;padding:2px 12px;font-size:22px;font-weight:800}
+#creature .card-photo .credit3{position:absolute;right:16px;bottom:10px;font-size:15px;color:#fff;text-shadow:0 1px 3px #000}
+#creature .name{margin-top:14px;position:relative;display:flex;align-items:baseline;gap:24px}
+#creature .name .zh{font-size:60px;line-height:1.1}
+#creature .name .en{display:flex;align-items:center;gap:12px;margin-top:0;font-size:36px}
+#creature .name .en span{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05}
+#creature .name .en b{color:#FFD45C}
+#creature .name .en small{font-size:22px;color:#9CD3FF}
+#creature .name .en em{font-style:normal;color:#9CD3FF}
+#creature .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px;position:relative}
+#creature .st{padding:10px 16px;color:var(--ink);text-align:center}
+#creature .st small{display:block;font-size:22px;color:var(--soft)}
+#creature .st b{display:block;font-size:30px;font-weight:400;line-height:1.2}
+#creature .meters{margin-top:14px;padding:10px 24px;color:var(--ink);font-size:28px;display:flex;justify-content:space-between;flex:none}
+#creature .meter{letter-spacing:2px;margin-left:6px}
+#creature .meter i{font-style:normal;opacity:.18}
+#creature .power{margin-top:12px;padding:10px 24px;color:var(--ink);font-size:25px;line-height:1.4;background:#FFFDF2;flex:none}
+#creature .power b{display:block;font-weight:400;color:var(--tomato)}
+#creature .power.b1{background:#E9FFF6}
+#creature .power.b1 b{color:#2E8C72}
+#creature .brains{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px;position:relative}
+#creature .br{display:flex;align-items:flex-end;gap:6px}
+#creature .br .bub{font-size:24px;line-height:1.35;padding:10px 14px;color:var(--ink);margin:0 0 14px;position:relative}
+#creature .br .bub:after{bottom:auto;top:50%;margin-top:-10px;left:-22px;margin-left:0;border:11px solid transparent;border-top-color:transparent;border-right-color:var(--ink)}
+#creature .br .bub small{display:block;font-size:20px;color:var(--soft)}
+#creature .br.slow .bub{background:#E9FFF6}
+#creature .foot{color:#9CD3FF}

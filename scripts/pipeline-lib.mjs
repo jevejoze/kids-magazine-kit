@@ -195,17 +195,6 @@ export function createPipeline(issueArg) {
       need(!t.photo_url || t.photo_credit, "08", "有配图就写 photo_credit");
       need(!META_SPOILER.test([t.title, t.story, ...(t.sides ?? []).map(s => s.say), t.role, ...(t.deeper ?? [])].join(" ")), "08", "周末思辨正文不得点破「思维本领/今天练」等课表字眼");
     },
-    "09-creature.json": r => {
-      fields(r, "09", ["no", "name_zh", "parts", "legend_url", "legend_credit", "photo_url", "photo_credit", "stats", "meters", "boxes", "fast", "slow", "sources", "log_update"]);
-      need(len(r.name_zh) <= 8, "09", `名字 ${len(r.name_zh)} 字，超过 8`);
-      need(r.stats?.length === 3, "09", "stats 要 3 格");
-      need(r.meters?.length >= 2 && r.meters?.length <= 3, "09", "meters 要 2–3 条");
-      r.meters?.forEach(m => need(m.n >= 1 && m.n <= 5, "09", `${m.label} 的格数要 1–5：${m.n}`));
-      need(r.boxes?.length === 3, "09", "boxes 要 3 块：传说里说、科学家怎么说、真实原型");
-      r.boxes?.forEach((x, i) => need(len(x.text) <= 60, "09", `第 ${i + 1} 块 ${len(x.text)} 字，超过 60`));
-      need(len(r.fast) <= 24 && len(r.slow) <= 24, "09", "快脑袋、慢脑袋各 ≤ 24 字");
-      need((r.sources ?? []).length >= 2, "09", "要 2 个来源");
-    },
     "12-words.json": w => {
       fields(w, "12", ["intro", "grammar", "items", "task"]);
       need(w.items?.length === 3, "12", "单词要 3 个");
@@ -239,16 +228,6 @@ export function createPipeline(issueArg) {
       fields(m, "16", ["hello", "send_note"]);
       need(len(m.hello) <= 60, "16", `开头问候 ${len(m.hello)} 字，超过 60`);
       need(len(m.ask_zh) <= 30, "16", `本期问题 ${len(m.ask_zh)} 字，超过 30`);
-    },
-    "17-news.json": n => {
-      fields(n, "17", ["week", "items", "ask_zh", "ask_en", "credits"]);
-      need(n.items?.length === 3, "17", "新闻要 3 条");
-      n.items?.forEach((x, i) => {
-        need(len(x.text) <= 50, "17", `第 ${i + 1} 条 ${len(x.text)} 字，超过 50`);
-        need((x.sources ?? []).length >= 2, "17", `第 ${i + 1} 条要 2 个来源`);
-        fields(x.talk ?? {}, "17", ["background", "scale", "follow_up"]);
-        need(x.photo_shows, "17", `第 ${i + 1} 条缺少 photo_shows（照片里实际拍到了什么）`);
-      });
     },
     // 各 kind 自己的字段和字数交给 sections/serial-<kind>/check.mjs（下面的栏目包循环接上）
     "18-serial.json": r => {
@@ -630,9 +609,15 @@ export function createPipeline(issueArg) {
         updated.push(st.log);
       } else if (r.bible_update) appendSection("serial-bible.md", `第 ${padNum} 期`, `- 第 ${padNum} 期（${b.date}）：${r.bible_update}`);
     }
+    // 怪物档案：有 state/creature/ 就追加 log.jsonl；旧数据目录照旧追加 creature-log.md
     if (useCreature()) {
-      const cr = read("09-creature.json");
-      if (cr.log_update) appendSection("creature-log.md", `No.${cr.no}`, `- No.${cr.no}（第 ${padNum} 期）：${cr.log_update}`);
+      const cr = read("09-creature.json"), st = registry.find(x => x.id === "creature")?.manifest.state;
+      if (st && existsSync(join(dataDir, "state", "creature"))) {
+        const logPath = join(dataDir, st.log), cur = existsSync(logPath) ? readFileSync(logPath, "utf8") : "";
+        if (!cur.split("\n").filter(Boolean).some(l => JSON.parse(l).issue === num))
+          atomicWrite(logPath, cur.replace(/\s*$/, cur.trim() ? "\n" : "") + JSON.stringify({ issue: num, date: b.date, no: cr.no, name_zh: cr.name_zh, summary: cr.log_update ?? "" }) + "\n");
+        updated.push(st.log);
+      } else if (cr.log_update) appendSection("creature-log.md", `No.${cr.no}`, `- No.${cr.no}（第 ${padNum} 期）：${cr.log_update}`);
     }
     if (useThink()) {
       const th = read("08-think.json");

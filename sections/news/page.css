@@ -1,0 +1,20 @@
+/* 环球小报 · 页面 id 是 #news，卡片在里面的 .card */
+#news .card{background:#E8F1FF}
+#news .nw{overflow:hidden;margin-top:18px;flex:none}
+#news .pic{background-size:cover;border-bottom:5px solid var(--ink);position:relative}
+#news .lead .pic{height:clamp(240px,var(--news-lead-height,320px),320px)}
+#news .loc{font-size:24px;color:var(--soft)}
+#news .txt{padding:12px 28px 16px}
+#news h3{font-size:40px;line-height:1.2;color:#2F6FB5}
+#news p{font-size:29px;line-height:1.5;margin-top:6px}
+#news .kw{display:inline-block;margin-left:8px;background:#FFF4C9;border-radius:14px;padding:2px 14px;font-size:27px}
+#news .kw small{font-size:24px;color:var(--soft)}
+#news .pair{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+#news .pair .pic{height:250px}
+#news .pair .txt{padding:10px 22px 14px}
+#news .pair h3{font-size:32px}
+#news .pair p{font-size:25px;line-height:1.45}
+#news .pair .kw{font-size:24px}
+#news .ask2{flex:none;margin-top:18px;padding:12px 30px;background:var(--tomato);color:#fff;font-size:29px;line-height:1.4}
+#news .ask2 .en{font-size:24px;opacity:.9}
+#news .credit2{font-size:15px;color:var(--soft);margin-top:10px;position:relative;line-height:1.3}

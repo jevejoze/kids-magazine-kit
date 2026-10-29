@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "传说怪物档案 09-creature.json",
+  "type": "object",
+  "required": ["no", "name_zh", "parts", "legend_url", "legend_credit", "photo_url", "photo_credit", "stats", "meters", "boxes", "fast", "slow", "sources", "log_update"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "no": { "type": "integer", "minimum": 1 },
+    "series": { "type": "string" },
+    "name_zh": { "type": "string", "minLength": 1, "maxLength": 8 },
+    "parts": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "object", "required": ["en", "zh"], "properties": { "en": { "type": "string" }, "zh": { "type": "string" } } } },
+    "legend_url": { "type": "string", "minLength": 1 },
+    "legend_credit": { "type": "string", "minLength": 1 },
+    "legend_pos": { "type": "string" },
+    "photo_url": { "type": "string", "minLength": 1 },
+    "photo_credit": { "type": "string", "minLength": 1 },
+    "photo_pos": { "type": "string" },
+    "tag": { "type": "string" },
+    "stats": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "object", "required": ["k", "v"], "properties": { "k": { "type": "string" }, "v": { "type": "string" } } } },
+    "meters": { "type": "array", "minItems": 2, "maxItems": 3, "items": { "type": "object", "required": ["label", "n", "icon"], "properties": { "label": { "type": "string" }, "n": { "type": "integer", "minimum": 1, "maximum": 5 }, "icon": { "type": "string" } } } },
+    "boxes": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "object", "required": ["title", "text"], "properties": { "title": { "type": "string" }, "text": { "type": "string" } } } },
+    "fast": { "type": "string" },
+    "slow": { "type": "string" },
+    "sources": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+    "log_update": { "type": "string" },
+    "foot": { "type": "string" }
+  }
+}
