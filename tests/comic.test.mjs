@@ -18,7 +18,7 @@ function render(data) {
   const html = issueHtml({ data });
   ids = cardIds(html);
   vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
-  return root.outerHTML.match(/<section class="card" id="c2">[\s\S]*?<\/section>/)[0];
+  return root.outerHTML.match(/<section class="card" data-section="comic">[\s\S]*?<\/section>/)[0];
 }
 
 test("comic reads two panels, then the diagram, then the follow-up panels", () => {
@@ -86,7 +86,7 @@ test("full comic budgets with two-line headings and 130px roles fit in SVG and P
   for (const mode of ["svg", "png"]) {
     let html = issueHtml({ data, characterPack: mode === "png" ? loadCharacterPack("storybook-v1") : null });
     const check = `<script>window.READY.then(()=>{
-      const c=document.querySelector('#c2'),r=c.getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
+      const c=document.querySelector('#comic .card'),r=c.getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
       const result={footer:f.bottom<=r.bottom-parseFloat(getComputedStyle(c).paddingBottom)+1,
         above:c.querySelector('.fact').getBoundingClientRect().bottom<=f.top+1,
         figure:c.querySelector('.diagram svg').getBoundingClientRect().height,
@@ -97,7 +97,7 @@ test("full comic budgets with two-line headings and 130px roles fit in SVG and P
     });</script>`;
     html = html.replace("</body>", check + "</body>");
     const file = join(dir, mode + ".html"); writeFileSync(file, html);
-    const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", `--user-data-dir=${join(dir, mode)}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#c2"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 45000 });
+    const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", `--user-data-dir=${join(dir, mode)}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#comic"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 45000 });
     const m = JSON.parse(dom.match(/<pre id="budget-result">(\{[^<]+\})<\/pre>/)[1]);
     t.diagnostic(`${mode}: diagram ${m.figure}px, footer ${m.footer}, text ${m.text}`);
     for (const key of ["footer", "above", "text", "panels"]) assert.equal(m[key], true, `${mode}: ${key}`);

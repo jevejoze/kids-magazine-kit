@@ -29,9 +29,10 @@ const cards = [];
 const rendered = new Set();
 const put = key => {
   rendered.add(key);
-  const pages = [].concat(SECTIONS[key].render(D[key], kit));
+  // 一页是一段 HTML，或 { html, class, style }：class、style 加在这一页的 .card 上
+  const pages = [].concat(SECTIONS[key].render(D[key], kit)).map(p => typeof p === "string" ? { html: p } : p);
   const id = SECTIONS[key].id ?? key;
-  cards.push(`<div class="section" id="${id}">${pages.map(html => `<section class="card" data-section="${id}">${html}</section>`).join("")}</div>`);
+  cards.push(`<div class="section" id="${id}">${pages.map(p => `<section class="card${p.class ? ` ${p.class}` : ""}" data-section="${id}"${p.style ? ` style="${p.style}"` : ""}>${p.html}</section>`).join("")}</div>`);
 };
 // 本期没有的页（没数据）不用先补前面的栏目，等下一个有的页再补
 const upTo = key => {
@@ -45,55 +46,8 @@ const legacy = key => {
   return false;
 };
 
-// 1 封面：有 cover.photo 用照片封面，否则用角色封面
-// 照片封面：顶部刊名条 + 下方照片。刊名条的颜色取自照片顶部（见文末 coverStrip），照片顶端渐隐进刊名条
-const CV = D.cover;
-if (legacy("cover") && CV && CV.photo) cards.push(`<section class="card photo-cover" id="c1"${CV.strip ? ` style="--strip:${CV.strip}"` : ""}>
-  <div class="photo" style="background-image:url('${CV.photo}');background-position:${CV.photo_pos || "center"}"></div><div class="shade"></div>
-  <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
-  <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
-  <div class="cover-bottom${CV.crew?.length ? " has-crew" : ""}">
-    <div class="q"><div class="cover-labels">${CV.stamp ? `<span class="stamp en">${CV.stamp}</span>` : ""}${CV.asked_by ? `<span class="asked fun">💡 本期问题由${CV.asked_by}提出</span>` : ""}</div>
-      <div class="t fun">${wrapChineseWords(D.question.zh)}</div><div class="en">${D.question.en}</div></div>
-    ${CV.crew?.length ? `<div class="crew">${CV.crew_say ? `<div class="bub fun">${CV.crew_say}</div>` : ""}<div class="chs">${CV.crew.map(ch).join("")}</div></div>` : ""}
-    <div class="credit en">${CV.credit}</div>
-  </div></section>`);
-else if (legacy("cover")) cards.push(`<section class="card" id="c1"><div class="dots"></div>
-  <div class="top"><span>${D.date} · ${D.weather}</span><span class="en">ISSUE ${N}</span></div>
-  <div class="mast"><div class="zh fun">${D.masthead.zh}</div><div class="en">${D.masthead.en}</div></div>
-  ${D.badge ? `<div class="badge fun">${D.badge.zh}<small class="en">${D.badge.en}</small></div>` : ""}
-  <div class="gang">${(D.cover_gang || GANG).map(ch).join("")}</div>
-  <div class="box q"><div class="lb fun">🐶 今天团子狗想知道……</div>
-    <div class="t fun">${D.question.zh}</div><div class="en">${D.question.en}</div></div>
-  <div class="toc fun">${TOC.map(([e, t]) => `<div><b>${e}</b>${t}</div>`).join("")}</div>
-  ${coverFoot(D.cover_greeting || "编辑部全员向你问好！Hello!")}</section>`);
-
-// 2 今日一问：4 格漫画 + 图解 + 便利贴冷知识
-const C = D.comic;
 const hl = (text, word) => word ? text.replace(new RegExp(`\\b(${word}\\w*)`, "i"), "<b>$1</b>") : text;
 const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
-const chatRow = (b, bi, p, pi) => {
-  const speaker = b.who || p.chars[bi] || p.chars[0] || "";
-  const spec = speaker.includes(":") ? speaker : p.chars.find(s => s.split(":")[0] === speaker) || speaker;
-  const [whoKey, mood = "normal", size = "110", props = ""] = spec.split(":");
-  const side = b.side || (p.bubbles.length > 1 ? (bi % 2 === 0 ? "left" : "right") : (pi % 2 === 0 ? "left" : "right"));
-  const ava = `<div class="chat-ava ${whoKey}">${draw(whoKey, mood, Number(size), props)}</div>`;
-  const bub = `<div class="bub who-${whoKey} ${side} ${b.lang === "en" ? "en" : "fun"}"><span class="bubble-text">${b.lang === "en" ? escapeText(b.text) : wrapChineseWords(b.text, false)}</span></div>`;
-  return `<div class="chat-row ${side}">${side === "left" ? ava + bub : bub + ava}</div>`;
-};
-const comicPanels = (panels, start) => panels.map((p, j) => {
-  const i = start + j;
-  return `<div class="box panel p${i}"><div class="panel-head"><span class="n en">${i + 1}</span>${p.title ? `<span>${p.title}</span>` : ""}</div>
-    <div class="bubs ${p.bubbles.length > 1 ? "pair" : "solo"}">${p.bubbles.map((b, bi) => chatRow(b, bi, p, i)).join("")}</div></div>`;
-}).join("");
-if (legacy("comic")) cards.push(`<section class="card" id="c2">${topBar(`${C.theme_icon || "🤔"} 今日一问 · Big Question`, C.tool ? `<span class="toolpill fun">🧰 ${C.tool}</span>` : undefined)}
-  <div class="h1 fun">${wrapChineseWords(C.title_zh || D.question.zh)}<span class="en">${C.title_en || D.question.en}</span></div>
-  <div class="grid upper">${comicPanels(C.panels.slice(0, 2), 0)}</div>
-  ${C.diagram ? `<div class="box diagram"><div class="dl fun">${C.diagram_title || "🦉 咕咕博士画给你看"}</div>${C.diagram}
-    ${C.takeaway ? `<div class="takeaway"><b>所以</b><span>${escapeText(C.takeaway)}</span></div>` : ""}</div>` : ""}
-  <div class="grid lower">${comicPanels(C.panels.slice(2), 2)}</div>
-  <div class="fact"><b>${C.fact_title || "💡 再发现"}</b><span>${C.fact}</span></div>
-  ${foot(C.host || "主持：团子狗 × 咕咕博士")}</section>`);
 
 // 传说怪物档案（每周一张，有 creature 时）：一张可收集的卡片——传说、科学家怎么说、真实原型
 const CR = D.creature;
@@ -203,41 +157,15 @@ const actualIds = [...document.querySelectorAll(".card")].map(cardId).filter((id
 if (JSON.stringify(actualIds) !== JSON.stringify(CARD_IDS)) throw new Error(`页面顺序与数据契约不一致：${actualIds.join(",")}，应为 ${CARD_IDS.join(",")}`);
 if (location.hash) { document.body.classList.add("single"); const el = document.querySelector(location.hash); (el.matches(".card") ? el : el.querySelector(".card")).classList.add("on"); }
 
-// 刊名条取色：照片可见区域最上面 5% 的平均色；太灰就提一点亮度。JSON 写了 cover.strip 就用它。
-// 刊名用深字还是白字，按刊名条的亮度定。render.mjs 截图前会等 window.READY
-async function coverStrip() {
-  const card = document.querySelector("#c1.photo-cover");
-  if (!card) return;
-  let rgb;
-  if (CV.strip) {
-    const c = document.createElement("canvas").getContext("2d");
-    c.fillStyle = CV.strip; c.fillRect(0, 0, 1, 1); rgb = [...c.getImageData(0, 0, 1, 1).data].slice(0, 3);
-  } else {
-    const box = card.querySelector(".photo"), img = new Image();
-    img.src = CV.photo; await img.decode();
-    const W = box.clientWidth, H = box.clientHeight, s = Math.max(W / img.width, H / img.height);
-    const pos = getComputedStyle(box).backgroundPosition.split(" ").map(v => v.endsWith("%") ? parseFloat(v) / 100 : 0.5);
-    const vw = W / s, vh = H / s, x0 = (img.width - vw) * pos[0], y0 = (img.height - vh) * (pos[1] ?? 0.5);
-    const cv = document.createElement("canvas"); cv.width = 32; cv.height = 2;
-    const c = cv.getContext("2d"); c.drawImage(img, x0, y0, vw, vh * 0.05, 0, 0, 32, 2);
-    const px = c.getImageData(0, 0, 32, 2).data; rgb = [0, 0, 0];
-    for (let i = 0; i < px.length; i += 4) for (let k = 0; k < 3; k++) rgb[k] += px[i + k] / 64;
-    const [mx, mn] = [Math.max(...rgb), Math.min(...rgb)];
-    if (mx - mn < 30 && mx < 200) rgb = rgb.map(v => Math.min(255, v + 24)); // 灰蒙蒙的天：提亮一点
-    card.style.setProperty("--strip", `rgb(${rgb.map(Math.round).join(",")})`);
-  }
-  const lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
-  card.classList.add(lum > 0.6 ? "light" : "dark");
-}
-// 正文偏长时，把这几页最大的那块图缩一点，让页脚回到版心里（卡片 id、元素、CSS 变量、最高、最低）
+// 正文偏长时，把这几页最大的那块图缩一点，让页脚回到版心里（卡片或栏目包 id、元素、CSS 变量、最高、最低）
 const FIT = [
-  ["c2", ".diagram svg", "--comic-diagram-height", 280, 200],
+  ["comic", ".diagram svg", "--comic-diagram-height", 280, 200],
   ["cdeep", ".card-photo", "--creature-photo-height", 380, 300],
   ["cnews", ".lead .pic", "--news-lead-height", 320, 240],
 ];
 function fitCards() {
   for (const [id, sel, prop, max, min] of FIT) {
-    const card = document.querySelector(`#${id}`), el = card?.querySelector(sel), foot = card?.querySelector(".foot");
+    const card = document.querySelector(`#${id}.card, #${id} > .card`), el = card?.querySelector(sel), foot = card?.querySelector(".foot");
     if (!el || !foot || !card.getBoundingClientRect().height) continue;
     card.style.setProperty(prop, `${max}px`);
     const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);
@@ -258,7 +186,8 @@ function fitChallengeLayout() {
     if (overflows()) card.classList.remove("challenge-roomy");
   }
 }
-window.READY = Promise.all([coverStrip(), characterPackReady]).then(async () => {
+// 栏目包的 page.js 可以再导出 ready(data, kit)：页面排好后要做的异步收尾（如封面取色），截图前等它做完
+window.READY = Promise.all([...[...rendered].map(k => SECTIONS[k].ready?.(D[k], kit)), characterPackReady]).then(async () => {
   await document.fonts?.ready;
   fitCards();
   fitChallengeLayout();

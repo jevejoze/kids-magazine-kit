@@ -1,0 +1,40 @@
+/* 封面：角色封面，和照片封面（顶部刊名条 + 照片；刊名条颜色 --strip 由 page.js 的 ready 从照片顶部取色，照片顶端渐隐进刊名条，刊名不压照片主体） */
+#cover .card{background:var(--butter)}
+#cover .mast{text-align:center;margin-top:20px;position:relative}
+#cover .mast .zh{font-size:128px;letter-spacing:6px;color:var(--ink);text-shadow:6px 6px 0 #fff}
+#cover .mast .en{font-size:48px;letter-spacing:3px}
+#cover .badge{position:absolute;right:40px;top:150px;transform:rotate(12deg);background:var(--tomato);color:#fff;border:5px solid var(--ink);border-radius:50%;width:190px;height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:40px;line-height:1.15;box-shadow:0 8px 0 var(--ink)}
+#cover .badge small{font-size:24px}
+#cover .gang{display:flex;justify-content:center;align-items:flex-end;gap:0;margin-top:70px;position:relative}
+#cover .q{padding:40px 44px;margin-top:60px}
+#cover .q .lb{font-size:32px;color:var(--tomato)}
+#cover .q .t{font-size:60px;line-height:1.25;margin-top:6px}
+#cover .q .en{font-size:40px;color:var(--soft)}
+#cover .toc{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:60px;position:relative}
+#cover .toc div{background:#fff;border:4px solid var(--ink);border-radius:24px;text-align:center;padding:14px 4px;font-size:28px}
+#cover .toc b{display:block;font-size:46px}
+#cover .photo-cover{--strip:#FFF8EE;background:var(--strip);color:#fff}
+#cover .photo-cover .photo,#cover .photo-cover .shade{position:absolute;left:0;right:0;bottom:0;top:190px}
+#cover .photo-cover .photo{background-size:cover;-webkit-mask-image:linear-gradient(transparent,#000 170px);mask-image:linear-gradient(transparent,#000 170px)}
+#cover .photo-cover .shade{background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.12) 64%,rgba(0,0,0,.84) 100%)}
+#cover .photo-cover .top{margin-top:-24px;font-size:24px;color:var(--mast-sub)}
+#cover .photo-cover .mast{text-align:center;margin-top:-4px;position:relative}
+#cover .photo-cover .mast .zh{font-size:90px;letter-spacing:6px;color:var(--mast-ink);text-shadow:0 2px 8px rgba(0,0,0,.12)}
+#cover .photo-cover .mast .en{font-size:23px;letter-spacing:4px;margin-top:0;color:var(--mast-sub)}
+#cover .photo-cover,#cover .photo-cover.light{--mast-ink:var(--ink);--mast-sub:rgba(74,59,50,.72);--mast-shadow:rgba(255,255,255,.65)}
+#cover .photo-cover.dark{--mast-ink:#fff;--mast-sub:rgba(255,255,255,.88);--mast-shadow:var(--ink)}
+#cover .photo-cover .cover-bottom{position:absolute;left:64px;right:32px;bottom:24px;display:grid;grid-template-columns:minmax(0,1fr);align-items:end;column-gap:24px;row-gap:40px}
+#cover .photo-cover .cover-bottom.has-crew{grid-template-columns:minmax(0,1fr) max-content}
+#cover .photo-cover .q{grid-column:1;grid-row:1;margin:0;padding:0;min-width:0}
+#cover .photo-cover .cover-labels{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;margin-bottom:16px}
+#cover .photo-cover .cover-labels:empty{display:none}
+#cover .photo-cover .stamp{display:inline-block;padding:6px 14px;border:1px solid rgba(255,255,255,.35);border-radius:12px;background:rgba(30,27,23,.7);color:#FFE3A8;font-size:28px;line-height:1.3}
+#cover .photo-cover .q .asked{display:inline-block;padding:6px 14px;border-radius:12px;background:#FFE8A6;color:var(--ink);font-size:28px;line-height:1.3;box-shadow:0 3px 0 rgba(74,59,50,.4)}
+#cover .photo-cover .q .t{font-size:52px;line-height:1.28;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+#cover .photo-cover .q .en{font-size:26px;line-height:1.35;color:#fff;opacity:.88;margin-top:16px}
+#cover .photo-cover .crew{grid-column:2;grid-row:1 / span 2;display:flex;flex-direction:column;align-items:flex-end;gap:12px;min-width:0}
+#cover .photo-cover .crew .chs{display:flex;align-items:flex-end;justify-content:flex-end;gap:0;width:max-content}
+#cover .photo-cover .crew .ch{flex-shrink:0}
+#cover .photo-cover .crew .bub{color:var(--ink);text-shadow:none;width:max-content;margin:0;font-size:25px;line-height:1.35;padding:12px 16px;border-width:3px;border-radius:22px;background:#FFF8EE;text-align:center;white-space:nowrap;box-shadow:0 4px 0 rgba(74,59,50,.65)}
+#cover .photo-cover .crew .bub:after{display:none}
+#cover .photo-cover .credit{grid-column:1;grid-row:2;position:relative;min-width:0;overflow-wrap:anywhere;margin:0;font-size:16px;line-height:1.3;color:rgba(255,255,255,.8);text-shadow:0 1px 4px #000}

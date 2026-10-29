@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "封面 10-cover.json",
+  "type": "object",
+  "required": ["question", "answer", "photo", "stamp", "crew", "crew_say", "credit"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "question": { "type": "object", "required": ["zh"], "properties": { "zh": { "type": "string", "minLength": 1 }, "en": { "type": "string" } } },
+    "answer": { "type": "string", "minLength": 1 },
+    "photo": {
+      "type": "object", "required": ["url", "license"],
+      "properties": { "url": { "type": "string" }, "page": { "type": "string" }, "author": { "type": "string" }, "license": { "type": "string", "minLength": 1 }, "verified": { "type": "string" } }
+    },
+    "photo_pos": { "type": "string" },
+    "stamp": { "type": "string", "minLength": 1 },
+    "asked_by": { "type": "string" },
+    "strip": { "type": "string" },
+    "crew": { "type": "array", "maxItems": 2, "items": { "type": "string", "pattern": "^[a-z]+:[a-z]+:[0-9]+(:[a-z+]+)?$" } },
+    "crew_say": { "type": "string", "minLength": 1 },
+    "credit": { "type": "string", "minLength": 1 },
+    "theme_icon": { "type": "string" },
+    "sources": { "type": "array", "items": { "type": "string" } }
+  }
+}

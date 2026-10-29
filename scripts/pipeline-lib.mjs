@@ -206,33 +206,6 @@ export function createPipeline(issueArg) {
       need(len(r.fast) <= 24 && len(r.slow) <= 24, "09", "快脑袋、慢脑袋各 ≤ 24 字");
       need((r.sources ?? []).length >= 2, "09", "要 2 个来源");
     },
-    "10-cover.json": c => {
-      fields(c, "10", ["question", "answer", "photo", "stamp", "crew", "crew_say", "credit"]);
-      need(!c.question?.options, "10", "封面只放一个问题，去掉 options（答案由今日一问讲）");
-      need(len(c.question?.zh) <= 24, "10", `问题 ${len(c.question?.zh)} 字，超过 24 字`);
-      need(len(c.stamp) <= 14, "10", `stamp ${len(c.stamp)} 字，超过 14 字`);
-      need((c.crew ?? []).length <= 2, "10", "封面角色最多 2 个");
-      (c.crew ?? []).forEach((x, i) => checkChar(x, "10", `封面第 ${i + 1} 个角色`));
-      need(len(c.crew_say) <= 12, "10", `crew_say ${len(c.crew_say)} 字，超过 12 字`);
-      need(c.photo?.license, "10", "照片缺少协议");
-    },
-    "11-comic.json": c => {
-      fields(c, "11", ["title_zh", "title_en", "panels", "fact"]);
-      need(c.panels?.length === 4, "11", "漫画要 4 格");
-      c.panels?.forEach((p, i) => {
-        need(p.bubbles.length <= 2, "11", `第 ${i + 1} 格气泡 ${p.bubbles.length} 个，最多 2 个`);
-        (p.chars ?? []).forEach(x => checkChar(x, "11", `第 ${i + 1} 格角色`));
-      });
-      const diagPath = c.diagram ? join(issue, c.diagram) : "";
-      need(c.diagram && nonempty(diagPath), "11", `找不到非空图解 ${c.diagram}`);
-      if (c.diagram && nonempty(diagPath) && String(c.diagram).endsWith(".svg")) {
-        const svg = readFileSync(diagPath, "utf8");
-        need(/<svg\b[^>]*\bviewBox=["']0 0 880 300["']/.test(svg), "11", "图解 SVG 必须设置 viewBox=\"0 0 880 300\"");
-        need(!/<image\b[^>]*\b(?:href|xlink:href)=["']https?:/i.test(svg), "11", "图解 SVG 不可引用外部网络图片");
-        const small = [...svg.matchAll(/font-size=["']?(\d+(?:\.\d+)?)/g)].map(m => Number(m[1])).find(sz => sz < 20);
-        need(!small, "11", `图解 SVG 含过小字号 ${small}px（要求中文标注 ≥ 24 号字）`);
-      }
-    },
     "12-words.json": w => {
       fields(w, "12", ["intro", "grammar", "items", "task"]);
       need(w.items?.length === 3, "12", "单词要 3 个");
@@ -458,7 +431,7 @@ export function createPipeline(issueArg) {
     const st = stages.find(s => s.section === section), tag = st ? st.id.slice(0, 2) : pack.id;
     const out = st ? st.outputs.find(o => o.endsWith(".json")).slice(6) : `${pack.id}.json`;
     const collect = fn => { const n = problems.length; fn(); return problems.splice(n).map(m => m.replace(/^\[[^\]]*\] /, "")); };
-    const ctx = { checkChar: (x, at) => collect(() => checkChar(x, tag, at)), stateful: existsSync(join(dataDir, "state", pack.id)) };
+    const ctx = { issue, checkChar: (x, at) => collect(() => checkChar(x, tag, at)), stateful: existsSync(join(dataDir, "state", pack.id)) };
     const { check: own } = require(file);
     const run = v => own(v, ctx).forEach(m => problems.push(`[${tag}] ${m}`));
     if (!slot) { checks[out] = run; continue; }

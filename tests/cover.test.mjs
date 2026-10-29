@@ -30,10 +30,10 @@ test("long cover credits wrap within the question column and stay clear of 200px
   if (!chrome) return t.skip("Chrome unavailable");
   const dir = mkdtempSync(join(tmpdir(), "kids-cover-credit-"));
   t.after(() => rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }));
-  const css = readFileSync(new URL("../assets/style.css", import.meta.url), "utf8");
+  const css = ["../assets/style.css", "../sections/cover/page.css"].map(f => readFileSync(new URL(f, import.meta.url), "utf8")).join("\n");
   const file = join(dir, "credit.html");
-  writeFileSync(file, `<!doctype html><meta charset="utf-8"><style>${css}</style><section class="card photo-cover" id="c1"></section>
-  <script>const card=document.querySelector('#c1'),rows=[];
+  writeFileSync(file, `<!doctype html><meta charset="utf-8"><style>${css}</style><div class="section" id="cover"><section class="card photo-cover" data-section="cover"></section></div>
+  <script>const card=document.querySelector('#cover .card'),rows=[];
   for(const count of [0,1,2]){
     card.innerHTML='<div class="cover-bottom'+(count?' has-crew':'')+'"><div class="q"><div class="t">半夜十二点，太阳为什么还在天上？</div></div>'+(count?'<div class="crew"><div class="chs">'+'<svg class="ch" width="200" height="200"></svg>'.repeat(count)+'</div></div>':'')+'<div class="credit en"></div></div>';
     const credit=card.querySelector('.credit');

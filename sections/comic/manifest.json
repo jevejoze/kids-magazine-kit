@@ -1,0 +1,10 @@
+{
+  "id": "comic",
+  "title": "今日一问",
+  "consumes": ["cover.question"],
+  "params": {},
+  "rules": [],
+  "image_policy": "free-only",
+  "narration": { "lines": 26 },
+  "state": null
+}

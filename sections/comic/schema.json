@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "今日一问 11-comic.json",
+  "type": "object",
+  "required": ["title_zh", "title_en", "panels", "fact", "diagram"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "title_zh": { "type": "string", "minLength": 1 },
+    "title_en": { "type": "string", "minLength": 1 },
+    "panels": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {
+        "type": "object", "required": ["bubbles"],
+        "properties": {
+          "title": { "type": "string" },
+          "bubbles": { "type": "array", "maxItems": 2 },
+          "chars": { "type": "array", "items": { "type": "string", "pattern": "^[a-z]+:[a-z]+:[0-9]+(:[a-z+]+)?$" } }
+        }
+      }
+    },
+    "diagram": { "type": "string", "minLength": 1 },
+    "diagram_title": { "type": "string" },
+    "takeaway": { "type": "string" },
+    "fact": { "type": "string", "minLength": 1 },
+    "fact_title": { "type": "string" },
+    "theme_icon": { "type": "string" },
+    "sources": { "type": "array", "items": { "type": "string" } }
+  }
+}

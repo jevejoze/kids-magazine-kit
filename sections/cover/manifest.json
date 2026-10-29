@@ -1,0 +1,10 @@
+{
+  "id": "cover",
+  "title": "封面",
+  "consumes": [],
+  "params": {},
+  "rules": ["images"],
+  "image_policy": "free-only",
+  "narration": { "lines": 12 },
+  "state": null
+}

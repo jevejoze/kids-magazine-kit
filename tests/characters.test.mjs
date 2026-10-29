@@ -93,7 +93,7 @@ test("comic speaker names inherit their configured expression and accessories", 
   const template = issueHtml({ data: issue, characterPack: loadCharacterPack("storybook-v1"), characters: source });
   ids = cardIds(template);
   vm.runInContext(template.match(/<script>([\s\S]*?)<\/script>/)[1], context);
-  const comic = root.outerHTML.match(/<section class="card" id="c2">[\s\S]*?<\/section>/)[0];
+  const comic = root.outerHTML.match(/<section class="card" data-section="comic">[\s\S]*?<\/section>/)[0];
   assert.match(comic, /data-character="dog" data-expression="surprise"/);
   assert.match(comic, /prop-eyemask/);
 });

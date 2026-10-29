@@ -100,12 +100,12 @@ export function checkCssScope(css, id) {
   return bad;
 }
 
-// page.js 在页面里以普通脚本内联运行：只用 kit，不 import；要导出 render(data, kit)
+// page.js 在页面里以普通脚本内联运行：只用 kit，不 import；要导出 render(data, kit)，可再导出 ready(data, kit)（截图前等它做完）
 export function checkPageScript(js) {
   const errors = [];
   if (/^\s*import\b/m.test(js)) errors.push("page.js 不能 import，用 render(data, kit) 拿到的 kit");
   if (!/^export\s+function\s+render\s*\(/m.test(js)) errors.push("page.js 要导出 export function render(data, kit)");
-  if (/^export\s+(?!function\s+render\b)/m.test(js)) errors.push("page.js 只导出 render");
+  if (/^export\s+(?!function\s+render\b|(async\s+)?function\s+ready\b)/m.test(js)) errors.push("page.js 只导出 render 和 ready");
   return errors;
 }
 
@@ -163,11 +163,11 @@ export function sectionOrder(issue, sections = []) {
 // 一个栏目在页面里的 id：注册了的用栏目包 id，其余用旧模板的卡片 id
 export const sectionDomId = (key, sections = [], issue = {}) => packFor(key, sections, issue)?.id ?? CARD_IDS[key];
 
-// 内联进页面的脚本：每个注册栏目的 page.js 包成一个函数，登记到 SECTIONS[页位]；分担页位的包只登记本期用到的那个
+// 内联进页面的脚本：每个注册栏目的 page.js 包成一个函数，登记到 SECTIONS[页位]（render，和可选的 ready）；分担页位的包只登记本期用到的那个
 export function sectionScripts(sections, issue = {}) {
   const own = sections.filter(s => !slotPack(s)).map(s => [s.id, s]);
   const slots = [...new Set(sections.filter(slotPack).map(s => s.manifest.slot.key))].map(key => [key, packFor(key, sections, issue)]).filter(([, s]) => s);
-  return [...own, ...slots].map(([key, s]) => `SECTIONS[${JSON.stringify(key)}] = (() => {\n${s.script.replace(/^export\s+function\s+render\b/m, "function render")}\nreturn { id: ${JSON.stringify(s.id)}, render };\n})();`).join("\n");
+  return [...own, ...slots].map(([key, s]) => `SECTIONS[${JSON.stringify(key)}] = (() => {\n${s.script.replace(/^export\s+(async\s+)?function\b/gm, "$1function")}\nreturn { id: ${JSON.stringify(s.id)}, render, ready: typeof ready === "function" ? ready : undefined };\n})();`).join("\n");
 }
 
 // 拼出整期的 issue.html：模板里的 {{占位}} 一次替换完，填进去的内容（数据、栏目脚本）不会再被当成占位
