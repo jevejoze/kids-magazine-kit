@@ -1,0 +1,47 @@
+# 杂志配置：出哪些栏目、哪天出、参数。没有这个文件时用引擎默认配置
+# 第 00 步跑 `node scripts/pipeline.mjs schedule issues/NNN [YYYY-MM-DD]`，按这里算好本期栏目写进任务书
+masthead:
+  zh: 小满早知道
+  en: XIAOMAN KNOWS!
+  by: 🐶🐭🦉🦝 团子编辑部 出品
+call: 小满
+send_note: 拍照发给妈妈
+english_level: L2
+image_policy: private-ok   # free-only：只用自由授权照片（要公开分享时用）
+
+# 栏目和顺序。words（单词屋）、english（英文三关）是可选栏目，写进来才做
+sections:
+  - cover
+  - comic
+  - creature
+  - words
+  - story
+  - challenge
+  - english
+  - news
+  - check
+  - serial
+  - think
+  - mailbox
+
+schedule:
+  weekday_theme:
+    mon: 自然科学
+    tue: 历史人物
+    wed: 世界各地
+    thu: 数学趣题
+    fri: 艺术手工
+    sat: 亲子小实验
+    sun: 周刊回顾
+  days:              # 只在这几天出的栏目；没写的天天出
+    creature: [mon]
+    think: [fri]
+  friday:            # 周五经典连载停一天，按这个顺序轮换
+    serial: [make, music, make, film]
+
+curriculum: thinking-plan.md   # 思维课表，按周给真的假的、周末思辨填本领
+
+# 首批开放的参数：narration_lines（这一页讲读最多几句）、image_policy（只能收紧）
+params:
+  news:
+    narration_lines: 26

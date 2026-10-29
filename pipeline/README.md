@@ -10,6 +10,7 @@
 
 ```
 <私有数据仓库>/               数据目录，下文写作 data/
+  magazine.yaml             杂志配置：出哪些栏目、哪天出、周五轮换、参数（可选，没有就用默认配置）
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
   story-bible.md  serial-bible.md  creature-log.md  think-log.md  thinking-plan.md  vocab.json  feedback.jsonl
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
@@ -71,7 +72,7 @@ sh .engine/scripts/sync.sh check                     # 有没提交或没推送�
 | 70 | 讲读视频 | 40、60 | 脚本 |
 | 90 | 更新档案 | 40 | agent |
 
-00 完成后，08、09、10、12、13、14、16、17、18、19 可以同时开工。`stages.json` 里带 `when` 的步骤只在任务书里那个字段为真时做（09 看 `creature`，只在周一；08 看 `think`，只在周五），其他日子 `status` 显示「本期不出」、算作完成。完整定义见 `stages.json`。
+00 完成后，08、09、10、12、13、14、16、17、18、19 可以同时开工。`stages.json` 里每个栏目步骤带 `section`（栏目 id）；任务书的 `sections` 里没有这个栏目，这一步 `status` 显示「本期不出」、算作完成。`sections` 由第 00 步的 `pipeline.mjs schedule` 按 `data/magazine.yaml` 写：默认 09 只在周一、08 只在周五，12 单词屋、15 英文三关要在 `magazine.yaml` 的 `sections` 里列出才做。没有 `sections` 的旧任务书照旧看 `creature`、`think` 两个字段。完整定义见 `stages.json`。
 
 ## 两种用法
 
@@ -113,6 +114,7 @@ node --test tests/*.test.mjs
 30、40、60、70 需要运行脚本，在任意有 Node 22+、Chrome、Python 3、ffmpeg 的环境里跑（Claude Code 云端会话、自己的电脑都可以）：
 
 ```bash
+node scripts/pipeline.mjs schedule <issue> [YYYY-MM-DD]  # 第 00 步：按 magazine.yaml 算本期栏目，写进任务书
 node scripts/pipeline.mjs status   <issue>   # 看每步做了没有、下一步能做什么
 node scripts/pipeline.mjs check    <issue>   # 检查已完成步骤的字段和字数
 node scripts/assets.mjs   fetch|trim|slice … # 第 20 步：下载图片、折纸图式裁边与切步骤

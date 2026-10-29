@@ -12,7 +12,7 @@ const PARAM_TYPES = ["string", "number", "boolean", "list"];
 const FIELDS = ["id", "title", "consumes", "params", "rules", "image_policy", "narration", "state"];
 const strings = v => Array.isArray(v) && v.every(x => typeof x === "string" && x.trim());
 
-function validateParam(name, p) {
+export function validateParam(name, p) {
   const at = `params.${name}`;
   if (!p || typeof p !== "object" || Array.isArray(p)) return [`${at} 必须是对象（type、default，可选 min/max/enum）`];
   const errors = [], unknown = Object.keys(p).filter(k => !["type", "default", "min", "max", "enum"].includes(k));
@@ -26,6 +26,15 @@ function validateParam(name, p) {
   if ("enum" in p && (!Array.isArray(p.enum) || !p.enum.length || !p.enum.every(fits))) errors.push(`${at}.enum 要是非空数组，每项都是 ${p.type}`);
   else if (p.enum && "default" in p && !p.enum.includes(p.default)) errors.push(`${at}.default 不在 enum 里`);
   return errors;
+}
+
+// 家长给的参数值是否符合声明：类型、min/max、enum
+export function checkParamValue(name, p, v) {
+  const fits = p.type === "list" ? Array.isArray(v) : typeof v === p.type && (p.type !== "number" || Number.isFinite(v));
+  if (!fits) return [`${name} 要是 ${p.type}`];
+  if (p.type === "number" && (v < (p.min ?? -Infinity) || v > (p.max ?? Infinity))) return [`${name} = ${v} 超出范围 ${p.min ?? "-∞"}–${p.max ?? "∞"}`];
+  if (p.enum && !p.enum.includes(v)) return [`${name} = ${JSON.stringify(v)} 不在可选值里：${p.enum.join(" / ")}`];
+  return [];
 }
 
 // manifest 校验：缺字段、类型不对、多出未声明的字段都报错，返回错误列表

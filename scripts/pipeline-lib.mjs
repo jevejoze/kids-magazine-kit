@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // 流水线工具。<issue> 是一期的工作区，如 data/issues/004
 //   node pipeline.mjs status   <issue>   每步做了没有，下一步能做什么
+//   node pipeline.mjs schedule <issue> [YYYY-MM-DD]   第 00 步：按 magazine.yaml 和日期写任务书的 sections
 //   node pipeline.mjs check    <issue>   检查已完成步骤的字段和字数
 //   node pipeline.mjs assemble <issue>   第 30 步：合并成 30-issue.json（渲染用）
 //   node pipeline.mjs script   <issue>   把 50-narration.json 导出为 70-final/家长讲读稿.md
@@ -27,6 +28,7 @@ import {
   PAGE_TITLES,
   NARRATION_MAX_LINES,
 } from "./contracts.mjs";
+import { scheduledIn, LEGACY, parseDate } from "./schedule.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const { stages } = JSON.parse(readFileSync(join(here, "..", "pipeline", "stages.json"), "utf8"));
@@ -106,17 +108,20 @@ export function createPipeline(issueArg) {
       });
     } catch { return false; }
   };
-  // 有 when 的步骤（如 09-creature 只在周一出、08-think 只在周五出）：任务书里这个字段不为 true 就算本期不出
-  const skipped = s => {
-    try { return !!(s.when && has("00-brief.json") && read("00-brief.json")[s.when] === false); }
-    catch { return false; }
-  };
-  const useCreature = () => has("09-creature.json") && (!has("00-brief.json") || !!read("00-brief.json").creature);
-  const useThink = () => has("08-think.json") && (!has("00-brief.json") || !!read("00-brief.json").think);
+  // 栏目本期出不出看任务书的 sections（第 00 步跑 pipeline.mjs schedule 写进去）：不在里面的步骤算本期不出。
+  // 没有 sections 的旧任务书照旧：creature、think 看同名布尔字段，单词屋、英文三关是可选栏目
+  const brief = () => { try { return has("00-brief.json") ? read("00-brief.json") : null; } catch { return null; } };
+  const inIssue = id => scheduledIn(brief(), id);
+  const skipped = s => inIssue(s.section) === false;
+  const optional = s => !!(LEGACY[s.section]?.optional && inIssue(s.section) === undefined);
+  const useCreature = () => has("09-creature.json") && (inIssue("creature") ?? !has("00-brief.json"));
+  const useThink = () => has("08-think.json") && (inIssue("think") ?? !has("00-brief.json"));
+  const useWords = () => has("12-words.json") && inIssue("words") !== false;
+  const useEnglish = () => has("15-english.json") && inIssue("english") !== false;
 
   // 渲染出来的页面顺序（card-1..N），和 template.html 一致；怪物档案、单词屋、新闻、真的假的、连载、周末思辨有才出
   const pageOrder = () => issuePageOrder({ cover: {}, comic: {}, creature: useCreature() ? {} : undefined,
-    words: has("12-words.json") ? {} : undefined, story: {}, challenge: {}, news: has("17-news.json") ? {} : undefined,
+    words: useWords() ? {} : undefined, story: {}, challenge: {}, news: has("17-news.json") ? {} : undefined,
     check: has("19-check.json") ? {} : undefined, serial: has("18-serial.json") ? {} : undefined,
     think: useThink() ? {} : undefined, mailbox: {} });
 
@@ -145,6 +150,15 @@ export function createPipeline(issueArg) {
   const checks = {
     "00-brief.json": b => {
       fields(b, "00", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level", "story"]);
+      try { parseDate(b.date); } catch (e) { need(false, "00", e.message); }
+      if ("sections" in b) {
+        const ok = b.sections && typeof b.sections === "object" && !Array.isArray(b.sections)
+          && Object.values(b.sections).every(x => x && typeof x.params === "object" && !Array.isArray(x.params));
+        need(ok, "00", "sections 要由 pipeline.mjs schedule 写成 {栏目: {params}}");
+        const kind = b.sections?.serial?.params?.kind;
+        if (ok && kind && b.serial) need((b.serial.kind ?? "book") === kind, "00", `serial.kind=${b.serial.kind ?? "book"} 和调度排的 ${kind} 不一致`);
+        for (const id of ["creature", "think"]) if (ok && typeof b[id] === "boolean") need(b[id] === id in b.sections, "00", `${id}=${b[id]} 和 sections 对不上`);
+      }
       const prevIssue = join(issue, "..", String(Number(b.issue) - 1).padStart(3, "0"), "30-issue.json");
       if (existsSync(prevIssue)) {
         try {
@@ -227,7 +241,7 @@ export function createPipeline(issueArg) {
       (s.scene ?? []).forEach((x, i) => checkChar(x, "13", `scene[${i}]`));
     },
     "14-puzzle.json": p => {
-      const e = has("15-english.json") ? read("15-english.json") : {};
+      const e = useEnglish() ? read("15-english.json") : {};
       fields({ ...e, ...p }, "14", ["title", "body", "answer", "solution", "taunt_zh"]);
       need(len(p.body) <= 120, "14", `题干 ${len(p.body)} 字，超过 120`);
       need(len([p.body, ...(p.clues ?? []), p.question ?? ""].join("")) <= 240, "14", "题目情境、条件和问题合计超过 240 字");
@@ -313,7 +327,9 @@ export function createPipeline(issueArg) {
       const order = rendered ?? pageOrder(), cards = order.length;
       if (hasStages) need(pages.length === cards && pages.every((p, i) => p.card === i + 1), "50", `${cards} 页都要按顺序讲读，不可重复或遗漏`);
       // 每页最多几句，按页的种类定；card 编号和渲染出来的 card-N.png 顺序一致（有英文三关时挑战页多 6 句）
-      const MAX = { ...NARRATION_MAX_LINES, challenge: has("15-english.json") ? 18 : NARRATION_MAX_LINES.challenge };
+      const MAX = { ...NARRATION_MAX_LINES, challenge: useEnglish() ? 18 : NARRATION_MAX_LINES.challenge };
+      // 任务书 sections 里的讲读句数上限优先（magazine.yaml 的 params.<栏目>.narration_lines）
+      for (const [id, sec] of Object.entries(brief()?.sections ?? {})) if (Number.isFinite(sec?.params?.narration_lines)) MAX[id] = sec.params.narration_lines;
       const max = c => (hasStages ? MAX[order[c - 1]] : undefined) ?? 30;
       let total = 0;
       // 照页面念的检查：各页的叙述文字（引号里的角色对白不算）
@@ -482,7 +498,7 @@ export function createPipeline(issueArg) {
       s = read("13-story.json"), p = read("14-puzzle.json"), mb = read("16-mailbox.json"),
       a = read("20-assets/assets.json");
     // 单词屋、英文三关是可选栏目，有文件才合并
-    const w = has("12-words.json") ? read("12-words.json") : null, e = has("15-english.json") ? read("15-english.json") : {};
+    const w = useWords() ? read("12-words.json") : null, e = useEnglish() ? read("15-english.json") : {};
     const nw = has("17-news.json") ? read("17-news.json") : null;
     const cr = useCreature() ? read("09-creature.json") : null, ck = has("19-check.json") ? read("19-check.json") : null;
     const th = useThink() ? read("08-think.json") : null;
@@ -533,10 +549,10 @@ export function createPipeline(issueArg) {
     for (const s of stages) {
       const ready = !state[s.id] && s.depends.every(d => state[d]);
       const outdated = !state[s.id] && s.outputs.some(p => existsSync(out(p)));
-      const mark = skipped(s) ? "➖" : state[s.id] ? "✅" : s.optional ? "➖" : ready ? "👉" : "⏳";
-      console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}${skipped(s) ? "（本期不出）" : s.optional && !state[s.id] ? "（可选，默认不做）" : outdated ? "（未完成、输出无效或已过期）" : ""}`);
+      const mark = skipped(s) ? "➖" : state[s.id] ? "✅" : optional(s) ? "➖" : ready ? "👉" : "⏳";
+      console.log(`${mark} ${s.id.padEnd(13)} ${s.title}${s.kind === "script" ? "（脚本）" : ""}${skipped(s) ? "（本期不出）" : optional(s) && !state[s.id] ? "（可选，默认不做）" : outdated ? "（未完成、输出无效或已过期）" : ""}`);
     }
-    const next = stages.filter(s => !s.optional && !state[s.id] && s.depends.every(d => state[d])).map(s => s.id);
+    const next = stages.filter(s => !optional(s) && !state[s.id] && s.depends.every(d => state[d])).map(s => s.id);
     console.log(`\n现在可以做：${next.join("、") || "（无）"}`);
   }
 

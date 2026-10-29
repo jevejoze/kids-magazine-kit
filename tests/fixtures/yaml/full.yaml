@@ -1,0 +1,30 @@
+# 注释整行
+masthead:
+  zh: 小满早知道   # 行尾注释
+  en: "XIAOMAN KNOWS!"
+  by: '团子编辑部 # 不是注释'
+image_policy: private-ok
+sections:
+  - cover
+  - comic
+  - creature
+flow: [make, music, "make", film]
+empty_flow: []
+schedule:
+  days:
+    creature: [mon]
+  friday:
+    serial: [make, music]
+params:
+  story:
+    narration_lines: 28
+  check:
+    enabled: true
+    ratio: 0.5
+nothing:
+tilde: ~
+voices:
+- who: narrator
+  zh: zh-CN-XiaoxiaoNeural
+- who: dog
+  zh: zh-CN-YunxiaNeural

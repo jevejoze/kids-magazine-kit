@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 import { inputFingerprint } from "./build-state.mjs";
 import { createPipeline } from "./pipeline-lib.mjs";
+import { scheduleIssue } from "./schedule.mjs";
 const [, , cmd, issue, extraArg] = process.argv;
-if (!issue || !["status", "check", "assemble", "fingerprint", "video-inputs", "script", "archive"].includes(cmd)) {
-  console.error("用法: node pipeline.mjs <status|check|assemble|fingerprint|script|archive> <issue 目录>");
+if (!issue || !["status", "schedule", "check", "assemble", "fingerprint", "video-inputs", "script", "archive"].includes(cmd)) {
+  console.error("用法: node pipeline.mjs <status|schedule|check|assemble|fingerprint|script|archive> <issue 目录>\n       node pipeline.mjs schedule <issue 目录> [YYYY-MM-DD]   第 00 步：按 magazine.yaml 和日期把本期栏目写进任务书");
   process.exit(1);
 }
 try {
   const pipeline = createPipeline(issue);
-  if (cmd === "check") {
+  if (cmd === "schedule") {
+    const brief = scheduleIssue(issue, extraArg);
+    console.log(`${brief.date} ${brief.weekday_theme}：${Object.keys(brief.sections).join("、")}`);
+    for (const [id, { params }] of Object.entries(brief.sections)) console.log(`  ${id.padEnd(10)} ${JSON.stringify(params)}`);
+  } else if (cmd === "check") {
     const errors = pipeline.check();
     console.log(errors.length ? errors.join("\n") : "全部通过");
     process.exitCode = errors.length ? 2 : 0;

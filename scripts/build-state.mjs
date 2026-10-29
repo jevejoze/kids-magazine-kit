@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, renameSync, rmSync, existsSync, statSync, 
 import { dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { characterPackFiles } from "./character-pack.mjs";
+import { scheduledIn, DAY_SECTIONS } from "./schedule.mjs";
 
 const engine = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const hash = value => createHash("sha256").update(value).digest("hex");
@@ -19,7 +20,8 @@ export function atomicWrite(path, value) {
 
 function sources(issue) {
   const brief = read(join(issue, "00-brief.json"));
-  const files = stages.filter(s => Number(s.id.slice(0, 2)) <= 20 && (!s.when || brief[s.when] === true))
+  // 本期出的栏目才算；旧任务书没有 sections 时，creature、think 要明确写 true
+  const files = stages.filter(s => Number(s.id.slice(0, 2)) <= 20 && (scheduledIn(brief, s.section) ?? !DAY_SECTIONS.includes(s.section)))
     .flatMap(s => s.outputs).filter(p => p.startsWith("issue/")).map(p => p.slice(6));
   // Track all downloaded assets, including replacements under the same filename.
   const assets = join(issue, "20-assets");
@@ -49,7 +51,7 @@ export function inputFingerprint(issue, stage) {
   issue = resolve(issue);
   const local = (...files) => files.map(p => [p, join(issue, p)]);
   let files;
-  if (stage === "30-assemble") files = [...sources(issue), ...engineFiles("scripts/pipeline-lib.mjs", "scripts/contracts.mjs", "pipeline/stages.json")];
+  if (stage === "30-assemble") files = [...sources(issue), ...engineFiles("scripts/pipeline-lib.mjs", "scripts/contracts.mjs", "scripts/schedule.mjs", "pipeline/stages.json")];
   else if (stage === "40-render") files = [...sources(issue), ...local("30-issue.json", "31-review.md"),
     ...engineFiles("scripts/render.mjs", "scripts/contracts.mjs", "scripts/character-pack.mjs", "scripts/sections.mjs", "assets/template.html", "assets/style.css", "assets/characters.js", "assets/kit.js"), ...sectionFiles(issue),
     ...characterPackFiles(read(join(issue, "30-issue.json")).character_pack).map(p => ["engine/" + relative(engine, p), p])];
