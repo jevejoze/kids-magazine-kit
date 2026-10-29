@@ -29,8 +29,19 @@ const makeKit = (D, CAST) => {
   // 槽位 → 角色：栏目按槽位（asker、expert、english、trickster）找角色，名字和别名都算提到了他
   const slots = CAST?.slots ?? {};
   const mentions = (text, slot) => { const c = CAST?.characters?.[slots[slot]]; return !!c && [c.name, ...(c.aliases ?? [])].some(n => String(text).includes(n)); };
+  // 经典连载四个栏目包（书、音乐盒、放映室、动手做）共用的版式：顶栏 → 标题 → 出处 → 完成图（可选）→ 正文（带配图）→ 本栏自己的块 → 成员吐槽和下回预告 → 页脚
+  const serialPage = (SR, { right, title, en, meta, done = "", pic = true, body }) => `${topBar(`${SERIAL[0]} ${SERIAL[1]} · ${SERIAL[2]}`, right)}
+  <div class="h1 fun">${title}<span class="en">${en}</span></div>
+  <div class="meta fun">${meta}</div>
+  ${done}
+  <div class="text">${pic ? `<div class="box pic"><div class="img" style="background-image:url('${SR.photo}');background-position:${SR.photo_pos || "center"}"></div><div class="credit3 en">${SR.photo_credit}</div></div>` : ""}
+    ${SR.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
+  ${body}
+  <div class="end"><div class="crew">${ch(SR.crew.who)}<div class="bub fun">${SR.crew.say}</div></div>
+    <div class="next fun">${SR.guess ? `<span class="guess">🔮 猜一猜：${SR.guess}</span>` : ""}<span>${SR.tbc}</span></div></div>
+  ${foot(SR.foot || NEXT(SERIAL[1]).replace(/^ · /, "") || "明天见！See you tomorrow!")}`;
   return {
-    issue: D, N, ch, bub, topBar, foot, coverFoot, next: NEXT, toc: TOC, serial: SERIAL, cast: GANG, slots, mentions, draw,
+    issue: D, N, ch, bub, topBar, foot, coverFoot, next: NEXT, toc: TOC, serial: SERIAL, serialPage, cast: GANG, slots, mentions, draw,
     escapeText, wrapChineseWords, pages: () => pg,
   };
 };

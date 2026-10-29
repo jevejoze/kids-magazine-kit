@@ -67,7 +67,7 @@ try {
 const registry = loadSections({ engine: resolve(here, ".."), data: resolve(jsonDir, "..", "..") });
 if (registry.errors.length) throw new Error(`栏目注册表有错：\n${registry.errors.join("\n")}`);
 const sections = registry.sections;
-const order = sectionOrder(data, sections), expected = order.map(key => sectionDomId(key, sections));
+const order = sectionOrder(data, sections), expected = order.map(key => sectionDomId(key, sections, data));
 const cast = magazineCast(resolve(jsonDir, "..", ".."));
 const html = issueHtml({ data, sections, characterPack, cast, title: `${data.masthead.zh} 第${N}期` });
 const htmlPath = join(outDir, "issue.html");

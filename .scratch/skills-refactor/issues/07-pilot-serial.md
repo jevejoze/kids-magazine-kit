@@ -6,9 +6,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] 四个栏目包齐全，共用版式放进 kit 对象
-- [ ] 周五出哪个由 magazine.yaml 的轮换表决定
-- [ ] 图片下到 `20-assets/<skill-id>/`，用共享下载模块
-- [ ] manifest 声明 free-only / private-ok，和 image_policy 冲突时报错
-- [ ] 折纸图式拆分移进动手做栏目
-- [ ] 普通日和周五旧期像素一致
+- [x] 四个栏目包齐全，共用版式放进 kit 对象
+- [x] 周五出哪个由 magazine.yaml 的轮换表决定
+- [x] 图片下到 `20-assets/<skill-id>/`，用共享下载模块
+- [x] manifest 声明 free-only / private-ok，和 image_policy 冲突时报错
+- [x] 折纸图式拆分移进动手做栏目
+- [x] 普通日和周五旧期像素一致

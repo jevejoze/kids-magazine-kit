@@ -30,7 +30,7 @@ import {
 } from "./contracts.mjs";
 import { scheduledIn, LEGACY, parseDate } from "./schedule.mjs";
 import { ticket, ticketSkillOf } from "./ticket.mjs";
-import { loadSections } from "./sections.mjs";
+import { loadSections, packFor } from "./sections.mjs";
 import { createRequire } from "node:module";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -277,33 +277,9 @@ export function createPipeline(issueArg) {
         need(x.photo_shows, "17", `第 ${i + 1} 条缺少 photo_shows（照片里实际拍到了什么）`);
       });
     },
+    // 各 kind 自己的字段和字数交给 sections/serial-<kind>/check.mjs（下面的栏目包循环接上）
     "18-serial.json": r => {
-      const text = len((r.paragraphs ?? []).join("").replace(/\s/g, ""));
-      if (r.kind === "book") {
-        fields(r, "18", ["ep", "book_zh", "book_en", "chapter", "title_zh", "paragraphs", "quote", "crew", "guess", "tbc", "photo_url", "photo_credit"]);
-        need(text <= 280, "18", `连载 ${text} 字，超过 280`);
-        need(words(r.quote?.en) <= 25, "18", `原著金句 ${words(r.quote?.en)} 个词，超过 25`);
-      } else {
-        need(["music", "film", "make"].includes(r.kind), "18", `kind 要写 book、music、film 或 make：${r.kind}`);
-        const origami = r.kind === "make" && r.craft === "origami";
-        // 折纸用完整图式代替成品照片
-        fields(r, "18", ["title_zh", "title_en", "by", "paragraphs", "tasks", "crew", "where", ...(origami ? ["diagram_url", "diagram_credit", "diagram_steps"] : ["photo_url", "photo_credit"])]);
-        if (r.kind === "make") {
-          need(["origami", "3d"].includes(r.craft), "18", `动手做的 craft 要写 origami 或 3d：${r.craft}`);
-          need(text <= (origami ? 30 : 120), "18", `介绍 ${text} 字，超过 ${origami ? 30 : 120}`);
-          if (origami) {
-            need(r.diagram_steps <= 12, "18", `图式 ${r.diagram_steps} 步，超过 12`);
-            need(r.tasks?.length === r.diagram_steps, "18", `每一步图配一句话：图式 ${r.diagram_steps} 步，tasks ${r.tasks?.length} 句`);
-            r.tasks?.forEach((t, i) => need(len(t) <= 14, "18", `第 ${i + 1} 步 ${len(t)} 字，超过 14`));
-          } else {
-            need(r.tasks?.length >= 4 && r.tasks?.length <= 8, "18", "3D 打印的步骤要 4–8 步");
-            r.tasks?.forEach((t, i) => need(len(t) <= 24, "18", `第 ${i + 1} 步 ${len(t)} 字，超过 24`));
-          }
-        } else {
-          need(text <= 180, "18", `介绍 ${text} 字，超过 180`);
-          need(r.tasks?.length === 3, "18", "任务要 3 个");
-        }
-      }
+      need(["book", "music", "film", "make"].includes(r.kind), "18", `kind 要写 book、music、film 或 make：${r.kind}`);
       if (r.crew?.who) checkChar(r.crew.who, "18", "crew.who");
       need(len(r.crew?.say) <= 20, "18", `crew.say ${len(r.crew?.say)} 字，超过 20`);
     },
@@ -474,15 +450,20 @@ export function createPipeline(issueArg) {
   };
 
   // 栏目包自带 check.mjs 的，按页校验交给栏目：check(value, ctx) 返回问题列表，这里加上步骤前缀
+  //   按 kind 换包的页位（经典连载）：先跑页位的共用检查，再跑本期 kind 那个包的
   for (const pack of registry) {
     const file = join(pack.dir, "check.mjs");
     if (!existsSync(file)) continue;
-    const st = stages.find(s => s.section === pack.id), tag = st ? st.id.slice(0, 2) : pack.id;
+    const slot = pack.manifest.slot, section = slot?.key ?? pack.id;
+    const st = stages.find(s => s.section === section), tag = st ? st.id.slice(0, 2) : pack.id;
     const out = st ? st.outputs.find(o => o.endsWith(".json")).slice(6) : `${pack.id}.json`;
     const collect = fn => { const n = problems.length; fn(); return problems.splice(n).map(m => m.replace(/^\[[^\]]*\] /, "")); };
     const ctx = { checkChar: (x, at) => collect(() => checkChar(x, tag, at)), stateful: existsSync(join(dataDir, "state", pack.id)) };
     const { check: own } = require(file);
-    checks[out] = v => own(v, ctx).forEach(m => problems.push(`[${tag}] ${m}`));
+    const run = v => own(v, ctx).forEach(m => problems.push(`[${tag}] ${m}`));
+    if (!slot) { checks[out] = run; continue; }
+    const common = checks[out];
+    checks[out] = v => { common?.(v); if (packFor(section, registry, { [section]: v }) === pack) run(v); };
   }
 
   function check({ contentOnly = false } = {}) {
@@ -666,9 +647,15 @@ export function createPipeline(issueArg) {
         appendSection("story-bible.md", marker, entry);
       }
     }
+    // 经典连载：本期 kind 的栏目包有 state/<包 id>/ 就追加它的 log.jsonl；旧数据目录照旧追加 serial-bible.md
     if (has("18-serial.json")) {
-      const r = read("18-serial.json");
-      if (r.bible_update) appendSection("serial-bible.md", `第 ${padNum} 期`, `- 第 ${padNum} 期（${b.date}）：${r.bible_update}`);
+      const r = read("18-serial.json"), st = packFor("serial", registry, { serial: r })?.manifest.state;
+      if (st && existsSync(join(dataDir, dirname(st.log)))) {
+        const logPath = join(dataDir, st.log), cur = existsSync(logPath) ? readFileSync(logPath, "utf8") : "";
+        if (!cur.split("\n").filter(Boolean).some(l => JSON.parse(l).issue === num))
+          atomicWrite(logPath, cur.replace(/\s*$/, cur.trim() ? "\n" : "") + JSON.stringify({ issue: num, date: b.date, kind: r.kind ?? "book", ...(r.ep !== undefined ? { ep: r.ep } : {}), title_zh: r.title_zh, summary: r.summary ?? r.bible_update ?? "" }) + "\n");
+        updated.push(st.log);
+      } else if (r.bible_update) appendSection("serial-bible.md", `第 ${padNum} 期`, `- 第 ${padNum} 期（${b.date}）：${r.bible_update}`);
     }
     if (useCreature()) {
       const cr = read("09-creature.json");

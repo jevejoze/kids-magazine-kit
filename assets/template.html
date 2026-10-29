@@ -18,7 +18,7 @@ const CAST = {{CAST}};
 
 {{KIT}}
 const kit = makeKit(D, CAST);
-const { N, ch, bub, topBar, foot, coverFoot, next: NEXT, serial: SERIAL, toc: TOC, cast: GANG, escapeText, wrapChineseWords } = kit;
+const { N, ch, bub, topBar, foot, coverFoot, next: NEXT, toc: TOC, cast: GANG, escapeText, wrapChineseWords } = kit;
 // 注册了的栏目（sections/<id>/page.js）登记在这里；有数据时按页序调用 render(data, kit)，返回一页或几页的内容
 const SECTIONS = {};
 {{SECTIONS}}
@@ -30,7 +30,8 @@ const rendered = new Set();
 const put = key => {
   rendered.add(key);
   const pages = [].concat(SECTIONS[key].render(D[key], kit));
-  cards.push(`<div class="section" id="${key}">${pages.map(html => `<section class="card" data-section="${key}">${html}</section>`).join("")}</div>`);
+  const id = SECTIONS[key].id ?? key;
+  cards.push(`<div class="section" id="${id}">${pages.map(html => `<section class="card" data-section="${id}">${html}</section>`).join("")}</div>`);
 };
 // 本期没有的页（没数据）不用先补前面的栏目，等下一个有的页再补
 const upTo = key => {
@@ -160,26 +161,8 @@ if (legacy("check") && CK) cards.push(`<section class="card" id="ccheck">${topBa
   ${CK.credit ? `<div class="credit2 en">${CK.credit}</div>` : ""}
   ${foot(`看完再倒过来对答案${NEXT("真的假的")}`)}</section>`);
 
-// 经典连载（可选）：书一期一回；周五换成音乐盒 / 放映室 / 动手做
-const SR = D.serial;
-if (legacy("serial") && SR) cards.push(`<section class="card ${SR.kind}" id="cserial">${topBar(`${SERIAL[0]} ${SERIAL[1]} · ${SERIAL[2]}`, SR.kind === "book" ? `第 ${SR.ep} 回` : undefined)}
-  <div class="h1 fun">${SR.kind === "book" ? `《${SR.book_zh}》` : ""}${SR.title_zh}<span class="en">${SR.kind === "book" ? `${SR.book_en} · ${SR.title_en}` : SR.title_en}</span></div>
-  <div class="meta fun">${SR.kind === "book" ? `${SR.chapter}　·　${SR.author}` : SR.by}</div>
-  ${(SR.diagram || SR.steps) && SR.photo ? `<div class="box done"><div class="img" style="background-image:url('${SR.photo}');background-position:${SR.photo_pos || "center"}"></div><div class="lb fun">做好是这样</div><div class="credit3 en">${SR.photo_credit}</div></div>` : ""}
-  <div class="text">${SR.diagram || SR.steps ? "" : `<div class="box pic"><div class="img" style="background-image:url('${SR.photo}');background-position:${SR.photo_pos || "center"}"></div><div class="credit3 en">${SR.photo_credit}</div></div>`}
-    ${SR.paragraphs.map(p => `<p>${p}</p>`).join("")}</div>
-  ${SR.steps
-    ? `<div class="box grid fun" style="--cols:${SR.steps.length > 9 ? 4 : 3};--rows:${Math.ceil(SR.steps.length / (SR.steps.length > 9 ? 4 : 3))}">${SR.steps.map((s, i) => `<div class="cell"><div class="img" style="background-image:url('${s}')"></div><p><b>${i + 1}</b>${SR.tasks[i]}</p></div>`).join("")}
-    <small>${SR.where ? `${SR.where}　·　` : ""}<span class="en">图式 ${SR.diagram_credit}</span></small></div>`
-    : SR.diagram
-    ? `<div class="box diagram"><div class="img" style="background-image:url('${SR.diagram}')"></div><div class="credit3 en">${SR.diagram_credit}</div></div>
-  <div class="box tasks steps fun">${SR.tasks.map((t, i) => `<p><b>${i + 1}</b>${t}</p>`).join("")}${SR.where ? `<small>${SR.where}</small>` : ""}</div>`
-    : SR.kind === "book"
-    ? `<div class="box quote"><div class="lb fun">📜 原著金句 · ${SR.quote.who}</div><div class="en">${/^[“"]/.test(SR.quote.en) ? SR.quote.en : `“${SR.quote.en}”`}</div><div class="zh fun">${SR.quote.zh}</div></div>`
-    : `<div class="box tasks fun"><div class="lb">${{ music: "🎧 边听边找", film: "🍿 看完考考你", make: "✂️ 跟着做" }[SR.kind]}</div>${SR.tasks.map((t, i) => `<p><b>${i + 1}</b>${t}</p>`).join("")}${SR.where ? `<small>${SR.where}</small>` : ""}</div>`}
-  <div class="end"><div class="crew">${ch(SR.crew.who)}<div class="bub fun">${SR.crew.say}</div></div>
-    <div class="next fun">${SR.guess ? `<span class="guess">🔮 猜一猜：${SR.guess}</span>` : ""}<span>${SR.tbc}</span></div></div>
-  ${foot(SR.foot || NEXT(SERIAL[1]).replace(/^ · /, "") || "明天见！See you tomorrow!")}</section>`);
+// 经典连载：sections/serial-{book,music,film,make}，按本期 kind 选一个包
+legacy("serial");
 
 // 周末思辨（周五）：一个两边都有道理的话题，孩子先写下想法，周六和家人聊
 const TK = D.think;

@@ -328,57 +328,6 @@ svg.ch{display:block}
 #ccheck .upside{margin:18px 0 6px;transform:rotate(180deg);font-size:24px;color:var(--soft);line-height:1.4;position:relative;text-align:center}
 #ccheck .credit2{margin-top:6px}
 
-/* 经典连载：书 / 音乐盒 / 放映室 / 动手做 */
-#cserial{background:#F4EBDD}
-#cserial.music{background:#E9E6FF}
-#cserial.film{background:#FFE9DC}
-#cserial.make{background:#E2F3E4}
-#cserial .h1{font-size:60px}
-#cserial .h1 .en{font-size:32px}
-#cserial .meta{font-size:26px;color:var(--soft);margin-top:6px;position:relative}
-#cserial .pic{float:left;width:380px;height:536px;margin:6px 30px 12px 0;overflow:hidden;background:#FFFDF7}
-#cserial .pic .img{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat}
-#cserial .pic .credit3{position:absolute;right:16px;bottom:10px;font-size:15px;color:#fff;text-shadow:0 1px 3px #000}
-#cserial .text{margin-top:22px;font-size:31px;line-height:1.62;position:relative;display:flow-root}
-#cserial .text p+p{margin-top:8px}
-#cserial .text em{font-style:normal;background:#FFE58F;padding:0 6px;border-radius:8px}
-#cserial .quote{margin-top:18px;padding:14px 28px 16px;background:#FFFDF2;flex:none}
-#cserial .quote .lb,#cserial .tasks .lb{font-size:26px;color:var(--tomato)}
-#cserial .quote .en{font-size:31px;line-height:1.35;color:#2F6FB5}
-#cserial .quote .zh{font-size:25px;color:var(--soft);margin-top:4px}
-#cserial .tasks{margin-top:18px;padding:14px 28px 16px;background:#FFFDF2;font-size:28px;line-height:1.4;flex:none}
-#cserial .tasks p{display:flex;gap:12px;margin-top:8px}
-#cserial .tasks p b{flex:0 0 38px;height:38px;border-radius:50%;background:var(--lav);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:400;font-size:22px;margin-top:2px}
-#cserial .tasks small{display:block;font-size:22px;color:var(--soft);margin-top:10px}
-/* 动手做：成品照片矮一点，给 4–8 步做法留位置 */
-#cserial.make .pic{width:340px;height:340px}
-#cserial.make .tasks p{margin-top:5px}
-/* 折纸：完整图式占满中间，下面两列配每一步的一句话 */
-/* 折纸：标题右侧的完成图 */
-#cserial .done{position:absolute;top:140px;right:64px;width:340px;height:178px;overflow:hidden;background:#FFFDF7}
-#cserial .done .img{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat}
-#cserial .done .lb{position:absolute;left:10px;top:8px;font-size:20px;background:#FFFDF2;border:2px solid var(--ink);border-radius:12px;padding:0 10px}
-#cserial .done .credit3{position:absolute;right:10px;bottom:6px;font-size:14px;color:#fff;text-shadow:0 1px 3px #000}
-#cserial .diagram{margin-top:16px;flex:1;min-height:0;background:#fff;overflow:hidden}
-#cserial .diagram .img{position:absolute;inset:12px 12px 32px;background-size:contain;background-position:center;background-repeat:no-repeat}
-#cserial .diagram .credit3{position:absolute;right:16px;bottom:8px;font-size:15px;color:var(--soft)}
-/* 折纸：图式切成一步一格，铺满整块，每格下面一句提示 */
-#cserial .grid{margin-top:16px;flex:1;min-height:0;display:grid;grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--rows),1fr) auto;gap:6px 14px;padding:14px 18px 10px}
-#cserial .grid .cell{display:flex;flex-direction:column;min-height:0;border-bottom:2px dashed #E4DCCB;padding-bottom:6px}
-#cserial .grid .img{flex:1;min-height:0;background-size:contain;background-position:center;background-repeat:no-repeat}
-#cserial .grid p{display:flex;align-items:center;gap:8px;font-size:23px;line-height:1.2;margin-top:4px}
-#cserial .grid p b{flex:0 0 32px;height:32px;border-radius:50%;background:var(--lav);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:400;font-size:19px}
-#cserial .grid small{grid-column:1/-1;font-size:19px;color:var(--soft);line-height:1.3}
-#cserial .steps{display:grid;grid-template-columns:1fr 1fr;column-gap:24px;font-size:24px;padding:8px 24px 10px}
-#cserial .steps p{margin-top:4px}
-#cserial .steps p b{flex-basis:34px;height:34px;font-size:20px}
-#cserial .steps small{grid-column:1/-1}
-#cserial .end{display:flex;align-items:flex-end;gap:20px;margin-top:14px;position:relative}
-#cserial .end .crew{display:flex;align-items:center;gap:10px;flex:0 0 470px}
-#cserial .end .crew .bub{font-size:26px;width:auto;flex:1;margin:0;padding:10px 16px}
-#cserial .end .crew .bub:after{left:-26px;bottom:auto;top:50%;margin-top:-14px;margin-left:0;border-top-color:transparent;border-right-color:var(--ink)}
-#cserial .end .next{flex:1;display:flex;flex-direction:column;gap:8px;font-size:28px;color:var(--tomato)}
-#cserial .end .guess{font-size:26px;color:var(--ink);background:#fff;border:4px dashed var(--ink);border-radius:20px;padding:8px 18px}
 /* 周末思辨：故事 → 两个成员各站一边 → 换你来 → 追问 → 我的想法 */
 #cthink{background:#EEF3FF}
 #cthink .h1{font-size:62px}

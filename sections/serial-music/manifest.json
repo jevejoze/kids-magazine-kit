@@ -1,0 +1,11 @@
+{
+  "id": "serial-music",
+  "title": "经典连载 · 音乐盒",
+  "slot": { "key": "serial", "kind": "music" },
+  "consumes": [],
+  "params": {},
+  "rules": ["images", "english-level"],
+  "image_policy": "private-ok",
+  "narration": { "lines": 20 },
+  "state": { "file": "state/serial-music/config.md", "log": "state/serial-music/log.jsonl" }
+}

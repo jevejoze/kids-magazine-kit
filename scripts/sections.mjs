@@ -10,6 +10,8 @@ const ASSETS = resolve(dirname(fileURLToPath(import.meta.url)), "../assets");
 const ID = /^[a-z][a-z0-9-]*$/;
 const PARAM_TYPES = ["string", "number", "boolean", "list"];
 const FIELDS = ["id", "title", "consumes", "params", "rules", "image_policy", "narration", "state"];
+// 可选字段 slot：一个旧页位由几个栏目包按 kind 分担（如 serial 的 book / music / film / make），本期数据的 kind 选哪个包
+const OPTIONAL = ["slot"];
 const strings = v => Array.isArray(v) && v.every(x => typeof x === "string" && x.trim());
 
 export function validateParam(name, p) {
@@ -41,7 +43,7 @@ export function checkParamValue(name, p, v) {
 export function validateManifest(m) {
   if (!m || typeof m !== "object" || Array.isArray(m)) return ["manifest 顶层必须是对象"];
   const errors = [];
-  const extra = Object.keys(m).filter(k => !FIELDS.includes(k));
+  const extra = Object.keys(m).filter(k => !FIELDS.includes(k) && !OPTIONAL.includes(k));
   if (extra.length) errors.push(`有未声明的字段：${extra.join("、")}`);
   const missing = FIELDS.filter(k => !(k in m));
   if (missing.length) errors.push(`缺字段：${missing.join("、")}`);
@@ -58,6 +60,8 @@ export function validateManifest(m) {
     errors.push("narration 要写成 {\"lines\": 正整数}");
   if ("state" in m && !(m.state === null || (m.state && typeof m.state === "object" && !Array.isArray(m.state) && typeof m.state.file === "string" && m.state.file.trim())))
     errors.push("state 写 null（不跨期记状态），或 {\"file\": \"数据目录里的状态文件\", ...}");
+  if ("slot" in m && !(m.slot && typeof m.slot === "object" && !Array.isArray(m.slot) && PAGE_KEYS.includes(m.slot.key) && typeof m.slot.kind === "string" && ID.test(m.slot.kind) && Object.keys(m.slot).length === 2))
+    errors.push(`slot 要写成 {"key": 页位（${PAGE_KEYS.join(" / ")}）, "kind": 本期数据的 kind}`);
   return errors;
 }
 
@@ -134,6 +138,7 @@ export function loadSections({ engine, data } = {}) {
     const css = existsSync(file("page.css")) ? readFileSync(file("page.css"), "utf8") : "";
     const unscoped = checkCssScope(css, name);
     if (unscoped.length) own.push(`${at}/page.css：选择器要以 #${name} 开头：${unscoped.join("、")}`);
+    if (manifest?.slot && sections.some(s => s.manifest.slot?.key === manifest.slot.key && s.manifest.slot.kind === manifest.slot.kind)) own.push(`${at}：页位 ${manifest.slot.key} 的 kind「${manifest.slot.kind}」已经有栏目包了`);
     seen.set(name, seen.get(name) ?? origin);
     errors.push(...own);
     if (!own.length) sections.push({ id: name, origin, dir, manifest, script, css });
@@ -141,19 +146,28 @@ export function loadSections({ engine, data } = {}) {
   return { sections, errors };
 }
 
-// 本期的页序：旧页序里有数据的键；注册了而旧页序里没有的新栏目，有数据就排在信箱前面
+// 页位 key 本期由哪个栏目包出：同 id 的包，或 slot.key 是它、slot.kind 和本期数据的 kind 一致的包（数据没写 kind 算 book）
+export function packFor(key, sections = [], issue = {}) {
+  return sections.find(s => s.id === key)
+    ?? sections.find(s => s.manifest?.slot?.key === key && s.manifest.slot.kind === (issue?.[key]?.kind ?? "book"));
+}
+const slotPack = s => Boolean(s.manifest?.slot);
+
+// 本期的页序：旧页序里有数据的键；注册了而旧页序里没有的新栏目，有数据就排在信箱前面（分担旧页位的包不另排）
 export function sectionOrder(issue, sections = []) {
-  const extra = sections.map(s => s.id).filter(id => !PAGE_KEYS.includes(id));
+  const extra = sections.filter(s => !slotPack(s)).map(s => s.id).filter(id => !PAGE_KEYS.includes(id));
   const keys = [...PAGE_KEYS.slice(0, -1), ...extra, PAGE_KEYS.at(-1)];
   return keys.filter(key => issue[key] != null);
 }
 
-// 一个栏目在页面里的 id：注册了的用栏目 id，其余用旧模板的卡片 id
-export const sectionDomId = (key, sections = []) => sections.some(s => s.id === key) ? key : CARD_IDS[key];
+// 一个栏目在页面里的 id：注册了的用栏目包 id，其余用旧模板的卡片 id
+export const sectionDomId = (key, sections = [], issue = {}) => packFor(key, sections, issue)?.id ?? CARD_IDS[key];
 
-// 内联进页面的脚本：每个注册栏目的 page.js 包成一个函数，登记到 SECTIONS
-export function sectionScripts(sections) {
-  return sections.map(s => `SECTIONS[${JSON.stringify(s.id)}] = (() => {\n${s.script.replace(/^export\s+function\s+render\b/m, "function render")}\nreturn { render };\n})();`).join("\n");
+// 内联进页面的脚本：每个注册栏目的 page.js 包成一个函数，登记到 SECTIONS[页位]；分担页位的包只登记本期用到的那个
+export function sectionScripts(sections, issue = {}) {
+  const own = sections.filter(s => !slotPack(s)).map(s => [s.id, s]);
+  const slots = [...new Set(sections.filter(slotPack).map(s => s.manifest.slot.key))].map(key => [key, packFor(key, sections, issue)]).filter(([, s]) => s);
+  return [...own, ...slots].map(([key, s]) => `SECTIONS[${JSON.stringify(key)}] = (() => {\n${s.script.replace(/^export\s+function\s+render\b/m, "function render")}\nreturn { id: ${JSON.stringify(s.id)}, render };\n})();`).join("\n");
 }
 
 // 拼出整期的 issue.html：模板里的 {{占位}} 一次替换完，填进去的内容（数据、栏目脚本）不会再被当成占位
@@ -169,9 +183,9 @@ export function issueHtml({ data, sections = loadSections({ engine: join(ASSETS,
     DATA: JSON.stringify(data),
     CAST: JSON.stringify(cast ?? JSON.parse(readFileSync(join(ASSETS, "../cast/default.json"), "utf8"))),
     KIT: asset("kit.js"),
-    SECTIONS: sectionScripts(sections),
+    SECTIONS: sectionScripts(sections, data),
     PAGE_ORDER: JSON.stringify(order),
-    CARD_IDS: JSON.stringify(order.map(key => sectionDomId(key, sections))),
+    CARD_IDS: JSON.stringify(order.map(key => sectionDomId(key, sections, data))),
   };
   return asset("template.html").replace(/\{\{([A-Z_]+)\}\}/g, (all, key) => key in values ? values[key] : all);
 }

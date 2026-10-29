@@ -8,7 +8,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { LEGACY, loadMagazine, scheduledIn } from "./schedule.mjs";
-import { loadSections } from "./sections.mjs";
+import { loadSections, packFor } from "./sections.mjs";
 
 const ENGINE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const { stages } = JSON.parse(readFileSync(join(ENGINE, "pipeline", "stages.json"), "utf8"));
@@ -56,13 +56,24 @@ export function magazineCast(dataDir, engine = ENGINE) {
 }
 
 // 栏目的声明：旧版页面看 LEGACY，栏目包看 manifest
-function spec(skill, registry) {
+//   按 kind 换包的页位（经典连载）：页位名、步骤 id、哪个 kind 包的 id，都领到本期 kind 的那个包
+function spec(skill, registry, brief) {
   if (CAPABILITIES[skill]) return { id: skill, section: null, ...CAPABILITIES[skill], consumes: [], state: null, params: {} };
   const byStage = stages.find(s => s.id === skill);
   const id = byStage ? byStage.section ?? Object.keys(CAPABILITIES).find(k => CAPABILITIES[k].stage === skill) : skill;
   if (!id) throw new Error(`第 ${skill} 步不属于哪个栏目，没有任务单`);
   if (CAPABILITIES[id]) return spec(id, registry);
-  const pack = registry.find(s => s.id === id);
+  const asked = registry.find(s => s.id === id), key = asked?.manifest.slot?.key ?? id;
+  if (brief && registry.some(s => s.manifest.slot?.key === key)) {
+    const kind = brief.sections?.[key]?.params?.kind ?? brief[key]?.kind ?? "book";
+    const pack = packFor(key, registry, { [key]: { kind } });
+    if (!pack) throw new Error(`${key} 本期 kind 是 ${kind}，没有对应的栏目包`);
+    if (asked && asked !== pack) throw new Error(`${key} 本期 kind 是 ${kind}，该领 ${pack.id} 的任务单，不是 ${asked.id}`);
+    const m = pack.manifest, l = LEGACY[key];
+    const params = { ...l.params, ...(m.params ?? {}), ...(m.narration ? { narration_lines: { ...l.params.narration_lines, default: m.narration.lines } } : {}) };
+    return { id: pack.id, section: key, pack: true, stage: l.stage, rules: m.rules ?? [], consumes: m.consumes ?? [], state: m.state ?? null, params };
+  }
+  const pack = asked;
   if (pack) {
     const m = pack.manifest, params = { ...(m.params ?? {}) };
     if (m.narration) params.narration_lines = { type: "number", default: m.narration.lines };
@@ -78,7 +89,7 @@ function spec(skill, registry) {
 // 状态文件：栏目包的 state/<id>/ 还没建（旧数据目录）时，沿用旧档案文件
 export function stateFiles(sp, dataDir) {
   if (!sp.state) return [];
-  const legacy = LEGACY[sp.id]?.state;
+  const legacy = LEGACY[sp.section ?? sp.id]?.state;
   const st = sp.pack && legacy && !existsSync(join(dataDir, "state", sp.id)) ? legacy : sp.state;
   return Object.values(st).map(f => `data/${f}`);
 }
@@ -90,10 +101,11 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
   const issue = resolve(issueDir), dataDir = resolve(issue, "..", "..");
   const { sections: registry, errors } = loadSections({ engine, data: dataDir });
   if (errors.length) throw new Error(`栏目注册表有问题：\n- ${errors.join("\n- ")}`);
-  const sp = spec(skill, registry);
+  spec(skill, registry);
   const briefFile = join(issue, "00-brief.json");
   if (!existsSync(briefFile)) throw new Error("还没有任务书 00-brief.json，先做第 00 步");
   const brief = readJson(briefFile);
+  const sp = spec(skill, registry, brief);
   const magazine = loadMagazine(dataDir, registry);
 
   let params = {};

@@ -125,6 +125,13 @@ export function validateMagazine(m, registry = []) {
     const d = declared(id, registry);
     if (d.policy === "private-ok" && policy === "free-only") errors.push(`栏目 ${id} 要用新闻原图（image_policy: private-ok），和全刊的 free-only 冲突`);
   }
+  // 按 kind 换包的页位（经典连载）：平时的 book 和周五轮换到的 kind 都要过授权检查
+  for (const key of [...new Set(registry.filter(s => s.manifest?.slot).map(s => s.manifest.slot.key))].filter(listed)) {
+    const friday = isMap(sch) && "friday" in sch ? sch.friday : DEFAULT_MAGAZINE.schedule.friday;
+    const kinds = new Set(["book", ...(Array.isArray(friday?.[key]) ? friday[key] : [])]);
+    for (const pack of registry.filter(s => s.manifest?.slot?.key === key && kinds.has(s.manifest.slot.kind)))
+      if (pack.manifest.image_policy === "private-ok" && policy === "free-only") errors.push(`栏目包 ${pack.id}（${key} 的 ${pack.manifest.slot.kind}）要用新闻原图（image_policy: private-ok），和全刊的 free-only 冲突；周五轮换去掉 ${pack.manifest.slot.kind}，或换一个自由授权的栏目包`);
+  }
   if ("params" in m) {
     if (!isMap(m.params)) errors.push("params 写成 栏目: {参数: 值}");
     else for (const [id, values] of Object.entries(m.params)) {

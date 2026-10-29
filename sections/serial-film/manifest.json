@@ -1,0 +1,11 @@
+{
+  "id": "serial-film",
+  "title": "经典连载 · 放映室",
+  "slot": { "key": "serial", "kind": "film" },
+  "consumes": [],
+  "params": {},
+  "rules": ["images", "english-level"],
+  "image_policy": "private-ok",
+  "narration": { "lines": 20 },
+  "state": { "file": "state/serial-film/config.md", "log": "state/serial-film/log.jsonl" }
+}

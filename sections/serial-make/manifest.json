@@ -1,0 +1,11 @@
+{
+  "id": "serial-make",
+  "title": "经典连载 · 动手做",
+  "slot": { "key": "serial", "kind": "make" },
+  "consumes": [],
+  "params": {},
+  "rules": ["images", "english-level"],
+  "image_policy": "private-ok",
+  "narration": { "lines": 20 },
+  "state": { "file": "state/serial-make/config.md", "log": "state/serial-make/log.jsonl" }
+}

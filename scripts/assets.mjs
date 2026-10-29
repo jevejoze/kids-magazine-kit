@@ -5,17 +5,28 @@
 //   node scripts/assets.mjs fetch <url> <out.jpg|out.png> [--min 800] [--max 2000]
 //   node scripts/assets.mjs trim  <in.png> <out.png> [--pad 20] [--white]
 //   node scripts/assets.mjs slice <in.png> <out.png> <x:y:w:h> [--pad 8] [--white] [--erase x:y:w:h]
+//
+// 栏目包的脚本直接 import：出错抛异常，不退出进程
+//   assetDir(issueDir, skillId)                     → <issue>/20-assets/<skill-id>/（栏目自己的图放这里）
+//   fetchImage(url, out, { min, max })              → { width, height, kb }
+//   trimImage(src, out, { pad, white })             → { width, height, crop }
+//   sliceImage(src, out, "x:y:w:h", { pad, white, erase }) → { width, height, crop }
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const UA = 'KidsMagazineKit/1.0 (https://github.com/jevejoze/kids-magazine-kit; educational-project)';
 
 function die(msg) {
-  console.error(`✗ ${msg}`);
-  process.exit(1);
+  throw new Error(msg);
 }
+
+export const assetDir = (issueDir, skillId) => path.join(issueDir, '20-assets', skillId);
+
+// --flag 值：没写返回 fallback
+const opt = (args, flag, fallback) => { const i = args.indexOf(flag); return i > -1 ? args[i + 1] : fallback; };
 
 function probeImage(file) {
   try {
@@ -62,14 +73,8 @@ function getCropBox(file, useWhite, preFilter = '') {
   return { crop, hasAlpha: false, info };
 }
 
-async function cmdFetch(args) {
-  const url = args[0];
-  const out = args[1];
+export async function fetchImage(url, out, { min: minEdge = 0, max: maxEdge = 0 } = {}) {
   if (!url || !out) die('用法：node scripts/assets.mjs fetch <url> <out> [--min 800] [--max 2000]');
-  const minIdx = args.indexOf('--min');
-  const minEdge = minIdx > -1 ? Number(args[minIdx + 1]) : 0;
-  const maxIdx = args.indexOf('--max');
-  const maxEdge = maxIdx > -1 ? Number(args[maxIdx + 1]) : 0;
 
   fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
   const tmp = `${out}.tmp`;
@@ -122,17 +127,11 @@ async function cmdFetch(args) {
     fs.renameSync(tmp, out);
   }
 
-  const sizeKB = Math.round(fs.statSync(out).size / 1024);
-  console.log(`✓ ${out}  ${info.width}x${info.height}  ${sizeKB} KB`);
+  return { width: info.width, height: info.height, kb: Math.round(fs.statSync(out).size / 1024) };
 }
 
-function cmdTrim(args) {
-  const src = args[0];
-  const out = args[1];
+export function trimImage(src, out, { pad = 20, white: useWhite = false } = {}) {
   if (!src || !out) die('用法：node scripts/assets.mjs trim <in.png> <out.png> [--pad 20] [--white]');
-  const padIdx = args.indexOf('--pad');
-  const pad = padIdx > -1 ? Number(args[padIdx + 1]) : 20;
-  const useWhite = args.includes('--white');
 
   const { crop, hasAlpha } = getCropBox(src, useWhite);
   const padColor = (!useWhite && hasAlpha) ? 'white@0' : 'white';
@@ -140,26 +139,18 @@ function cmdTrim(args) {
   fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
   execFileSync('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', src, '-vf', vf, out]);
   const info = probeImage(out);
-  console.log(`✓ ${out}  crop=${crop}  pad=${pad}  -> ${info.width}x${info.height}`);
+  return { width: info.width, height: info.height, crop };
 }
 
-function cmdSlice(args) {
-  const src = args[0];
-  const out = args[1];
-  const rect = args[2];
+export function sliceImage(src, out, rect, { pad = 8, white: useWhite = false, erase } = {}) {
   if (!src || !out || !rect) {
     die('用法：node scripts/assets.mjs slice <in.png> <out.png> <x:y:w:h> [--pad 8] [--white] [--erase x:y:w:h]');
   }
   const [x, y, w, h] = rect.split(':').map(Number);
   if ([x, y, w, h].some(Number.isNaN)) die(`无效坐标 <x:y:w:h>：${rect}`);
-  const padIdx = args.indexOf('--pad');
-  const pad = padIdx > -1 ? Number(args[padIdx + 1]) : 8;
-  const useWhite = args.includes('--white');
-  const eraseIdx = args.indexOf('--erase');
-
   const filters = [`crop=${w}:${h}:${x}:${y}`];
-  if (eraseIdx > -1 && args[eraseIdx + 1]) {
-    const [ex, ey, ew, eh] = args[eraseIdx + 1].split(':').map(Number);
+  if (erase) {
+    const [ex, ey, ew, eh] = erase.split(':').map(Number);
     const cond = `between(X,${ex},${ex + ew})*between(Y,${ey},${ey + eh})`;
     filters.push(`format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(${cond},0,alpha(X,Y))'`);
   }
@@ -172,20 +163,29 @@ function cmdSlice(args) {
   fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
   execFileSync('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', src, '-vf', fullVf, out]);
   const info = probeImage(out);
-  console.log(`✓ ${out}  cell=${w}:${h}:${x}:${y}  inner=${crop}  -> ${info.width}x${info.height}`);
+  return { width: info.width, height: info.height, crop };
 }
 
-const [, , cmd, ...rest] = process.argv;
-if (cmd === 'fetch') {
-  await cmdFetch(rest);
-} else if (cmd === 'trim') {
-  cmdTrim(rest);
-} else if (cmd === 'slice') {
-  cmdSlice(rest);
-} else {
-  console.log(`用法：
+async function main([cmd, ...args]) {
+  const [a, b, c] = args, pad = opt(args, '--pad'), white = args.includes('--white');
+  if (cmd === 'fetch') {
+    const r = await fetchImage(a, b, { min: Number(opt(args, '--min', 0)), max: Number(opt(args, '--max', 0)) });
+    console.log(`✓ ${b}  ${r.width}x${r.height}  ${r.kb} KB`);
+  } else if (cmd === 'trim') {
+    const r = trimImage(a, b, { pad: pad === undefined ? 20 : Number(pad), white });
+    console.log(`✓ ${b}  crop=${r.crop}  pad=${pad ?? 20}  -> ${r.width}x${r.height}`);
+  } else if (cmd === 'slice') {
+    const r = sliceImage(a, b, c, { pad: pad === undefined ? 8 : Number(pad), white, erase: opt(args, '--erase') });
+    console.log(`✓ ${b}  cell=${c}  inner=${r.crop}  -> ${r.width}x${r.height}`);
+  } else {
+    console.log(`用法：
   node scripts/assets.mjs fetch <url> <out.jpg|out.png> [--min 800] [--max 2000]
   node scripts/assets.mjs trim  <in.png> <out.png> [--pad 20] [--white]
   node scripts/assets.mjs slice <in.png> <out.png> <x:y:w:h> [--pad 8] [--white] [--erase x:y:w:h]`);
-  process.exit(cmd ? 1 : 0);
+    process.exit(cmd ? 1 : 0);
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main(process.argv.slice(2)).catch(e => { console.error(`✗ ${e.message}`); process.exit(1); });
 }

@@ -1,0 +1,11 @@
+{
+  "id": "serial-book",
+  "title": "经典连载 · 书",
+  "slot": { "key": "serial", "kind": "book" },
+  "consumes": [],
+  "params": {},
+  "rules": ["images", "english-level"],
+  "image_policy": "free-only",
+  "narration": { "lines": 20 },
+  "state": { "file": "state/serial-book/config.md", "log": "state/serial-book/log.jsonl" }
+}
