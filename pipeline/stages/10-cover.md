@@ -1,5 +1,7 @@
 # 10 封面选题
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> cover`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：选一个反直觉的问题和一张能证明它的真实照片。封面决定孩子要不要往下翻，是全期最重要的一步。
 
 **读**：`issue/00-brief.json`、`data/profile.md`（兴趣权重）、最近几期的 `10-cover.json`（避免重复）
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "10-cover", "by": "", "at": ""},
+  "_meta": {"stage": "10-cover", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "question": {"zh": "蜜蜂没学过数学，<br>为啥把格子造成六边形？", "en": "Why do bees build their cells as hexagons?"},
   "answer": "答案要点：六边形最省蜂蜡，还能挤得一点缝都没有（今日一问照此讲）",
   "photo": {"url": "图片直链", "page": "图片所在页面", "author": "作者", "license": "CC BY-SA 4.0",

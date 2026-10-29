@@ -1,5 +1,7 @@
 # 15 英文三关（暂停，可选）
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> english`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 > 目前默认不做：挑战页只放中文谜题，浣熊台词由第 14 步写。家长在 `profile.md` 里写明要英文三关时才做这一步，这时 `taunt_zh` / `taunt_en` 可省略。
 
 **读**：`issue/00-brief.json`、`issue/12-words.json`
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "15-english", "by": "", "at": ""},
+  "_meta": {"stage": "15-english", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "taunt_zh": "哼，数格子？我数得比蜜蜂还快！",
   "taunt_en": "Can you count faster than a bee?",
   "prop": "",

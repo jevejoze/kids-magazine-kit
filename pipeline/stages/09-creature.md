@@ -1,5 +1,7 @@
 # 09 传说怪物档案
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> creature`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：每周一（自然科学日）一张可收集的怪物卡，排在今日一问后面。一张卡讲一只传说怪物：传说里怎么说、科学家怎么说、它的真实原型是什么。编号从 No.001 往上排，孩子攒成一本档案。其他日子不出（`00-brief.json` 的 `creature` 为 `false` 时这一步跳过）。
 
 **读**：`issue/00-brief.json`（`creature`）、`data/creature-log.md`（已经发过哪些、下一个编号）、`data/profile.md`（兴趣）
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "09-creature", "by": "", "at": ""},
+  "_meta": {"stage": "09-creature", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "no": 1,
   "name_zh": "大海蛇",
   "parts": [{"en": "Sea", "zh": "海"}, {"en": "Serpent", "zh": "大蛇"}],

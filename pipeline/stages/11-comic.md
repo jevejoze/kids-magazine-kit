@@ -1,5 +1,7 @@
 # 11 今日一问（4 格漫画 + 图解）
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> comic`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：把封面问题的答案讲清楚：一个机制或证据链、一个可核实的数字、纠正一个常见误解。用前两格开场，让主图解释，再用后两格追问或验证。
 
 **读**：`issue/00-brief.json`、`issue/10-cover.json`
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "11-comic", "by": "", "at": ""},
+  "_meta": {"stage": "11-comic", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "theme_icon": "🔢",
   "title_zh": "蜂巢里的数学：为什么是六边形？",
   "title_en": "Why are honeycomb cells hexagons?",

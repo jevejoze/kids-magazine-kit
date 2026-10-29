@@ -84,11 +84,12 @@ sh .engine/scripts/sync.sh check                     # 有没提交或没推送�
 0. 在数据目录里跑 `sync.sh start` 拉最新
 1. 读 `pipeline/stages/<步骤>.md`（公开地址：`https://raw.githubusercontent.com/jevejoze/kids-magazine-kit/main/pipeline/stages/<步骤>.md`）
 2. 确认依赖步骤的输出文件都在 `issue/` 里；缺了就停下，告诉家长先做哪一步
-3. 读说明里列出的输入，写出说明里规定的输出文件，字段名照抄
-4. 每个输出 JSON 顶层写 `"_meta": {"stage": "13-story", "by": "<agent 名称>", "at": "<ISO 时间>"}`
-5. 按说明里的"自检"逐条检查
-6. 交付；推送等这一期做完第 90 步一起做
-7. 只写自己这一步的输出；发现上游有错，写进自己输出的 `_meta.issues`，交给家长决定
+3. 栏目步骤和第 50 步领任务单：`node scripts/pipeline.mjs ticket <issue> <栏目>`（栏目 id、步骤 id 或 `narration`）。单上有这一步要守的规则（内容红线总在）、角色槽位、任务书字段、本期参数、状态文件、上游值和输出路径
+4. 读说明里列出的输入，写出说明里规定的输出文件，字段名照抄
+5. 每个输出 JSON 顶层写 `"_meta": {"stage": "13-story", "by": "<agent 名称>", "at": "<ISO 时间>", "ticket": "<任务单指纹>"}`
+6. 按说明里的"自检"逐条检查
+7. 交付；推送等这一期做完第 90 步一起做
+8. 只写自己这一步的输出；发现上游有错，写进自己输出的 `_meta.issues`，交给家长决定
 
 重做某一步：直接覆盖它的输出，再把依赖它的下游步骤重做一遍。
 
@@ -102,6 +103,7 @@ sh .engine/scripts/sync.sh check                     # 有没提交或没推送�
 - 第 31 步先检查当前合并内容，再运行 `node scripts/pipeline.mjs fingerprint <issue>`，将指纹填入审稿记录。内容变化后必须重新审稿；第 50 步写稿前也读取这个指纹，放入 `_meta.content_hash`。
 - 第 40、70 步先在临时目录生成，完成后替换成品；失败保留上一版，页数变少时清掉多余旧页，目录里的其他笔记会保留。预览不生成正式制作记录。
 - 语音每完成一句就原子保存 manifest，失败后重跑同一命令可复用已完成的句子；`--dry` 不创建音频目录或制作记录。
+- 输出写了 `_meta.ticket` 时，指纹要和当前任务单一致：任务书字段、本期参数、规则文件、cast 或上游值变了，`status` 把这一步标成过期，`check` 报「任务单变了」，合并也会停下。没写 `_meta.ticket` 的旧输出照旧有效。
 - 过期检测覆盖合并、审稿、讲读及脚本产物，不会自动改写 agent 撰写的各栏目。封面换题后是否重写漫画，仍需编辑按依赖判断。
 
 ```bash
@@ -116,6 +118,7 @@ node --test tests/*.test.mjs
 ```bash
 node scripts/pipeline.mjs schedule <issue> [YYYY-MM-DD]  # 第 00 步：按 magazine.yaml 算本期栏目，写进任务书
 node scripts/pipeline.mjs status   <issue>   # 看每步做了没有、下一步能做什么
+node scripts/pipeline.mjs ticket   <issue> <栏目>   # 领任务单，指纹写进输出的 _meta.ticket
 node scripts/pipeline.mjs check    <issue>   # 检查已完成步骤的字段和字数
 node scripts/assets.mjs   fetch|trim|slice … # 第 20 步：下载图片、折纸图式裁边与切步骤
 node scripts/pipeline.mjs assemble <issue>   # 第 30 步

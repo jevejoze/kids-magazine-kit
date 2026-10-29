@@ -1,5 +1,7 @@
 # 08 周末思辨
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> think`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：每周五一页，排在经典连载后面、信箱前面。抛出一个两边都有道理的话题，孩子周五读完先写下自己的想法，周六和家人聊一聊，聊完再看想法变没变。练的是三件事：说出理由、听懂另一边、换个身份再想一遍。其他日子不出（`00-brief.json` 的 `think` 为 `false` 时这一步跳过）。
 
 **读**：`issue/00-brief.json`（`think`、日期）、`data/thinking-plan.md`（可选，本周练的思维本领）、`data/think-log.md`（话题池、已经用过的）、`data/profile.md`（兴趣、最近在问什么）、`data/child-questions.md`
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "08-think", "by": "", "at": ""},
+  "_meta": {"stage": "08-think", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "title": "用 AI 写的作业，算你写的吗？",
   "title_en": "If AI does your homework, who did it?",
   "story": "小明让 AI 写了一篇作文，老师夸他写得真好。同桌小红自己写，有两个错字，可每句都是她自己想的。下周考试要当堂写作文了。",

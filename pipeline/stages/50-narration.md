@@ -7,13 +7,13 @@
 **写**：`issue/50-narration.json`
 
 ```json
-{"_meta": {"stage": "50-narration", "by": "", "at": "", "content_hash": "<当前内容指纹>"},
+{"_meta": {"stage": "50-narration", "by": "", "at": "", "content_hash": "<当前内容指纹>", "ticket": "<任务单指纹>"},
  "narration": [{"card": 1, "thread": "半夜十二点的太阳，团子困得要命", "lines": [
    {"who": "narrator", "lang": "zh", "text": "……", "emotion": "开心", "sfx": "chime"}
  ]}]}
 ```
 
-写稿前运行 `node scripts/pipeline.mjs fingerprint <issue>`，把指纹放进 `_meta.content_hash`。必须先确认审稿通过且指纹有效；内容变化后重写对应台词并更新指纹，不能直接给旧稿换指纹。
+写稿前运行 `node scripts/pipeline.mjs fingerprint <issue>`，把指纹放进 `_meta.content_hash`；再领任务单 `node scripts/pipeline.mjs ticket <issue> narration`，单上的指纹放进 `_meta.ticket`。必须先确认审稿通过且指纹有效；内容变化后重写对应台词并更新指纹，不能直接给旧稿换指纹。
 
 `card` 按渲染出来的页面顺序编号：封面 1、今日一问 2、怪物档案（周一才有）、单词屋（做了才有）、小剧场、挑战、环球小报、真的假的、经典连载、周末思辨（周五才有）、信箱（最后一页）。平时 1–8，周一、周五 1–9。
 

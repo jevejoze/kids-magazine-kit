@@ -1,5 +1,7 @@
 # 14 谜题
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> challenge`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：挑战页的全部内容：捣蛋浣熊一句挑衅 + 一道四五年级奥数入门难度的题，和本期主题挂钩，唯一解。面向平板阅读，情境、条件和提问分开排版，不留手账、草稿和手写答案格。答案在本页底部倒印，不在下一期公布。
 
 **读**：`issue/00-brief.json`
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "14-puzzle", "by": "", "at": ""},
+  "_meta": {"stage": "14-puzzle", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "taunt_zh": "哼，数格子？我数得比蜜蜂还快！",
   "taunt_en": "Can you count faster than a bee?",
   "prop": "magnifier",

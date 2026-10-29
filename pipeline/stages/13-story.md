@@ -1,5 +1,7 @@
 # 13 小剧场
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> story`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：编辑部推理连载的一集。真相要能从文中线索推出来。
 
 **读**：`issue/00-brief.json`（`story`）、`data/story-bible.md`
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "13-story", "by": "", "at": ""},
+  "_meta": {"stage": "13-story", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "ep": 5, "night": false,
   "title_zh": "……", "title_en": "……",
   "paragraphs": ["……", "……"],

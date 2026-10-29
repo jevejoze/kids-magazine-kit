@@ -1,5 +1,7 @@
 # 16 信箱
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> mailbox`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：杂志的最后一页，用来收孩子的反馈。页面上固定有 5 个问题，由模板生成：👍 最喜欢哪一页、👎 哪一页不太喜欢、今天难不难、💡 今天想到了什么有趣的问题、👀 今天看到了什么有意思的事。这一步只写页面上方的几句话。
 
 **读**：`issue/00-brief.json`（`last_feedback`、`send_note`）、`data/letters.md`、周六读上一期的 `issue/08-think.json`
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "16-mailbox", "by": "", "at": ""},
+  "_meta": {"stage": "16-mailbox", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "hello": "小满早上好！你问为什么没有木乃伊猫——其实有，而且很多！",
   "ask_zh": "如果你是蜜蜂，会把家盖成什么形状？",
   "send_note": "说给妈妈听"

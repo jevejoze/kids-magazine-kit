@@ -1,5 +1,7 @@
 # 18 经典连载
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> serial`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：信箱前面的一页。平时连载一本经典儿童书，一期讲一段，停在悬念上，让孩子明天还想翻开；周五（艺术日）换成「音乐盒」「放映室」或「动手做」，介绍一首曲子、一部电影，或者带孩子做一件折纸、打印一个 3D 模型。
 
 **读**：`issue/00-brief.json`（`serial`）、`data/serial-bible.md`（书目、分集计划、角色认领、已讲到哪、周五片单）、`data/profile.md`（英文档位）
@@ -10,7 +12,7 @@
 
 ```json
 {
-  "_meta": {"stage": "18-serial", "by": "", "at": ""},
+  "_meta": {"stage": "18-serial", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "kind": "book",
   "ep": 3,
   "book_zh": "柳林风声", "book_en": "The Wind in the Willows", "author": "Kenneth Grahame · 1908",
@@ -30,7 +32,7 @@
 
 ```json
 {
-  "_meta": {"stage": "18-serial", "by": "", "at": ""},
+  "_meta": {"stage": "18-serial", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "kind": "music",
   "title_zh": "彼得与狼", "title_en": "Peter and the Wolf",
   "by": "普罗科菲耶夫 Prokofiev · 1936 · 约 25 分钟",
@@ -48,7 +50,7 @@
 
 ```json
 {
-  "_meta": {"stage": "18-serial", "by": "", "at": ""},
+  "_meta": {"stage": "18-serial", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "kind": "make", "craft": "origami",
   "title_zh": "会跳的纸青蛙", "title_en": "Jumping Paper Frog",
   "by": "折纸 · 难度 ⭐⭐ · 约 15 分钟 · 一张名片大小的卡纸",

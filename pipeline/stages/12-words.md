@@ -1,5 +1,7 @@
 # 12 单词屋（暂停，可选）
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> words`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 > 目前默认不做，页面里没有单词屋。家长在 `profile.md` 里写明要单词屋时才做这一步；做了，模板会自动把单词屋排在今日一问后面。
 
 **目标**：3 个和本期主题相关的英文单词，例句练一个语法点。
@@ -10,7 +12,7 @@
 
 ```json
 {
-  "_meta": {"stage": "12-words", "by": "", "at": ""},
+  "_meta": {"stage": "12-words", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "intro": "Hi, it's Boba Mouse! 🐝 Today we count sides with the bees. Buzz buzz! 嗡嗡！",
   "grammar": "比较级 more / less / better",
   "items": [

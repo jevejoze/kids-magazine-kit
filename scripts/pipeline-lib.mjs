@@ -29,6 +29,7 @@ import {
   NARRATION_MAX_LINES,
 } from "./contracts.mjs";
 import { scheduledIn, LEGACY, parseDate } from "./schedule.mjs";
+import { ticket, ticketSkillOf } from "./ticket.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const { stages } = JSON.parse(readFileSync(join(here, "..", "pipeline", "stages.json"), "utf8"));
@@ -99,7 +100,7 @@ export function createPipeline(issueArg) {
         if (!nonempty(f)) return false;
         if (!p.endsWith(".json")) return true;
         const name = p.slice(6), value = read(name);
-        if (validateStructure(name, value).length) return false;
+        if (validateStructure(name, value).length || staleTicket(name, value)) return false;
         const before = problems.length;
         checks[name]?.(value);
         const valid = problems.length === before;
@@ -107,6 +108,14 @@ export function createPipeline(issueArg) {
         return valid && (name !== "30-issue.json" || (validateIssue(value).length === 0 && currentBuild(issue, "30-assemble")));
       });
     } catch { return false; }
+  };
+  // 输出写了 _meta.ticket 却和当前任务单对不上：任务书、参数、规则、cast 或上游值变了，这一步要按新任务单重做。
+  // 没写 _meta.ticket 的旧输出照旧有效
+  const staleTicket = (name, value) => {
+    const want = value?._meta?.ticket, skill = want && ticketSkillOf(name);
+    if (!skill) return null;
+    try { return ticket(issue, skill).fingerprint === want ? null : "任务单变了，输出已过期，请按新任务单重做"; }
+    catch (e) { return `领不到任务单（${e.message.split("\n")[0]}），输出已过期`; }
   };
   // 栏目本期出不出看任务书的 sections（第 00 步跑 pipeline.mjs schedule 写进去）：不在里面的步骤算本期不出。
   // 没有 sections 的旧任务书照旧：creature、think 看同名布尔字段，单词屋、英文三关是可选栏目
@@ -476,6 +485,8 @@ export function createPipeline(issueArg) {
         const value = read(file), structural = validateStructure(file, value);
         problems.push(...structural);
         if (!structural.length) fn(value);
+        const stale = staleTicket(file, value);
+        if (stale) problems.push(`[${stages.find(s => s.outputs.includes(`issue/${file}`))?.id.slice(0, 2) ?? file}] ${stale}`);
       } catch (e) { problems.push(`[${file}] 读不了：${e.message}`); }
     }
     if (!contentOnly && has("31-review.md")) need(reviewPassed(), "31", "审稿未通过或内容指纹已过期，请重新合并、审稿");

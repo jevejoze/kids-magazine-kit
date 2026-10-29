@@ -18,19 +18,20 @@ const lines = (id, max = 60) => ({ type: "number", default: NARRATION_MAX_LINES[
 const text = { type: "string", default: "" };
 
 // 旧版页面的伪 manifest。stage：对应的流水线步骤；required：旧模板必须有这一页；optional：可选栏目（家长写进 sections 才做）
+// rules：要守的 core/rules（红线由任务单自动加）；consumes：要读的上游值；state：跨期状态文件
 // params 里 open 的才能在 magazine.yaml 里改；其余由调度填（周五轮换、课表）
 export const LEGACY = {
-  cover:     { stage: "10-cover",    required: true, params: { narration_lines: lines("cover") } },
-  comic:     { stage: "11-comic",    required: true, params: { narration_lines: lines("comic") } },
-  creature:  { stage: "09-creature", params: { narration_lines: lines("creature") } },
-  words:     { stage: "12-words",    optional: true, params: { narration_lines: lines("words") } },
-  story:     { stage: "13-story",    required: true, params: { narration_lines: lines("story") } },
+  cover:     { stage: "10-cover",    required: true, rules: ["images"], params: { narration_lines: lines("cover") } },
+  comic:     { stage: "11-comic",    required: true, consumes: ["cover.question"], params: { narration_lines: lines("comic") } },
+  creature:  { stage: "09-creature", rules: ["images"], state: { file: "creature-log.md" }, params: { narration_lines: lines("creature") } },
+  words:     { stage: "12-words",    optional: true, rules: ["english-level"], params: { narration_lines: lines("words") } },
+  story:     { stage: "13-story",    required: true, state: { file: "story-bible.md" }, params: { narration_lines: lines("story") } },
   challenge: { stage: "14-puzzle",   required: true, params: { narration_lines: lines("challenge") } },
-  english:   { stage: "15-english",  optional: true, params: {} },
-  news:      { stage: "17-news",     params: { narration_lines: lines("news") } },
-  check:     { stage: "19-check",    params: { narration_lines: lines("check"), skill: text, choices: text, tools: text } },
-  serial:    { stage: "18-serial",   params: { narration_lines: lines("serial"), kind: { type: "string", default: "book", enum: SERIAL_KINDS } } },
-  think:     { stage: "08-think",    params: { narration_lines: lines("think"), skill: text, friday_topic: text } },
+  english:   { stage: "15-english",  optional: true, rules: ["english-level"], params: {} },
+  news:      { stage: "17-news",     rules: ["images", "english-level"], params: { narration_lines: lines("news") } },
+  check:     { stage: "19-check",    rules: ["no-visible-pedagogy"], params: { narration_lines: lines("check"), skill: text, choices: text, tools: text } },
+  serial:    { stage: "18-serial",   rules: ["images", "english-level"], state: { file: "serial-bible.md" }, params: { narration_lines: lines("serial"), kind: { type: "string", default: "book", enum: SERIAL_KINDS } } },
+  think:     { stage: "08-think",    rules: ["no-visible-pedagogy"], state: { file: "think-log.md" }, params: { narration_lines: lines("think"), skill: text, friday_topic: text } },
   mailbox:   { stage: "16-mailbox",  required: true, params: { narration_lines: lines("mailbox") } },
 };
 // 首批开放给家长改的参数；周五轮换在 schedule.friday 里写

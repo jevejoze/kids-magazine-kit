@@ -1,5 +1,7 @@
 # 17 环球小报
 
+开工前领任务单：`node scripts/pipeline.mjs ticket <issue> news`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`。
+
 **目标**：3 条最近 7 天适合孩子的真实新闻，1 条头条 + 2 条短讯。页面保持简短，讲读版靠 `talk` 讲得更丰富。
 
 **读**：`issue/00-brief.json`、`data/profile.md`（兴趣）
@@ -8,7 +10,7 @@
 
 ```json
 {
-  "_meta": {"stage": "17-news", "by": "", "at": ""},
+  "_meta": {"stage": "17-news", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "week": "10.06–10.12",
   "items": [
     {"flag": "🇪🇸", "place": "西班牙 · 巴塞罗那", "title": "长颈鹿会做加法！", "text": "≤ 50 字",

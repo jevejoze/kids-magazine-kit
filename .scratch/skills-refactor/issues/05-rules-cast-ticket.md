@@ -4,10 +4,10 @@
 
 **Blocked by:** 04
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] 总规则拆成独立规则文件（红线、图片、英文档位、讲读、no-visible-pedagogy），根 SKILL.md 引用它们
-- [ ] cast 包把槽位（asker、expert、english、trickster、narrator）映射到角色；少于 2 个角色或槽位没人担报错
-- [ ] 红线和 cast 隐式进入每张任务单，声明里去不掉
-- [ ] 任务单指纹稳定：输入不变指纹不变，任一输入变了指纹就变
-- [ ] `_meta.ticket` 与当前任务单不符时，status / check 把这一步标成过期
+- [x] 总规则拆成独立规则文件（红线、图片、英文档位、讲读、no-visible-pedagogy），根 SKILL.md 引用它们
+- [x] cast 包把槽位（asker、expert、english、trickster、narrator）映射到角色；少于 2 个角色或槽位没人担报错
+- [x] 红线和 cast 隐式进入每张任务单，声明里去不掉
+- [x] 任务单指纹稳定：输入不变指纹不变，任一输入变了指纹就变
+- [x] `_meta.ticket` 与当前任务单不符时，status / check 把这一步标成过期
