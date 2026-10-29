@@ -158,9 +158,9 @@ test("enabled weekly column is required; malformed JSON is not complete", t => {
 test("archive receipt must refer to this issue and existing updated records", t => {
   const issue = fixture(t), p = createPipeline(issue);
   cards(issue);
-  put(issue, "90-archive.json", { issue: 2, updated: ["story-bible.md"] });
+  put(issue, "90-archive.json", { issue: 2, updated: ["state/story/open-threads.md"] });
   assert.equal(p.done("90-archive"), false);
-  put(issue, "90-archive.json", { issue: 3, content_hash: p.fingerprint(), updated: ["story-bible.md"] });
+  put(issue, "90-archive.json", { issue: 3, content_hash: p.fingerprint(), updated: ["state/story/open-threads.md"] });
   assert.equal(p.done("90-archive"), true);
   put(issue, "90-archive.json", { issue: 3, updated: ["missing.md"] });
   assert.equal(p.done("90-archive"), false);
@@ -343,13 +343,15 @@ test("parent script export and archive helper respect render freshness", t => {
   cards(issue);
   const r1 = p.archive(), pub = join(issue, "../../成品/003");
   assert.equal(r1.content_hash, p.fingerprint());
-  assert.ok(r1.updated.includes("story-bible.md") && r1.updated.includes("vocab.json"));
+  assert.ok(r1.updated.includes("state/story/log.jsonl") && r1.updated.includes("state/story/open-threads.md") && r1.updated.includes("vocab.json"));
   assert.ok(existsSync(join(pub, "card-9.png")) && existsSync(join(pub, "小满早知道-第003期.pdf")));
   assert.equal(existsSync(join(pub, "小满早知道-第003期-讲读版.mp4")), false);
   assert.equal(p.done("90-archive"), false);
-  const bible = readFileSync(join(issue, "../../story-bible.md"), "utf8");
+  const log = readFileSync(join(issue, "../../state/story/log.jsonl"), "utf8");
+  assert.deepEqual(log.trim().split("\n").map(l => JSON.parse(l)), [{ issue: 3, ep: 3, title_zh: "珍珠的真相", summary: json(issue, "13-story.json").summary, secret: json(issue, "13-story.json").secret }]);
+  assert.match(readFileSync(join(issue, "../../state/story/open-threads.md"), "utf8"), /- 半夜的吸溜声/);
   assert.deepEqual(p.archive(), r1);
-  assert.equal(readFileSync(join(issue, "../../story-bible.md"), "utf8"), bible);
+  assert.equal(readFileSync(join(issue, "../../state/story/log.jsonl"), "utf8"), log, "重复归档不重复追加");
   put(issue, "90-archive.json", r1);
   assert.equal(p.done("90-archive"), true);
 });

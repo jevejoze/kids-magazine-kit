@@ -2,7 +2,7 @@
 
 **目标**：定下这一期做什么，给后面各步一个统一的方向。后面所有步骤都先读这个文件。
 
-**读**：`data/MY_CHILD.md`、`data/profile.md`、`data/curation-log.md`（最近一次策展结论和随手记）、`data/child-questions.md`、`data/story-bible.md`、`data/serial-bible.md`、`data/creature-log.md`、`data/think-log.md`、`data/letters.md`、上一期的 `issue/30-issue.json`（取期号和连载进度）
+**读**：`data/MY_CHILD.md`、`data/profile.md`、`data/curation-log.md`（最近一次策展结论和随手记）、`data/child-questions.md`、`data/state/story/`（小剧场的设定、每集记录、未回收伏笔；旧数据目录是 `data/story-bible.md`）、`data/serial-bible.md`、`data/creature-log.md`、`data/think-log.md`、`data/letters.md`、上一期的 `issue/30-issue.json`（取期号和连载进度）
 
 **写**：`issue/00-brief.json`（`issue/` = `data/issues/NNN/`，NNN 是三位期号，文件夹不存在就新建）
 

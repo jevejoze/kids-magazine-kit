@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "小剧场 13-story.json",
+  "type": "object",
+  "required": ["ep", "title_zh", "title_en", "paragraphs", "scene", "clue", "tbc", "secret"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "ep": { "type": "integer", "minimum": 1 },
+    "lang": { "enum": ["zh"] },
+    "night": { "type": "boolean" },
+    "title_zh": { "type": "string", "minLength": 1 },
+    "title_en": { "type": "string", "minLength": 1 },
+    "paragraphs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "scene": { "type": "array", "items": { "type": "string", "pattern": "^[a-z]+:[a-z]+:[0-9]+(:[a-z+]+)?$" } },
+    "clue": { "type": "string", "minLength": 1 },
+    "tbc": { "type": "string", "minLength": 1 },
+    "foot": { "type": "string" },
+    "secret": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string" },
+    "threads_after": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "bible_update": { "type": "string" }
+  }
+}

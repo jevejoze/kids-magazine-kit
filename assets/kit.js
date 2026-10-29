@@ -1,6 +1,6 @@
 // 栏目共用的版式工具，旧模板和各栏目的 page.js 都用它：render(data, kit)
 // 页码按调用 foot() 的先后计数，所以栏目要按页序渲染；总页数先写占位 {{TOTAL}}，全部渲染完再替换
-const makeKit = D => {
+const makeKit = (D, CAST) => {
   const N = String(D.issue).padStart(3, "0");
   const ch = spec => { const [n, m = "normal", s = 180, p = ""] = spec.split(":"); return draw(n, m, +s, p); };
   const bub = b => `<div class="bub ${b.lang === "en" ? "en" : "fun"}">${b.text}</div>`;
@@ -26,8 +26,11 @@ const makeKit = D => {
     });
     return words.map(word => /^\s+$/.test(word) ? word : `<span class="word-group">${escapeText(word)}</span>`).join("");
   }).join("<br>");
+  // 槽位 → 角色：栏目按槽位（asker、expert、english、trickster）找角色，名字和别名都算提到了他
+  const slots = CAST?.slots ?? {};
+  const mentions = (text, slot) => { const c = CAST?.characters?.[slots[slot]]; return !!c && [c.name, ...(c.aliases ?? [])].some(n => String(text).includes(n)); };
   return {
-    issue: D, N, ch, bub, topBar, foot, coverFoot, next: NEXT, toc: TOC, serial: SERIAL, cast: GANG, draw,
+    issue: D, N, ch, bub, topBar, foot, coverFoot, next: NEXT, toc: TOC, serial: SERIAL, cast: GANG, slots, mentions, draw,
     escapeText, wrapChineseWords, pages: () => pg,
   };
 };

@@ -28,6 +28,7 @@ export function validateCast(cast) {
   const errors = [], chars = isMap(cast.characters) ? Object.keys(cast.characters) : [];
   if (chars.length < 2) errors.push(`cast 至少要 2 个角色，现在 ${chars.length} 个`);
   for (const [k, c] of Object.entries(cast.characters ?? {})) if (!isMap(c) || typeof c.name !== "string" || !c.name) errors.push(`角色 ${k} 缺 name`);
+  for (const [k, c] of Object.entries(cast.characters ?? {})) if (isMap(c) && c.aliases !== undefined && !(Array.isArray(c.aliases) && c.aliases.every(a => typeof a === "string" && a))) errors.push(`角色 ${k} 的 aliases 要是字符串数组`);
   const slots = isMap(cast.slots) ? cast.slots : {};
   for (const s of SLOTS) {
     const who = slots[s];
@@ -48,6 +49,12 @@ export function loadCast(dataDir, name = "default", engine = ENGINE) {
   return cast;
 }
 
+// 本刊用的 cast：magazine.yaml 的 cast，默认 default
+export function magazineCast(dataDir, engine = ENGINE) {
+  const { sections: registry } = loadSections({ engine, data: dataDir });
+  return loadCast(dataDir, loadMagazine(dataDir, registry).cast ?? "default", engine);
+}
+
 // 栏目的声明：旧版页面看 LEGACY，栏目包看 manifest
 function spec(skill, registry) {
   if (CAPABILITIES[skill]) return { id: skill, section: null, ...CAPABILITIES[skill], consumes: [], state: null, params: {} };
@@ -55,15 +62,25 @@ function spec(skill, registry) {
   const id = byStage ? byStage.section ?? Object.keys(CAPABILITIES).find(k => CAPABILITIES[k].stage === skill) : skill;
   if (!id) throw new Error(`第 ${skill} 步不属于哪个栏目，没有任务单`);
   if (CAPABILITIES[id]) return spec(id, registry);
+  const pack = registry.find(s => s.id === id);
+  if (pack) {
+    const m = pack.manifest, params = { ...(m.params ?? {}) };
+    if (m.narration) params.narration_lines = { type: "number", default: m.narration.lines };
+    return { id, section: id, pack: true, stage: stages.find(s => s.section === id)?.id ?? null, rules: m.rules ?? [], consumes: m.consumes ?? [], state: m.state ?? null, params };
+  }
   if (LEGACY[id]) {
     const l = LEGACY[id];
     return { id, section: id, stage: l.stage, rules: l.rules ?? [], consumes: l.consumes ?? [], state: l.state ?? null, params: l.params };
   }
-  const pack = registry.find(s => s.id === id);
-  if (!pack) throw new Error(`没有这个栏目：${skill}`);
-  const m = pack.manifest, params = { ...(m.params ?? {}) };
-  if (m.narration) params.narration_lines = { type: "number", default: m.narration.lines };
-  return { id, section: id, stage: stages.find(s => s.section === id)?.id ?? null, rules: m.rules ?? [], consumes: m.consumes ?? [], state: m.state ?? null, params };
+  throw new Error(`没有这个栏目：${skill}`);
+}
+
+// 状态文件：栏目包的 state/<id>/ 还没建（旧数据目录）时，沿用旧档案文件
+export function stateFiles(sp, dataDir) {
+  if (!sp.state) return [];
+  const legacy = LEGACY[sp.id]?.state;
+  const st = sp.pack && legacy && !existsSync(join(dataDir, "state", sp.id)) ? legacy : sp.state;
+  return Object.values(st).map(f => `data/${f}`);
 }
 
 // 栏目的输出文件：有步骤就是步骤的 outputs，栏目包没有步骤就是 issue/<id>.json
@@ -116,7 +133,7 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
     cast: { id: cast.id ?? magazine.cast, slots: cast.slots, characters: cast.characters },
     brief: briefPart,
     params,
-    state: sp.state ? [`data/${sp.state.file}`] : [],
+    state: stateFiles(sp, dataDir),
     consumes,
     output: outputsOf(sp),
   };

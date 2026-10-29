@@ -4,8 +4,8 @@
   "characters": {
     "dog":     { "name": "团子狗",   "emoji": "🐶", "lang": "zh",    "persona": "懒、贪吃、爱问为什么，憨憨的" },
     "mouse":   { "name": "波波鼠",   "emoji": "🐭", "lang": "en+zh", "persona": "爱喝珍珠奶茶，伦敦来的交换生，英文为主，偶尔蹩脚中文" },
-    "owl":     { "name": "咕咕博士", "emoji": "🦉", "lang": "zh+en", "persona": "戴眼镜，博学，爱讲冷知识" },
-    "raccoon": { "name": "捣蛋浣熊", "emoji": "🦝", "lang": "zh+en", "persona": "爱藏东西、出难题、嘴硬心软" }
+    "owl":     { "name": "咕咕博士", "aliases": ["博士"], "emoji": "🦉", "lang": "zh+en", "persona": "戴眼镜，博学，爱讲冷知识" },
+    "raccoon": { "name": "捣蛋浣熊", "aliases": ["浣熊"], "emoji": "🦝", "lang": "zh+en", "persona": "爱藏东西、出难题、嘴硬心软" }
   },
   "slots": {
     "asker": "dog",

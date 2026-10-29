@@ -12,7 +12,8 @@
 <私有数据仓库>/               数据目录，下文写作 data/
   magazine.yaml             杂志配置：出哪些栏目、哪天出、周五轮换、参数（可选，没有就用默认配置）
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
-  story-bible.md  serial-bible.md  creature-log.md  think-log.md  thinking-plan.md  vocab.json  feedback.jsonl
+  serial-bible.md  creature-log.md  think-log.md  thinking-plan.md  vocab.json  feedback.jsonl
+  state/story/               小剧场：config.md 设定、log.jsonl 每集一行、open-threads.md 未回收伏笔（旧数据目录是 story-bible.md）
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
   voices/polyphones.json    这个孩子常用词的多音字读音（可选，补充引擎的通用词典）
   sfx/                       讲读版音效（可选）

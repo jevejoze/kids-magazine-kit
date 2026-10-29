@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] 小剧场栏目包齐全（SKILL.md、manifest、schema、check、page.js、page.css、narrate.md）
-- [ ] 规则和校验里只写槽位
-- [ ] 状态用 config.md、log.jsonl、open-threads.md；栏目输出 threads_after，归档步骤落盘
-- [ ] 全部含小剧场的旧期像素一致
-- [ ] 在 demo fixture 上用任务单跑通一期小剧场，check 通过
+- [x] 小剧场栏目包齐全（SKILL.md、manifest、schema、check、page.js、page.css、narrate.md）
+- [x] 规则和校验里只写槽位
+- [x] 状态用 config.md、log.jsonl、open-threads.md；栏目输出 threads_after，归档步骤落盘
+- [x] 全部含小剧场的旧期像素一致
+- [x] 在 demo fixture 上用任务单跑通一期小剧场，check 通过

@@ -12,6 +12,7 @@ import { inputFingerprint, recordBuild, publishDirectory } from "./build-state.m
 import { createPipeline } from "./pipeline-lib.mjs";
 import { validateIssue } from "./contracts.mjs";
 import { loadSections, sectionOrder, sectionDomId, issueHtml } from "./sections.mjs";
+import { magazineCast } from "./ticket.mjs";
 import { loadCharacterPack } from "./character-pack.mjs";
 
 const args = process.argv.slice(2);
@@ -67,7 +68,8 @@ const registry = loadSections({ engine: resolve(here, ".."), data: resolve(jsonD
 if (registry.errors.length) throw new Error(`栏目注册表有错：\n${registry.errors.join("\n")}`);
 const sections = registry.sections;
 const order = sectionOrder(data, sections), expected = order.map(key => sectionDomId(key, sections));
-const html = issueHtml({ data, sections, characterPack, title: `${data.masthead.zh} 第${N}期` });
+const cast = magazineCast(resolve(jsonDir, "..", ".."));
+const html = issueHtml({ data, sections, characterPack, cast, title: `${data.masthead.zh} 第${N}期` });
 const htmlPath = join(outDir, "issue.html");
 writeFileSync(htmlPath, html);
 

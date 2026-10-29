@@ -6,7 +6,6 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import vm from "node:vm";
 import { loadCharacterPack } from "../scripts/character-pack.mjs";
-import { CARD_IDS, pageOrder } from "../scripts/contracts.mjs";
 import { issueHtml } from "../scripts/sections.mjs";
 
 const source = readFileSync(new URL("../assets/characters.js", import.meta.url), "utf8");
@@ -85,12 +84,14 @@ test("comic speaker names inherit their configured expression and accessories", 
   const issue = JSON.parse(readFileSync(new URL("../examples/demo/issues/003/30-issue.json", import.meta.url), "utf8"));
   issue.comic.panels[0].chars = ["dog:surprise:120:eyemask"];
   issue.comic.panels[0].bubbles[0].who = "dog";
-  const root = { outerHTML: "" }, ids = pageOrder(issue).map(key => CARD_IDS[key]);
+  const root = { outerHTML: "" }, cardIds = html => JSON.parse(html.match(/const CARD_IDS = (.*);/)[1]);
+  let ids = [];
   const context = vm.createContext({
     document: { body: { insertAdjacentHTML() {} }, getElementById: () => root, querySelector: () => null, querySelectorAll: () => ids.map(id => ({ id, closest: () => null })) },
     Image: class { decode() { return Promise.resolve(); } }, location: { hash: "" }, window: {},
   });
   const template = issueHtml({ data: issue, characterPack: loadCharacterPack("storybook-v1"), characters: source });
+  ids = cardIds(template);
   vm.runInContext(template.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   const comic = root.outerHTML.match(/<section class="card" id="c2">[\s\S]*?<\/section>/)[0];
   assert.match(comic, /data-character="dog" data-expression="surprise"/);

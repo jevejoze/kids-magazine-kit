@@ -1,0 +1,10 @@
+{
+  "id": "story",
+  "title": "小剧场",
+  "consumes": [],
+  "params": {},
+  "rules": [],
+  "image_policy": "free-only",
+  "narration": { "lines": 30 },
+  "state": { "file": "state/story/config.md", "log": "state/story/log.jsonl", "threads": "state/story/open-threads.md" }
+}

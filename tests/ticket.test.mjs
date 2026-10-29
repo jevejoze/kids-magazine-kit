@@ -30,7 +30,7 @@ test("ticket fingerprint is stable and names rules, cast slots, params, state, u
   assert.deepEqual(a.content.rules.map(r => r.id), ["red-lines"]);
   assert.equal(a.content.cast.slots.trickster, "raccoon");
   assert.equal(a.content.brief.story.ep, 3);
-  assert.deepEqual(a.content.state, ["data/story-bible.md"]);
+  assert.deepEqual(a.content.state, ["data/state/story/config.md", "data/state/story/log.jsonl", "data/state/story/open-threads.md"]);
   assert.deepEqual(a.content.output, ["issue/13-story.json"]);
   assert.equal(a.content.params.narration_lines, 30);
   assert.deepEqual(ticket(issue, "news").content.rules.map(r => r.id), ["red-lines", "images", "english-level"]);

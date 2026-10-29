@@ -157,7 +157,8 @@ export function sectionScripts(sections) {
 }
 
 // 拼出整期的 issue.html：模板里的 {{占位}} 一次替换完，填进去的内容（数据、栏目脚本）不会再被当成占位
-export function issueHtml({ data, sections = [], characterPack = null, title = "", characters } = {}) {
+// sections 不给时用引擎自带的栏目包，cast 不给时用引擎的 cast/default.json
+export function issueHtml({ data, sections = loadSections({ engine: join(ASSETS, "..") }).sections, characterPack = null, title = "", characters, cast } = {}) {
   const asset = f => readFileSync(join(ASSETS, f), "utf8");
   const order = sectionOrder(data, sections);
   const values = {
@@ -166,6 +167,7 @@ export function issueHtml({ data, sections = [], characterPack = null, title = "
     CHARACTER_PACK: JSON.stringify(characterPack),
     CHARACTERS: characters ?? asset("characters.js"),
     DATA: JSON.stringify(data),
+    CAST: JSON.stringify(cast ?? JSON.parse(readFileSync(join(ASSETS, "../cast/default.json"), "utf8"))),
     KIT: asset("kit.js"),
     SECTIONS: sectionScripts(sections),
     PAGE_ORDER: JSON.stringify(order),

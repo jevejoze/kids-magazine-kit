@@ -30,8 +30,11 @@ import {
 } from "./contracts.mjs";
 import { scheduledIn, LEGACY, parseDate } from "./schedule.mjs";
 import { ticket, ticketSkillOf } from "./ticket.mjs";
+import { loadSections } from "./sections.mjs";
+import { createRequire } from "node:module";
 
 const here = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 const { stages } = JSON.parse(readFileSync(join(here, "..", "pipeline", "stages.json"), "utf8"));
 // 50-narration.md「写法：错的和对的」里的例句，讲读稿照抄就报错
 const NARRATION_EXAMPLES = (() => {
@@ -47,6 +50,7 @@ const YEAR_DATE = new RegExp(`[零〇一二三四五六七八九]{4}年|${NUM}{1
 export function createPipeline(issueArg) {
   const issue = resolve(issueArg);
   const dataDir = resolve(issue, "..", "..");
+  const registry = loadSections({ engine: resolve(here, ".."), data: dataDir }).sections;
 
   const out = p => p.startsWith("issue/") ? join(issue, p.slice(6)) : join(dataDir, p.slice(5));
   const read = name => JSON.parse(readFileSync(join(issue, name), "utf8"));
@@ -242,12 +246,6 @@ export function createPipeline(issueArg) {
         const old = vocab.find(v => v.word.toLowerCase() === x.word.toLowerCase());
         need(!old || old.issue === self, "12", `${x.word} 已经在第 ${old?.issue} 期学过`);
       });
-    },
-    "13-story.json": s => {
-      fields(s, "13", ["ep", "title_zh", "title_en", "paragraphs", "scene", "clue", "tbc", "secret"]);
-      const text = (s.paragraphs ?? []).join(" ");
-      need(len(text.replace(/\s/g, "")) <= 300, "13", `故事 ${len(text.replace(/\s/g, ""))} 字，超过 300`);
-      (s.scene ?? []).forEach((x, i) => checkChar(x, "13", `scene[${i}]`));
     },
     "14-puzzle.json": p => {
       const e = useEnglish() ? read("15-english.json") : {};
@@ -475,6 +473,18 @@ export function createPipeline(issueArg) {
     },
   };
 
+  // 栏目包自带 check.mjs 的，按页校验交给栏目：check(value, ctx) 返回问题列表，这里加上步骤前缀
+  for (const pack of registry) {
+    const file = join(pack.dir, "check.mjs");
+    if (!existsSync(file)) continue;
+    const st = stages.find(s => s.section === pack.id), tag = st ? st.id.slice(0, 2) : pack.id;
+    const out = st ? st.outputs.find(o => o.endsWith(".json")).slice(6) : `${pack.id}.json`;
+    const collect = fn => { const n = problems.length; fn(); return problems.splice(n).map(m => m.replace(/^\[[^\]]*\] /, "")); };
+    const ctx = { checkChar: (x, at) => collect(() => checkChar(x, tag, at)), stateful: existsSync(join(dataDir, "state", pack.id)) };
+    const { check: own } = require(file);
+    checks[out] = v => own(v, ctx).forEach(m => problems.push(`[${tag}] ${m}`));
+  }
+
   function check({ contentOnly = false } = {}) {
     problems.length = 0;
     for (const [file, fn] of Object.entries(checks)) {
@@ -635,13 +645,26 @@ export function createPipeline(issueArg) {
       if (!cur.includes(marker) && !cur.includes(String(text).trim())) atomicWrite(p, cur.replace(/\s*$/, "\n\n") + String(text).trim() + "\n");
       updated.push(relName);
     };
+    // 小剧场：有 state/story/ 就追加 log.jsonl、按 threads_after 重写 open-threads.md；旧数据目录照旧追加 story-bible.md
     if (has("13-story.json")) {
       const s = read("13-story.json");
       const marker = `EP.${String(s.ep).padStart(2, "0")}`;
-      const entry = s.bible_update
-        ? (String(s.bible_update).includes(marker) ? s.bible_update : `### ${marker}（第 ${padNum} 期）\n${s.bible_update}`)
-        : `### ${marker}《${s.title_zh}》（第 ${padNum} 期）\n- 真相：${s.secret || ""}`;
-      appendSection("story-bible.md", marker, entry);
+      const st = registry.find(x => x.id === "story")?.manifest.state;
+      if (st && existsSync(join(dataDir, "state", "story"))) {
+        const logPath = join(dataDir, st.log), cur = existsSync(logPath) ? readFileSync(logPath, "utf8") : "";
+        if (!cur.split("\n").filter(Boolean).some(l => JSON.parse(l).issue === num))
+          atomicWrite(logPath, cur.replace(/\s*$/, cur.trim() ? "\n" : "") + JSON.stringify({ issue: num, ep: s.ep, title_zh: s.title_zh, summary: s.summary ?? s.bible_update ?? "", secret: s.secret ?? "" }) + "\n");
+        updated.push(st.log);
+        if (Array.isArray(s.threads_after)) {
+          atomicWrite(join(dataDir, st.threads), `# 未回收伏笔\n\n${s.threads_after.length ? s.threads_after.map(t => `- ${t}`).join("\n") : "（暂无）"}\n`);
+          updated.push(st.threads);
+        }
+      } else {
+        const entry = s.bible_update
+          ? (String(s.bible_update).includes(marker) ? s.bible_update : `### ${marker}（第 ${padNum} 期）\n${s.bible_update}`)
+          : `### ${marker}《${s.title_zh}》（第 ${padNum} 期）\n- 真相：${s.secret || ""}`;
+        appendSection("story-bible.md", marker, entry);
+      }
     }
     if (has("18-serial.json")) {
       const r = read("18-serial.json");

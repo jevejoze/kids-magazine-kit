@@ -8,16 +8,18 @@ import { execFileSync } from "node:child_process";
 import { loadCharacterPack } from "../scripts/character-pack.mjs";
 import { issueHtml } from "../scripts/sections.mjs";
 import vm from "node:vm";
-import { validateIssue, validateStructure, pageOrder, CARD_IDS } from "../scripts/contracts.mjs";
+import { validateIssue, validateStructure } from "../scripts/contracts.mjs";
 
 const issue = () => JSON.parse(readFileSync(new URL("../examples/demo/issues/003/30-issue.json", import.meta.url), "utf8"));
 function render(data) {
-  const root = { outerHTML: "" }, ids = pageOrder(data).map(key => CARD_IDS[key]);
+  const root = { outerHTML: "" }, cardIds = html => JSON.parse(html.match(/const CARD_IDS = (.*);/)[1]);
+  let ids = [];
   const context = vm.createContext({ document: {
     body: { insertAdjacentHTML() {} }, getElementById: () => root, querySelector: () => null,
     querySelectorAll: () => ids.map(id => ({ id, closest: () => null })),
   }, Image: class {}, location: { hash: "" }, window: {} });
   const template = issueHtml({ data });
+  ids = cardIds(template);
   vm.runInContext(template.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   return id => root.outerHTML.match(new RegExp(`<section class="[^"]*" id="${id}">[\\s\\S]*?<\\/section>`))[0];
 }

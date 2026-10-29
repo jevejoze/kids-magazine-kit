@@ -40,8 +40,6 @@ svg.ch{display:block}
 .bub{background:#FFF8EE;border:4px solid var(--ink);border-radius:28px;padding:16px 20px;font-size:30px;line-height:1.38;position:relative;margin-bottom:10px;width:100%}
 .bub:after{content:"";position:absolute;bottom:-20px;left:50%;margin-left:-14px;border:14px solid transparent;border-top-color:var(--ink)}
 /* Custom tails must clear the default downward tail before setting their own sides. */
-#c4 .act .bub:after,
-#c4 .duo-row .bub:after,
 #c5 .taunt .bub:after,
 #cthink .side .bub:after{inset:auto;margin:0;border:0;width:0;height:0}
 .bub.en{font-size:34px;background:#E9F6FF}
@@ -130,81 +128,6 @@ svg.ch{display:block}
 #c3 .w .ex b{color:var(--tomato);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:6px}
 #c3 .task{margin-top:22px;font-size:30px;padding:18px 30px 14px;background:#FFFDF2;flex:none}
 
-/* card 4 小剧场 */
-#c4{background:#E6F7F0}
-#c4 .h1{font-size:66px}
-#c4 .h1 .en{font-size:36px}
-#c4 .stage{margin-top:18px;height:300px;overflow:hidden;flex:none}
-#c4 .stage .bg{position:absolute;inset:0;width:100%;height:100%}
-#c4 .scene{position:absolute;left:0;right:0;bottom:-6px;display:flex;justify-content:space-around;align-items:flex-end}
-#c4 .story{margin-top:20px;font-size:31px;line-height:1.6;position:relative}
-#c4 .story p+p{margin-top:8px}
-#c4 .story.en{font-size:31px;line-height:1.5}
-#c4 .story em{font-style:normal;background:#FFE58F;padding:0 6px;border-radius:8px}
-#c4 .tbc{margin-top:14px;display:flex;flex-direction:column;gap:8px;position:relative;font-size:32px;color:var(--tomato)}
-#c4 .tbc .clue{font-size:28px;color:var(--ink);background:#fff;border:4px dashed var(--ink);border-radius:20px;padding:8px 20px}
-#c4 .story-acts{display:flex;flex-direction:column;gap:14px;margin-top:14px;flex:1}
-#c4 .act{
-  background:#FFFDF9;border:4.5px solid var(--ink);border-radius:28px;
-  box-shadow:0 7px 0 var(--ink);padding:10px 18px;display:flex;align-items:center;gap:18px;
-}
-#c4 .act .char-fig{flex-shrink:0;filter:drop-shadow(0 5px 0 rgba(74,59,50,.16))}
-#c4 .act .char-fig svg{display:block}
-#c4 .act .act-txt{flex:1;display:flex;flex-direction:column;gap:6px}
-#c4 .act .bub{
-  background:#FFF5E6;border:3px solid var(--ink);border-radius:20px;
-  padding:10px 18px;font-size:26px;line-height:1.35;color:var(--ink);
-  position:relative;box-shadow:0 3px 0 rgba(74,59,50,.08);margin:0;width:auto;
-}
-#c4 .act:not(.duo-act) .bub:before{
-  content:"";position:absolute;left:-12px;top:22px;
-  border-top:8px solid transparent;border-bottom:8px solid transparent;
-  border-right:12px solid var(--ink);
-}
-#c4 .act:not(.duo-act) .bub:after{
-  content:"";position:absolute;left:-8px;top:23px;
-  border-top:7px solid transparent;border-bottom:7px solid transparent;
-  border-right:10px solid #FFF5E6;
-}
-#c4 .act .nar{font-size:24px;line-height:1.38;color:var(--soft);padding-left:4px}
-#c4 .act.duo-act{flex-direction:column;gap:10px;padding:12px 16px}
-#c4 .duo-row{display:flex;align-items:center;gap:14px;width:100%}
-#c4 .duo-row.dog-row{flex-direction:row-reverse}
-#c4 .duo-row.mouse-row .bub{background:#EEF6FF}
-#c4 .duo-row.mouse-row .bub:before{
-  content:"";position:absolute;left:-11px;top:18px;
-  border-top:7px solid transparent;border-bottom:7px solid transparent;
-  border-right:11px solid var(--ink);
-}
-#c4 .duo-row.mouse-row .bub:after{
-  content:"";position:absolute;left:-7px;top:19px;
-  border-top:6px solid transparent;border-bottom:6px solid transparent;
-  border-right:9px solid #EEF6FF;
-}
-#c4 .duo-row.dog-row .bub{background:#FFF8E1}
-#c4 .duo-row.dog-row .bub:before{
-  content:"";position:absolute;right:-11px;top:18px;
-  border-top:7px solid transparent;border-bottom:7px solid transparent;
-  border-left:11px solid var(--ink);
-}
-#c4 .duo-row.dog-row .bub:after{
-  content:"";position:absolute;right:-7px;top:19px;
-  border-top:6px solid transparent;border-bottom:6px solid transparent;
-  border-left:9px solid #FFF8E1;
-}
-#c4 .clue-box{
-  background:#FFF8E6;border:4px solid var(--ink);border-radius:24px;
-  box-shadow:0 6px 0 var(--ink);padding:10px 18px;display:flex;align-items:center;gap:16px;
-  margin-top:10px;
-}
-#c4 .clue-box .key-icon{
-  width:56px;height:56px;background:#FFD45C;border:3px solid var(--ink);border-radius:16px;
-  display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 3px 0 var(--ink);
-  flex-shrink:0;
-}
-#c4 .clue-box .clue-txt{flex:1;font-size:24px;line-height:1.35;color:var(--soft)}
-#c4 .clue-box .clue-txt b{font-size:26px;color:var(--ink);display:block;margin-bottom:2px}
-
 /* card 5 挑战：情境 → 线索 → 判断，答案倒印 */
 #c5{background:#F1ECFA}
 #c5 .dots{opacity:.3}
@@ -289,7 +212,7 @@ svg.ch{display:block}
 #c6 .pick.many span{padding:3px 12px;font-size:22px;white-space:nowrap}
 #c6 .checkin .lines i{height:44px}
 @page{size:1080px 1440px;margin:0}
-@media print{body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0;break-after:page}.card:last-of-type{break-after:auto}}
+@media print{body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0;break-after:page}.card.is-last{break-after:auto}}
 
 /* card 1 photo cover：顶部刊名条 + 照片。刊名条颜色 --strip 由模板从照片顶部取色，照片顶端渐隐进刊名条，刊名不压照片主体 */
 #c1.photo-cover{--strip:#FFF8EE;background:var(--strip);color:#fff}
