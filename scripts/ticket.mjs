@@ -1,6 +1,6 @@
 // 任务单：做一个栏目（或讲读）之前领一张，里面是这一栏要守的规则、角色槽位、任务书字段、本期参数、状态文件、上游值和输出路径
 //   ticket(issueDir, skill, { engine })   → { content, fingerprint, markdown }
-//   skill：栏目 id（cover、story……或注册的栏目包）、步骤 id（13-story）、或 narration（第 50 步讲读稿）
+//   skill：栏目 id（cover、story……或注册的栏目包）、步骤 id（和栏目 id 一样）、或 narration（讲读稿）、review（审稿）
 //   指纹是 content 的 sha256；写进输出 JSON 的 _meta.ticket，任务单一变，status / check 就把这一步标成过期
 //   validateCast(cast)、loadCast(dataDir, name, engine)   cast 包：槽位 → 角色
 import { createHash } from "node:crypto";
@@ -18,8 +18,8 @@ const ALWAYS = ["red-lines"];
 const BRIEF_FIELDS = ["issue", "date", "weekday_theme", "english_level", "topic_hint", "child_question", "focus", "avoid", "last_feedback"];
 // 讲读稿、审稿不是栏目，按能力领任务单；review 的 rules 在 ticket() 里按本期实际出的栏目动态并出来，这里留空
 const CAPABILITIES = {
-  narration: { stage: "50-narration", rules: ["narration", "no-visible-pedagogy"] },
-  review: { stage: "31-review", rules: [] },
+  narration: { stage: "narration", rules: ["narration", "no-visible-pedagogy"] },
+  review: { stage: "review", rules: [] },
 };
 
 // 审稿要看的规则并集：本期实际出的每个栏目（含讲读）各自声明的规则，去重
@@ -103,7 +103,7 @@ function spec(skill, registry, brief) {
   if (CAPABILITIES[skill]) return { id: skill, section: null, ...CAPABILITIES[skill], consumes: [], state: null, params: {} };
   const byStage = stages.find(s => s.id === skill);
   const id = byStage ? byStage.section ?? Object.keys(CAPABILITIES).find(k => CAPABILITIES[k].stage === skill) : skill;
-  if (!id) throw new Error(`第 ${skill} 步不属于哪个栏目，没有任务单`);
+  if (!id) throw new Error(`${skill} 不属于哪个栏目，没有任务单`);
   if (CAPABILITIES[id]) return spec(id, registry);
   const asked = registry.find(s => s.id === id), key = asked?.manifest.slot?.key ?? id;
   if (brief && registry.some(s => s.manifest.slot?.key === key)) {
@@ -139,13 +139,13 @@ export function stateFiles(sp, dataDir) {
 // 栏目的输出文件：有步骤就是步骤的 outputs，栏目包没有步骤就是 issue/<id>.json
 const outputsOf = sp => sp.stage ? stages.find(s => s.id === sp.stage).outputs : [`issue/${sp.id}.json`];
 
-// 讲读骨架：本期实际页序（渲染过就按 40-cards/pages.json，否则按 30-issue.json 算）+ 每页栏目包自己的 narrate.md + 缩放后的句数上限
+// 讲读骨架：本期实际页序（渲染过就按 cards/pages.json，否则按 issue.json 算）+ 每页栏目包自己的 narrate.md + 缩放后的句数上限
 //   卡号完全由这期实际出的栏目决定，不依赖哪个栏目固定排第几页
 function narrationSkeleton(issue, registry, brief) {
-  const issueFile = join(issue, "30-issue.json");
-  if (!existsSync(issueFile)) throw new Error("讲读要先合并出整期：issue/30-issue.json 还没有，先做第 30 步");
+  const issueFile = join(issue, "issue.json");
+  if (!existsSync(issueFile)) throw new Error("讲读要先合并出整期：issue/issue.json 还没有，先做 assemble 这一步");
   const merged = readJson(issueFile);
-  const pagesFile = join(issue, "40-cards", "pages.json");
+  const pagesFile = join(issue, "cards", "pages.json");
   const order = existsSync(pagesFile) ? readJson(pagesFile).map(p => p.section) : sectionOrder(merged, registry);
   const paramsOverrides = Object.fromEntries(Object.entries(brief.sections ?? {})
     .filter(([, sec]) => Number.isFinite(sec?.params?.narration_lines)).map(([id, sec]) => [id, sec.params.narration_lines]));
@@ -168,8 +168,8 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
   const { sections: registry, errors } = loadSections({ engine, data: dataDir });
   if (errors.length) throw new Error(`栏目注册表有问题：\n- ${errors.join("\n- ")}`);
   spec(skill, registry);
-  const briefFile = join(issue, "00-brief.json");
-  if (!existsSync(briefFile)) throw new Error("还没有任务书 00-brief.json，先做第 00 步");
+  const briefFile = join(issue, "brief.json");
+  if (!existsSync(briefFile)) throw new Error("还没有任务书 brief.json，先做 brief 这一步");
   const brief = readJson(briefFile);
   const sp = spec(skill, registry, brief);
   const magazine = loadMagazine(dataDir, registry);
@@ -224,7 +224,7 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
 function markdown(c, fingerprint) {
   const name = k => c.cast.characters[k]?.name ?? (k === "narrator" ? "旁白" : k);
   const out = [
-    `# 任务单 · ${c.skill}${c.stage ? `（第 ${c.stage.slice(0, 2)} 步）` : ""}`, "",
+    `# 任务单 · ${c.skill}`, "",
     "## 任务书", "", "```json", JSON.stringify(c.brief, null, 2), "```", "",
     "## 本期参数", "", Object.keys(c.params).length ? "```json\n" + JSON.stringify(c.params, null, 2) + "\n```" : "（无）", "",
     "## 角色槽位", "", ...Object.entries(c.cast.slots).map(([s, k]) => `- ${s}：${name(k)}（${k}）`), "",

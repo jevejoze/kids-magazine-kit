@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "周末思辨 08-think.json",
+  "title": "周末思辨 think.json",
   "type": "object",
   "required": ["title", "story", "sides", "role", "deeper", "parent_guide", "source", "log_update"],
   "properties": {

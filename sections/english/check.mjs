@@ -1,5 +1,5 @@
 // 英文三关的按页校验：check(english, ctx) → 问题列表（不带步骤前缀）
-//   英文三关没有自己的页面，内容并进挑战页（D.challenge.english），这里只校验 15-english.json 本身
+//   英文三关没有自己的页面，内容并进挑战页（D.challenge.english），这里只校验 english.json 本身
 const words = s => String(s ?? "").replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
 
 export function check(e, ctx) {

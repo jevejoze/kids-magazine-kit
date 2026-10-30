@@ -1,7 +1,7 @@
-// 折纸图式拆分：整张图式裁掉留白，再按格子一步切一张，放进 20-assets/serial-make/
+// 折纸图式拆分：整张图式裁掉留白，再按格子一步切一张，放进 assets/serial-make/
 //   node sections/serial-make/split.mjs <issue> <图式.png> <x:y:w:h> [<x:y:w:h> …] [--white] [--erase N=x:y:w:h]
 //   格子坐标量在裁好的 diagram.png 上；不给格子只裁整张，先看裁好的图再量
-//   split(issueDir, src, rects, { white, erase }) → { diagram, steps }，路径相对 20-assets/，照抄进 assets.json
+//   split(issueDir, src, rects, { white, erase }) → { diagram, steps }，路径相对 assets/，照抄进 assets.json
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { assetDir, trimImage, sliceImage } from "../../scripts/assets.mjs";
@@ -34,8 +34,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   }
   try {
     const r = split(issue, src, rects, { white, erase });
-    console.log(`✓ 整张图式 20-assets/${r.diagram}`);
-    r.steps.forEach(f => console.log(`✓ 20-assets/${f}`));
+    console.log(`✓ 整张图式 assets/${r.diagram}`);
+    r.steps.forEach(f => console.log(`✓ assets/${f}`));
     console.log(`assets.json：${JSON.stringify(r.steps.length ? { serial_steps: r.steps } : { serial_diagram: r.diagram })}`);
   } catch (e) {
     console.error(`✗ ${e.message}`);

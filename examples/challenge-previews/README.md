@@ -17,12 +17,12 @@ node --input-type=module <<'JS'
 import fs from 'node:fs';
 const kind = 'queue', root = `output/challenge-${kind}`;
 fs.mkdirSync(root, { recursive: true });
-const data = JSON.parse(fs.readFileSync('examples/demo/issues/003/30-issue.json'));
+const data = JSON.parse(fs.readFileSync('examples/demo/issues/003/issue.json'));
 const sample = JSON.parse(fs.readFileSync(`examples/challenge-previews/${kind}.json`));
 data.challenge = { taunt_zh: sample.taunt_zh, prop: sample.prop, puzzle: sample.puzzle };
 data._answers.puzzle = sample.answer;
 delete data._answers.english;
-fs.cpSync('examples/demo/issues/003/20-assets', `${root}/20-assets`, { recursive: true });
+fs.cpSync('examples/demo/issues/003/assets', `${root}/assets`, { recursive: true });
 fs.writeFileSync(`${root}/issue.json`, JSON.stringify(data, null, 2));
 JS
 node scripts/render.mjs output/challenge-queue/issue.json output/challenge-queue/cards --preview --flat

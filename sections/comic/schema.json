@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "今日一问 11-comic.json",
+  "title": "今日一问 comic.json",
   "type": "object",
   "required": ["title_zh", "title_en", "panels", "fact", "diagram"],
   "properties": {

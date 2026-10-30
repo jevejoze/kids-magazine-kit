@@ -26,7 +26,7 @@ export function check(c, ctx = {}) {
   return problems;
 }
 
-// 这一页的讲读校验：checkNarration(lines) → 问题列表。lines 是这一页的 50-narration.json 台词数组
+// 这一页的讲读校验：checkNarration(lines) → 问题列表。lines 是这一页的 narration.json 台词数组
 //   规矩 12：今日一问以"你也可以试试"收尾，说了"试试"之后最多再有一句
 export function checkNarration(lines) {
   const problems = [];

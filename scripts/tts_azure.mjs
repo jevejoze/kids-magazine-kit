@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 第 60 步：用 Azure 语音把 50-narration.json 每一句合成成 wav。需要 Node 22+，不用装依赖。
+// 第 60 步：用 Azure 语音把 narration.json 每一句合成成 wav。需要 Node 22+，不用装依赖。
 //   node scripts/tts_azure.mjs <issue 目录>            合成整期（已经合成过、内容没变的句子跳过）
 //   node scripts/tts_azure.mjs <issue 目录> --dry      只算计费字符，不调用 Azure
 //   node scripts/tts_azure.mjs --audition <数据目录>   每个角色每种语言合成一句试听，写到 <数据目录>/voices/试听/
@@ -139,7 +139,7 @@ function shift(wav, semitones) {
   } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 if (pinyinCheck) {
-  const nar = JSON.parse(readFileSync(join(resolve(target), "50-narration.json"), "utf8")).narration;
+  const nar = JSON.parse(readFileSync(join(resolve(target), "narration.json"), "utf8")).narration;
   let n = 0;
   for (const page of nar) page.lines.forEach((line, i) => {
     const hits = uncovered(line);
@@ -171,10 +171,10 @@ if (audition) {
 }
 
 const issue = resolve(target);
-if (!dry && !createPipeline(issue).done("50-narration")) throw new Error("讲读稿未通过检查或内容已过期，请先重新审稿并更新讲读稿");
-const inputs = inputFingerprint(issue, "60-audio");
-const nar = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
-const outDir = join(issue, "60-audio");
+if (!dry && !createPipeline(issue).done("narration")) throw new Error("讲读稿未通过检查或内容已过期，请先重新审稿并更新讲读稿");
+const inputs = inputFingerprint(issue, "audio");
+const nar = JSON.parse(readFileSync(join(issue, "narration.json"), "utf8")).narration;
+const outDir = join(issue, "audio");
 if (!dry) mkdirSync(outDir, { recursive: true });
 const manPath = join(outDir, "manifest.json");
 const old = existsSync(manPath) ? JSON.parse(readFileSync(manPath, "utf8")) : { files: [] };
@@ -182,7 +182,7 @@ const oldByFile = Object.fromEntries((old.files ?? []).map(f => [f.file, f]));
 
 const files = [], used = {}, checkpoint = { ...oldByFile };
 const saveManifest = (complete = false) => atomicWrite(manPath, JSON.stringify({
-  _meta: { stage: "60-audio", by: "Azure 语音", at: new Date().toISOString(), complete },
+  _meta: { stage: "audio", by: "Azure 语音", at: new Date().toISOString(), complete },
   voices: used, billable_chars: { this_run: spent, whole_issue: planned }, paid_lines: paid,
   files: complete ? files : Object.values(checkpoint),
 }, null, 2));
@@ -217,5 +217,5 @@ for (const page of nar) {
 }
 if (dry) { console.log(`整期 ${planned} 计费字符（含多音字注音 ${phonemes} 处）；已合成可跳过 ${skipped} 句${sample ? `\n注音示例：${sample}` : ""}`); process.exit(0); }
 saveManifest(true);
-recordBuild(issue, "60-audio", inputs, [manPath, ...files.map(f => join(outDir, f.file))]);
+recordBuild(issue, "audio", inputs, [manPath, ...files.map(f => join(outDir, f.file))]);
 console.log(`\n${files.length} 句完成：本次合成 ${files.length - skipped} 句（${spent} 计费字符${paid ? `，其中 ${paid} 句走付费资源` : ""}），跳过 ${skipped} 句`);

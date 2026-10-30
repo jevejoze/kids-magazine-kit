@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "封面 10-cover.json",
+  "title": "封面 cover.json",
   "type": "object",
   "required": ["question", "answer", "photo", "stamp", "crew", "crew_say", "credit"],
   "properties": {

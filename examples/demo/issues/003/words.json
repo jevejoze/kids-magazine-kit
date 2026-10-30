@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "stage": "words",
+    "by": "示例",
+    "at": "2026-10-14T06:00:00+08:00"
+  },
+  "intro": "Hi! I'm Boba Mouse. 🧋 Pack your bags — today we are going to Norway! 挪威！",
+  "items": [
+    {
+      "cn": "午夜",
+      "example": "In Norway, the sun is still up at midnight in summer.",
+      "icon": "🌙",
+      "word": "midnight"
+    },
+    {
+      "cn": "转圈、绕圈",
+      "example": "The sun moves in a circle and never goes down.",
+      "icon": "⭕",
+      "word": "circle"
+    },
+    {
+      "cn": "窗帘",
+      "example": "People close the curtains because it is too bright.",
+      "icon": "🪟",
+      "word": "curtain",
+      "new": true
+    }
+  ],
+  "task": "用 because 改写：It is bright at midnight. People close the curtains. → 两句合成一句！",
+  "grammar": "because 从句"
+}

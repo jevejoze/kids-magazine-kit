@@ -81,7 +81,7 @@ test("changed pixels are rejected instead of silently changing an existing versi
 });
 
 test("comic speaker names inherit their configured expression and accessories", () => {
-  const issue = JSON.parse(readFileSync(new URL("../examples/demo/issues/003/30-issue.json", import.meta.url), "utf8"));
+  const issue = JSON.parse(readFileSync(new URL("../examples/demo/issues/003/issue.json", import.meta.url), "utf8"));
   issue.comic.panels[0].chars = ["dog:surprise:120:eyemask"];
   issue.comic.panels[0].bubbles[0].who = "dog";
   const root = { outerHTML: "" }, cardIds = html => JSON.parse(html.match(/const CARD_IDS = (.*);/)[1]);

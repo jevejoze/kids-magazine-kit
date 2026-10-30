@@ -1,16 +1,16 @@
 # 信箱（mailbox）
 
-杂志的最后一页，用来收孩子的反馈。页面上固定有 5 个问题，由模板生成：👍 最喜欢哪一页、👎 哪一页不太喜欢、今天难不难、💡 今天想到了什么有趣的问题、👀 今天看到了什么有意思的事。这一步只写页面上方的几句话。页脚"说给谁听"来自 `magazine.yaml` 的 `send_note`（经 `00-brief.json` 带下来），不用在这一步重写。
+杂志的最后一页，用来收孩子的反馈。页面上固定有 5 个问题，由模板生成：👍 最喜欢哪一页、👎 哪一页不太喜欢、今天难不难、💡 今天想到了什么有趣的问题、👀 今天看到了什么有意思的事。这一步只写页面上方的几句话。页脚"说给谁听"来自 `magazine.yaml` 的 `send_note`（经 `brief.json` 带下来），不用在这一步重写。
 
 ## 开工
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> mailbox`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`
-2. 读 `issue/00-brief.json`（`last_feedback`）、`data/letters.md`、周六读上一期的 `issue/08-think.json`
-3. 写 `issue/16-mailbox.json`，字段见同目录 `schema.json`
+2. 读 `issue/brief.json`（`last_feedback`）、`data/letters.md`、周六读上一期的 `issue/think.json`
+3. 写 `issue/mailbox.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "16-mailbox", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "mailbox", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "hello": "小满早上好！你问为什么没有木乃伊猫——其实有，而且很多！",
   "ask_zh": "如果你是蜜蜂，会把家盖成什么形状？"
 }
@@ -28,4 +28,4 @@
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[16]` 报错；字数；没有上期答案；`hello` 里引用的话在 `letters.md` 或 `feedback.jsonl` 里找得到
+`node scripts/pipeline.mjs check <issue>` 没有 `[mailbox]` 报错；字数；没有上期答案；`hello` 里引用的话在 `letters.md` 或 `feedback.jsonl` 里找得到

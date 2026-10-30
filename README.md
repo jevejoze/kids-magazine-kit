@@ -38,9 +38,9 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 
 1. 把 `templates/data/` 复制到 Drive，改名为你的刊名（如 `小满早知道/`），这就是**数据目录**
 2. 填好 `MY_CHILD.md`
-3. 对 agent 说：**"按问卷给孩子建刊"**，再说 **"做第 00 步"**
-4. 之后每一步交给你指定的 agent：**"做第 10 步，数据目录在 ……"**。agent 会读 `pipeline/stages/10-cover.md` 照做
-5. 内容步骤做完后，让一个能跑脚本的 agent（如 Claude Code 云端会话）做 30、40、60、70 步，成品出现在 `issues/NNN/70-final/`。第 60 步默认用 Azure 语音，先在环境里设好 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`
+3. 对 agent 说：**"按问卷给孩子建刊"**，再说 **"做 brief 这一步"**
+4. 之后每一步交给你指定的 agent：**"做 cover 这一步，数据目录在 ……"**。agent 会读 `pipeline/stages/cover.md` 照做
+5. 内容步骤做完后，让一个能跑脚本的 agent（如 Claude Code 云端会话）做 assemble、render、audio、video 这几步，成品出现在 `issues/NNN/final/`。audio 默认用 Azure 语音，先在环境里设好 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`
 
 渲染图片、排版截图和对比页仅供本地预览，不提交到仓库；运行必需的现有版本化角色素材保留在 `assets/characters/`。
 
@@ -50,7 +50,7 @@ A daily Chinese–English magazine for one child, written by an AI "editorial te
 git clone https://github.com/jevejoze/kids-magazine-kit && cd kids-magazine-kit
 node scripts/pipeline.mjs status   examples/demo/issues/003
 node scripts/pipeline.mjs assemble examples/demo/issues/003
-node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/issues/003/40-cards --flat
+node scripts/render.mjs examples/demo/issues/003/issue.json examples/demo/issues/003/cards --flat
 ```
 
 示例 003 保留历史新闻，已包含经典连载和信息查证栏目，同时演示可选的单词屋与英文三关。默认渲染会检查内容步骤、审稿结论及内容指纹；审稿前或渲染旧格式 JSON 时加 `--preview`。运行回归测试：`node --test tests/*.test.mjs`。完成状态和阻断规则见 [流水线说明](pipeline/README.md#校验与完成状态)。
@@ -63,7 +63,7 @@ node scripts/render.mjs examples/demo/issues/003/30-issue.json examples/demo/iss
 | 说 | agent 会 |
 |---|---|
 | 做第 N 步 | 按 `pipeline/stages/` 里那一步的说明，写出这一步的文件 |
-| 出下一期 | 一个 agent 从第 00 步做到第 90 步；已有的步骤跳过，审稿不通过就回去改，没有语音合成时出家长讲读稿 |
+| 出下一期 | 一个 agent 从brief 这一步做到archive 这一步；已有的步骤跳过，审稿不通过就回去改，没有语音合成时出家长讲读稿 |
 | 记一笔：她今天盯着封面看了很久 | 原话记进 `curation-log.md` |
 | 做本周策展 | 汇总本周反馈，出调整建议，等你确认 |
 
@@ -105,7 +105,7 @@ MIT
 ## 试验：固定绘本角色素材库
 
 
-新角色库 `storybook-v1` 包含 4 位成员、每位 9 种表情，直接重复使用固定的透明 PNG，不在每期重新生成。在 `00-brief.json` 中设置 `"character_pack": "storybook-v1"` 即可随整期保存；省略时继续使用原有 SVG。现有角色和道具写法不变。
+新角色库 `storybook-v1` 包含 4 位成员、每位 9 种表情，直接重复使用固定的透明 PNG，不在每期重新生成。在 `brief.json` 中设置 `"character_pack": "storybook-v1"` 即可随整期保存；省略时继续使用原有 SVG。现有角色和道具写法不变。
 
 - [素材文件、版本约定与接入方式](assets/characters/storybook-v1/README.md)
 - 本地查看全部表情：`node scripts/preview-characters.mjs storybook-v1`

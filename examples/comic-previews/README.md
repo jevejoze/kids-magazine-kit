@@ -1,6 +1,6 @@
 # 今日一问栏目样张
 
-`honey.json`、`cat.json` 是独立的 `comic` 对象，搭配同名 SVG；用于检查不同题材的版面与解释方式，不是已经出版的整期。极昼样张采用 `../demo/issues/003/11-comic.json`。
+`honey.json`、`cat.json` 是独立的 `comic` 对象，搭配同名 SVG；用于检查不同题材的版面与解释方式，不是已经出版的整期。极昼样张采用 `../demo/issues/003/comic.json`。
 
 - **极昼：机制解释**。前两格提出问题、引入倾斜，中间图用红点的一圈路线解释，后两格回答冬季追问并给出手电筒实验。见 NASA Earth Facts、NOAA 北极昼夜资料和 LPI SkyTellers；链接保存在示例源文件。
 - **蜂巢：等面积比较**。先看圆格空隙，再比较等面积正方形和正六边形。单位面积下，正方形周长为 4，正六边形周长为 `6 × sqrt(2 / (3 × sqrt(3))) ≈ 3.72242`，少约 6.94%，图中取整为 7%。这是平面周长比较，不把它当作真实蜂蜡用量的实测节省率。圆格只用于展示空隙，不参与该周长计算。数学依据：[Thomas Hales, The Honeycomb Conjecture](https://arxiv.org/abs/math/9906042)。
@@ -13,10 +13,10 @@ node --input-type=module <<'JS'
 import fs from 'node:fs';
 const kind = 'honey', root = `output/comic-${kind}`;
 fs.mkdirSync(root, { recursive: true });
-const data = JSON.parse(fs.readFileSync('examples/demo/issues/003/30-issue.json'));
+const data = JSON.parse(fs.readFileSync('examples/demo/issues/003/issue.json'));
 data.comic = JSON.parse(fs.readFileSync(`examples/comic-previews/${kind}.json`));
 data.comic.diagram = fs.readFileSync(`examples/comic-previews/${kind}.svg`, 'utf8');
-fs.cpSync('examples/demo/issues/003/20-assets', `${root}/20-assets`, { recursive: true });
+fs.cpSync('examples/demo/issues/003/assets', `${root}/assets`, { recursive: true });
 fs.writeFileSync(`${root}/issue.json`, JSON.stringify(data, null, 2));
 JS
 node scripts/render.mjs output/comic-honey/issue.json output/comic-honey/cards --preview --flat

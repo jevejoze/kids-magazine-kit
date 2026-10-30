@@ -21,8 +21,8 @@ try {
     console.log(errors.length ? errors.join("\n") : "全部通过");
     process.exitCode = errors.length ? 2 : 0;
   } else if (cmd === "video-inputs") {
-    if (!["40-render", "60-audio"].every(stage => pipeline.done(stage))) throw new Error("页图或音频未完成、已过期，请重新制作后再合成视频");
-    console.log(inputFingerprint(issue, "70-video"));
+    if (!["render", "audio"].every(stage => pipeline.done(stage))) throw new Error("页图或音频未完成、已过期，请重新制作后再合成视频");
+    console.log(inputFingerprint(issue, "video"));
   } else if (cmd === "fingerprint") {
     console.log(pipeline.fingerprint());
   } else if (cmd === "script") {

@@ -18,7 +18,7 @@ export function check(n) {
 
 // 这一页的讲读校验：checkNarration(lines, ctx) → 问题列表
 //   规矩 11：三条新闻都要讲到：每条的 word.en 都要在波波鼠的英文句里出现
-//   ctx.keywords：这期三条新闻的 word.en（取自 17-news.json）
+//   ctx.keywords：这期三条新闻的 word.en（取自 news.json）
 export function checkNarration(lines, ctx) {
   const problems = [];
   (ctx.keywords ?? []).forEach(w => {

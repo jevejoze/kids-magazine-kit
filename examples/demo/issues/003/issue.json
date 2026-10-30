@@ -1,0 +1,302 @@
+{
+  "issue": 3,
+  "date": "2026.10.14 周三",
+  "weather": "🌤️ 晴转多云",
+  "masthead": {
+    "zh": "小满早知道",
+    "en": "XIAOMAN KNOWS!",
+    "by": "🐶🐭🦉🦝 团子编辑部 出品"
+  },
+  "question": {
+    "zh": "挪威夏天半夜 12 点，<br>太阳为啥还在天上？",
+    "en": "Why is the sun up at midnight in Norway?"
+  },
+  "cover": {
+    "photo": "assets/cover.jpg",
+    "photo_pos": "32% center",
+    "strip": "",
+    "stamp": "📷 00:44 · 挪威北角",
+    "asked_by": "",
+    "crew": [
+      "dog:sleepy:200:eyemask",
+      "owl:happy:160:sunglasses"
+    ],
+    "crew_say": "太亮啦，睡不着……",
+    "credit": "© Yan Zhang · CC BY-SA 3.0"
+  },
+  "comic": {
+    "fact": "不是整个挪威都有极昼，要看地点和季节。北极出现极昼时，南极附近正是冬天。",
+    "panels": [
+      {
+        "title": "明明已经半夜了",
+        "bubbles": [
+          {
+            "who": "dog",
+            "lang": "zh",
+            "text": "半夜十二点还这么亮，太阳不下班吗？"
+          }
+        ],
+        "chars": [
+          "dog:surprise:130:eyemask"
+        ]
+      },
+      {
+        "title": "关键是地球的倾斜",
+        "bubbles": [
+          {
+            "who": "owl",
+            "lang": "zh",
+            "text": "地球斜着转。北极附近转一圈，也可能一直晒到太阳。"
+          }
+        ],
+        "chars": [
+          "owl:talk:130"
+        ]
+      },
+      {
+        "title": "那冬天会怎样？",
+        "bubbles": [
+          {
+            "who": "dog",
+            "lang": "zh",
+            "text": "那北极的冬天呢？"
+          },
+          {
+            "who": "owl",
+            "lang": "zh",
+            "text": "朝向背光一侧，可能整天见不到太阳。"
+          }
+        ],
+        "chars": [
+          "dog:think:110",
+          "owl:talk:110"
+        ]
+      },
+      {
+        "title": "自己动手找一找",
+        "bubbles": [
+          {
+            "who": "mouse",
+            "lang": "en",
+            "text": "Still in the light!"
+          },
+          {
+            "who": "dog",
+            "lang": "zh",
+            "text": "拿手电照地球仪，转一圈找找看！"
+          }
+        ],
+        "chars": [
+          "mouse:wave:110",
+          "dog:happy:110"
+        ]
+      }
+    ],
+    "theme_icon": "🌍",
+    "title_en": "Why is the sun still up at midnight?",
+    "title_zh": "半夜了，太阳怎么还没下班？",
+    "diagram": "diagram.svg",
+    "diagram_title": "先看整球，再到放大窗跟着红点转一圈",
+    "takeaway": "地球斜着转，让北极附近的夏天出现极昼。",
+    "fact_title": "💡 再发现"
+  },
+  "words": {
+    "intro": "Hi! I'm Boba Mouse. 🧋 Pack your bags — today we are going to Norway! 挪威！",
+    "items": [
+      {
+        "cn": "午夜",
+        "example": "In Norway, the sun is still up at midnight in summer.",
+        "icon": "🌙",
+        "word": "midnight"
+      },
+      {
+        "cn": "转圈、绕圈",
+        "example": "The sun moves in a circle and never goes down.",
+        "icon": "⭕",
+        "word": "circle"
+      },
+      {
+        "cn": "窗帘",
+        "example": "People close the curtains because it is too bright.",
+        "icon": "🪟",
+        "word": "curtain",
+        "new": true
+      }
+    ],
+    "task": "用 because 改写：It is bright at midnight. People close the curtains. → 两句合成一句！",
+    "grammar": "because 从句"
+  },
+  "story": {
+    "ep": 3,
+    "lang": "zh",
+    "night": true,
+    "title_zh": "珍珠的真相",
+    "title_en": "The Pearl Tells the Truth",
+    "paragraphs": [
+      "早上，大家围着四个空杯子。浣熊举起爪子：“昨晚我可没出门！窗户开着，你们自己看！”",
+      "咕咕博士检查了窗台，摇摇头：“窗台上没有脚印，窗外也没有。真有人爬窗进来，一定会留下痕迹。”",
+      "波波鼠突然指着团子狗的尾巴大叫：“Look！珍珠！”——一颗珍珠，正粘在团子狗的尾巴尖上！",
+      "“我就一直睡在沙发上啊……”团子狗挠挠头。咕咕博士推了推眼镜：“门是从里面锁上的。只有本来就在屋里的人，才喝得到奶茶。”",
+      "“是你梦游啦！”大家一起喊。团子狗不好意思地笑了。当天晚上，浣熊又买了四杯奶茶，每杯都写上了名字。半夜，阁楼里又传来吸溜吸溜的声音——"
+    ],
+    "scene": [
+      "dog:sleepy:150",
+      "owl:think:150:magnifier",
+      "mouse:surprise:150",
+      "raccoon:smirk:150"
+    ],
+    "clue": "侦探笔记：哪条线索证明不是有人爬窗进来？",
+    "tbc": "这次又是谁？明天揭晓！To be continued…"
+  },
+  "challenge": {
+    "taunt_zh": "哼，四条线索，你能排对吗？",
+    "taunt_en": "Four clues. Can you solve it?",
+    "prop": "sweat",
+    "puzzle": {
+      "title": "午夜观景台的队伍",
+      "body": "艾莎、健太、卢卡、阿米尔，四位小客人排队登上午夜观景台。队首是第1位，队尾是第4位。",
+      "clues": [
+        "艾莎不在第1位，也不在第4位。",
+        "健太不在第1位。",
+        "阿米尔和艾莎挨着站。",
+        "健太排在卢卡前面，中间可能隔着别人。"
+      ],
+      "question": "从队首到队尾，四人依次是谁？"
+    },
+    "english": [
+      {
+        "cn": "选一个词填进去",
+        "en": "At ___ the sun is still up in Norway. (midnight / noon)",
+        "stars": 1
+      },
+      {
+        "cn": "读一读，为什么拉窗帘？",
+        "en": "In summer, the sun never sets in northern Norway. People play football at midnight. They close the curtains when they sleep. Why do they close the curtains?",
+        "stars": 2
+      },
+      {
+        "cn": "用英文说两句，要用到 because",
+        "en": "Would you like to see the midnight sun? Say two sentences with because.",
+        "stars": 3
+      }
+    ]
+  },
+  "check": {
+    "where": "一段讲极昼的短视频",
+    "claim": "极昼时，太阳一直停在同一个位置。",
+    "clues": [
+      "先找一段连续拍摄的极昼视频。",
+      "看太阳和地平线的位置有没有改变。",
+      "再比较另一个地点拍到的轨迹。"
+    ],
+    "verdict": "假：太阳仍会在天空中移动。"
+  },
+  "mailbox": {
+    "hello": "小满早上好！团子狗爆料：我梦见喝奶茶，醒来枕头边真有吸管！梦游的人记得自己做过什么吗？",
+    "ask_zh": "在挪威过没有黑夜的夏天，你最想做什么？",
+    "send_note": "拍照发给妈妈"
+  },
+  "_answers": {
+    "puzzle": "阿米尔 → 艾莎 → 健太 → 卢卡",
+    "puzzle_solution": "艾莎只能在 2 或 3（线索①）。健太不在 1、又在卢卡前面，所以健太只能在 2 或 3，卢卡在健太后面。艾莎在 3 时健太在 2，卢卡在 4，阿米尔在 1，阿米尔和艾莎不挨着，与线索③冲突；所以艾莎在 2，健太 3，卢卡 4，阿米尔 1。唯一解，四条线索缺一不可。",
+    "english": [
+      "midnight",
+      "Because it is too bright. / Because the sun never sets.",
+      "开放题"
+    ],
+    "story_secret": "第3集真相：团子狗半夜梦游喝光了四杯奶茶。决定性证据是尾巴尖上粘着的珍珠；开着的窗户是干扰线索（窗台无脚印，已排除）。新悬念：半夜的吸溜声——第4集揭晓。",
+    "check": {
+      "truth": "false",
+      "verdict": "假：太阳仍会在天空中移动。",
+      "explain": "极昼表示太阳整天不落到地平线下，不表示太阳在天空中的位置不变。",
+      "sources": [
+        "https://aa.usno.navy.mil/faq/eqtime",
+        "https://pmel.noaa.gov/arctic-zone/gallery_np_seasons.html"
+      ]
+    },
+    "news_sources": [
+      "https://newsforkids.net/articles/2026/10/08/british-girl-11-is-worlds-youngest-woman-grandmaster/",
+      "https://www.ctvnews.ca/lifestyle/article/british-schoolgirl-becomes-chess-youngest-ever-woman-grandmaster/",
+      "https://newsforkids.net/articles/2026/10/01/injured-pelican-knocks-noaa-scientists-answer/",
+      "https://www.adn.com/alaska-news/wildlife/2026/09/20/scientists-heard-a-knock-at-the-door-it-was-a-pelican-in-need-of-help/",
+      "https://www.snexplores.org/article/dogs-read-anger-fear-emotion-human-faces",
+      "https://www.sciencenews.org/article/dogs-understand-emotions-humans-face"
+    ]
+  },
+  "news": {
+    "week": "10.06–10.12",
+    "ask_zh": "你怎么看？鹈鹕为什么会去敲人类的门？",
+    "ask_en": "Why do you think the pelican knocked on the door?",
+    "credits": "来源：News for Kids · CTV · Science News Explores · ADN　照片：Wilfredor (CC0，示意) · F. Schulenburg · Slyronit (CC BY-SA) / Wikimedia Commons",
+    "foot": "新闻来源已交叉核实 · 头条照片为示意",
+    "items": [
+      {
+        "flag": "🇬🇧",
+        "place": "英国 · 伦敦",
+        "title": "11 岁女孩成为最年轻的“女子特级大师”",
+        "text": "伦敦女孩 Bodhana 打破了 12 岁的旧纪录。她 2020 年才开始学棋，老师是网上视频！",
+        "word": {
+          "en": "record",
+          "zh": "纪录"
+        },
+        "photo": "assets/news-1.jpg",
+        "photo_pos": "center 60%"
+      },
+      {
+        "flag": "🇺🇸",
+        "place": "美国 · 佛罗里达",
+        "title": "鹈鹕敲门求救",
+        "text": "一只鹈鹕用嘴“咚咚”敲实验室的门，翅膀扎着鱼钩。科学家花 10 分钟取下，它飞走了。",
+        "word": {
+          "en": "help",
+          "zh": "帮助"
+        },
+        "photo": "assets/news-2.jpg",
+        "photo_pos": "center 40%"
+      },
+      {
+        "flag": "🇦🇹",
+        "place": "奥地利 · 维也纳",
+        "title": "狗狗看得出你在害怕",
+        "text": "狗狗躺进扫描仪看人脸照片，害怕的脸让它大脑的反应和生气、难过都不一样。",
+        "word": {
+          "en": "face",
+          "zh": "脸"
+        },
+        "photo": "assets/news-3.jpg",
+        "photo_pos": "center 30%"
+      }
+    ]
+  },
+  "serial": {
+    "kind": "book",
+    "ep": 1,
+    "book_zh": "爱丽丝漫游奇境",
+    "book_en": "Alice’s Adventures in Wonderland",
+    "chapter": "第一章：掉进兔子洞",
+    "author": "Lewis Carroll",
+    "title_zh": "一只看表的兔子",
+    "title_en": "A Rabbit with a Watch",
+    "paragraphs": [
+      "爱丽丝坐在姐姐身边，觉得有点无聊。一只白兔忽然跑过。",
+      "兔子一边跑，一边担心自己迟到了。更奇怪的是，它竟从背心口袋里掏出一块怀表！",
+      "爱丽丝追着它跑，钻进树篱下的大洞。洞道先向前延伸，忽然直直向下。她来不及停住，便掉了下去。"
+    ],
+    "quote": {
+      "who": "白兔",
+      "en": "Oh dear! Oh dear! I shall be late!",
+      "zh": "哎呀！哎呀！我要迟到了！"
+    },
+    "crew": {
+      "who": "dog:surprise:150",
+      "say": "兔子也要赶时间？"
+    },
+    "guess": "洞底会有什么？",
+    "tbc": "下回：越掉越深的洞",
+    "photo_credit": "John Tenniel / Project Gutenberg #11 · Public domain in the USA",
+    "sources": [
+      "https://www.gutenberg.org/ebooks/11"
+    ],
+    "photo": "assets/serial.jpg"
+  }
+}

@@ -19,7 +19,7 @@ const USAGE = "用法: node regress.mjs baseline <数据目录> <基线目录> |
 export function issuesIn(data) {
   const root = join(data, "issues");
   if (!existsSync(root)) return [];
-  return readdirSync(root).filter(n => /^\d{3}$/.test(n) && existsSync(join(root, n, "30-issue.json"))).sort();
+  return readdirSync(root).filter(n => /^\d{3}$/.test(n) && existsSync(join(root, n, "issue.json"))).sort();
 }
 
 export function pixelHash(png) {
@@ -74,7 +74,7 @@ async function snapshot(data, n, out) {
   try { issue = JSON.parse(JSON.stringify(createPipeline(src).buildIssue())); }
   catch (e) { issue = { _error: e.message }; }
   writeFileSync(join(dir, "issue.json"), JSON.stringify(issue, null, 2) + "\n");
-  const error = await render(join(src, "30-issue.json"), cards);
+  const error = await render(join(src, "issue.json"), cards);
   if (error) { writeFileSync(join(dir, "error.txt"), error + "\n"); return { error }; }
   const pngs = readdirSync(cards).filter(f => /^card-\d+\.png$/.test(f)).sort((a, b) => parseInt(a.slice(5)) - parseInt(b.slice(5)));
   const pixels = Object.fromEntries(pngs.map(f => [f, pixelHash(join(cards, f))]));

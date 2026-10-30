@@ -5,12 +5,12 @@
 ## 开工
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> challenge`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`
-2. 读 `issue/00-brief.json`
-3. 写 `issue/14-puzzle.json`，字段见同目录 `schema.json`
+2. 读 `issue/brief.json`
+3. 写 `issue/challenge.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "14-puzzle", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "challenge", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "taunt_zh": "哼，数格子？我数得比蜜蜂还快！",
   "taunt_en": "Can you count faster than a bee?",
   "prop": "magnifier",
@@ -40,4 +40,4 @@
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[14]` 报错；按 `solution` 自己从头做一遍；逻辑题把所有排列试一遍，确认只有一个满足全部条件，再逐条去掉线索，确认每次都不止一个解
+`node scripts/pipeline.mjs check <issue>` 没有 `[challenge]` 报错；按 `solution` 自己从头做一遍；逻辑题把所有排列试一遍，确认只有一个满足全部条件，再逐条去掉线索，确认每次都不止一个解

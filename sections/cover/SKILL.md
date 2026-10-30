@@ -5,12 +5,12 @@
 ## 开工
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> cover`，照单上的规则、参数、角色槽位写；最后一行的指纹写进 `_meta.ticket`
-2. 读任务书（`child_question`、`topic_hint`、`weekday_theme`）、`data/profile.md`（兴趣权重）、最近几期的 `10-cover.json`（避免重复）
-3. 写 `issue/10-cover.json`，字段见同目录 `schema.json`
+2. 读任务书（`child_question`、`topic_hint`、`weekday_theme`）、`data/profile.md`（兴趣权重）、最近几期的 `cover.json`（避免重复）
+3. 写 `issue/cover.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "10-cover", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "cover", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "question": {"zh": "蜜蜂没学过数学，<br>为啥把格子造成六边形？", "en": "Why do bees build their cells as hexagons?"},
   "answer": "答案要点：六边形最省蜂蜡，还能挤得一点缝都没有（今日一问照此讲）",
   "photo": {"url": "图片直链", "page": "图片所在页面", "author": "作者", "license": "CC BY-SA 4.0",
@@ -43,4 +43,4 @@
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[10]` 报错；答案能在 `sources` 里查到；照片协议允许使用；渲染后看一眼封面，主体没被刊名、问题、角色挡住。
+`node scripts/pipeline.mjs check <issue>` 没有 `[cover]` 报错；答案能在 `sources` 里查到；照片协议允许使用；渲染后看一眼封面，主体没被刊名、问题、角色挡住。

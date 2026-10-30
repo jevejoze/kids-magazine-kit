@@ -5,12 +5,12 @@
 ## 开工
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> think`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`
-2. 读 `issue/00-brief.json`（`think`、日期）、`data/thinking-plan.md`（可选，本周练的思维本领）、任务单列出的话题池（`data/state/think/`，旧数据目录是 `data/think-log.md`）、`data/profile.md`（兴趣、最近在问什么）、`data/child-questions.md`、任务单的 `skill`/`friday_topic` 参数
-3. 写 `issue/08-think.json`，字段见同目录 `schema.json`
+2. 读 `issue/brief.json`（`think`、日期）、`data/thinking-plan.md`（可选，本周练的思维本领）、任务单列出的话题池（`data/state/think/`，旧数据目录是 `data/think-log.md`）、`data/profile.md`（兴趣、最近在问什么）、`data/child-questions.md`、任务单的 `skill`/`friday_topic` 参数
+3. 写 `issue/think.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "08-think", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "think", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "title": "用 AI 写的作业，算你写的吗？",
   "title_en": "If AI does your homework, who did it?",
   "story": "小明让 AI 写了一篇作文，老师夸他写得真好。同桌小红自己写，有两个错字，可每句都是她自己想的。下周考试要当堂写作文了。",
@@ -44,4 +44,4 @@
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[08]` 报错；两边都说出了理由；字数；话题里没有红线内容；用了新闻的，数字和来源一致；话题池里没用过
+`node scripts/pipeline.mjs check <issue>` 没有 `[think]` 报错；两边都说出了理由；字数；话题里没有红线内容；用了新闻的，数字和来源一致；话题池里没用过

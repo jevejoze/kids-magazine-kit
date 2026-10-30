@@ -1,6 +1,6 @@
 # 经典连载 · 放映室（serial-film）
 
-周五（艺术日）连载停一天，信箱前面这一页换成「放映室」：介绍一部电影，配 3 个边看边找的小任务。页位是 `serial`，本期 `kind` 是 `film` 时由这个包出；周五出哪一种由 `magazine.yaml` 的 `schedule.friday.serial` 轮换表决定，第 00 步写进任务书 `sections.serial.params.kind`。
+周五（艺术日）连载停一天，信箱前面这一页换成「放映室」：介绍一部电影，配 3 个边看边找的小任务。页位是 `serial`，本期 `kind` 是 `film` 时由这个包出；周五出哪一种由 `magazine.yaml` 的 `schedule.friday.serial` 轮换表决定，brief 这一步写进任务书 `sections.serial.params.kind`。
 
 ## 开工
 
@@ -9,11 +9,11 @@
    - `state/serial-film/config.md`：家长写的片单、偏好
    - `state/serial-film/log.jsonl`：出过的，一期一行，别重复
    - 数据目录还没有 `state/serial-film/` 时，片单在旧档案 `serial-bible.md`「周五片单」
-3. 写 `issue/18-serial.json`，字段见同目录 `schema.json`
+3. 写 `issue/serial.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "18-serial", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "serial", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "kind": "film",
   "title_zh": "……", "title_en": "……",
   "by": "导演 · 年份 · 片长 · 年龄分级",
@@ -39,12 +39,12 @@
 
 ## 图片
 
-第 20 步把 `photo_url` 下载成 `20-assets/serial-film/serial.jpg`（`node scripts/assets.mjs fetch <url> <issue>/20-assets/serial-film/serial.jpg --min 800 --max 1600`），`assets.json` 的 `serial` 写 `serial-film/serial.jpg`。
+assets 这一步把 `photo_url` 下载成 `assets/serial-film/serial.jpg`（`node scripts/assets.mjs fetch <url> <issue>/assets/serial-film/serial.jpg --min 800 --max 1600`），`assets.json` 的 `serial` 写 `serial-film/serial.jpg`。
 
 ## 状态
 
-本步只写 `18-serial.json`。第 90 步归档时：有 `state/serial-film/` 就把 `summary` 追加进 `log.jsonl`；旧数据目录照旧写 `bible_update`（追加到 `serial-bible.md`「周五片单」的一行）。
+本步只写 `serial.json`。archive 这一步归档时：有 `state/serial-film/` 就把 `summary` 追加进 `log.jsonl`；旧数据目录照旧写 `bible_update`（追加到 `serial-bible.md`「周五片单」的一行）。
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[18]` 报错；字数；任务看得出来、答案在作品里。
+`node scripts/pipeline.mjs check <issue>` 没有 `[serial]` 报错；字数；任务看得出来、答案在作品里。

@@ -5,12 +5,12 @@
 ## 开工
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> comic`，照单上的规则、参数、角色槽位写；最后一行的指纹写进 `_meta.ticket`。任务单「上游值」里有 `cover.question`，封面问题一改，这一步就过期
-2. 读任务书和 `issue/10-cover.json`（`answer` 是答案要点）
-3. 写 `issue/11-comic.json` 和 `issue/11-diagram.svg`，字段见同目录 `schema.json`
+2. 读任务书和 `issue/cover.json`（`answer` 是答案要点）
+3. 写 `issue/comic.json` 和 `issue/diagram.svg`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "11-comic", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "comic", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "theme_icon": "🔢",
   "title_zh": "蜂巢里的数学：为什么是六边形？",
   "title_en": "Why are honeycomb cells hexagons?",
@@ -20,7 +20,7 @@
     {"bubbles": [{"lang": "zh", "text": "……"}, {"lang": "zh", "text": "……"}], "chars": ["<asker>:think:110", "<expert>:happy:110"]},
     {"bubbles": [{"lang": "en", "text": "……"}, {"lang": "zh", "text": "……"}], "chars": ["<english>:happy:110", "<asker>:happy:110"]}
   ],
-  "diagram": "11-diagram.svg",
+  "diagram": "diagram.svg",
   "diagram_title": "告诉孩子跟着哪条线、哪个点或哪组对比看",
   "takeaway": "用一句话直接回答封面问题",
   "fact_title": "💡 再发现",
@@ -45,4 +45,4 @@
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[11]` 报错；数字自己算一遍或在 `sources` 里能查到；关键事实优先引用官方机构、博物馆或原始研究；SVG 能在浏览器打开、文字不出界；图中轨迹、光线、标签要互相一致，简化示意明确说明；按实际页面检查角色、气泡和图解没有裁切或重叠。
+`node scripts/pipeline.mjs check <issue>` 没有 `[comic]` 报错；数字自己算一遍或在 `sources` 里能查到；关键事实优先引用官方机构、博物馆或原始研究；SVG 能在浏览器打开、文字不出界；图中轨迹、光线、标签要互相一致，简化示意明确说明；按实际页面检查角色、气泡和图解没有裁切或重叠。

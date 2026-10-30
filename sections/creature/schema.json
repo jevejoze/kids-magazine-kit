@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "传说怪物档案 09-creature.json",
+  "title": "传说怪物档案 creature.json",
   "type": "object",
   "required": ["no", "name_zh", "parts", "legend_url", "legend_credit", "photo_url", "photo_credit", "stats", "meters", "boxes", "fast", "slow", "sources", "log_update"],
   "properties": {

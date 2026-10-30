@@ -7,7 +7,7 @@
 //   node scripts/assets.mjs slice <in.png> <out.png> <x:y:w:h> [--pad 8] [--white] [--erase x:y:w:h]
 //
 // 栏目包的脚本直接 import：出错抛异常，不退出进程
-//   assetDir(issueDir, skillId)                     → <issue>/20-assets/<skill-id>/（栏目自己的图放这里）
+//   assetDir(issueDir, skillId)                     → <issue>/assets/<skill-id>/（栏目自己的图放这里）
 //   fetchImage(url, out, { min, max })              → { width, height, kb }
 //   trimImage(src, out, { pad, white })             → { width, height, crop }
 //   sliceImage(src, out, "x:y:w:h", { pad, white, erase }) → { width, height, crop }
@@ -23,7 +23,7 @@ function die(msg) {
   throw new Error(msg);
 }
 
-export const assetDir = (issueDir, skillId) => path.join(issueDir, '20-assets', skillId);
+export const assetDir = (issueDir, skillId) => path.join(issueDir, 'assets', skillId);
 
 // --flag 值：没写返回 fallback
 const opt = (args, flag, fallback) => { const i = args.indexOf(flag); return i > -1 ? args[i + 1] : fallback; };

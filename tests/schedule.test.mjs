@@ -12,7 +12,7 @@ const demo = new URL("../examples/demo/", import.meta.url).pathname;
 const tmp = t => { const d = mkdtempSync(join(tmpdir(), "kids-schedule-")); t.after(() => rmSync(d, { recursive: true, force: true })); return d; };
 const copyDemo = t => {
   const root = tmp(t);
-  cpSync(demo, root, { recursive: true, filter: src => !["40-cards", "60-audio", "70-final"].includes(basename(src)) });
+  cpSync(demo, root, { recursive: true, filter: src => !["cards", "audio", "final"].includes(basename(src)) });
   return root;
 };
 const demoMagazine = () => loadMagazine(demo);
@@ -44,7 +44,7 @@ test("Friday serial follows the rotation, counting earlier non-book Fridays", t 
   const root = tmp(t), magazine = DEFAULT_MAGAZINE;
   const kind = no => schedule({ magazine, date: "2026-10-16", dataDir: root, issueNo: no }).sections.serial.params.kind;
   assert.equal(kind(1), "make");
-  const brief = (no, b) => { mkdirSync(join(root, "issues", no), { recursive: true }); writeFileSync(join(root, "issues", no, "00-brief.json"), JSON.stringify(b)); };
+  const brief = (no, b) => { mkdirSync(join(root, "issues", no), { recursive: true }); writeFileSync(join(root, "issues", no, "brief.json"), JSON.stringify(b)); };
   brief("001", { sections: { serial: { params: { kind: "make" } } } });
   brief("002", { serial: { kind: "book" } });
   assert.equal(kind(5), "music");
@@ -110,20 +110,20 @@ test("schedule CLI writes the brief, and the demo still assembles to the same st
   const root = copyDemo(t), issue = join(root, "issues", "003");
   const before = createPipeline(issue);
   before.assemble();
-  const old = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
+  const old = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
   const r = spawnSync(process.execPath, [new URL("../scripts/pipeline.mjs", import.meta.url).pathname, "schedule", issue], { encoding: "utf8" });
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stdout, /2026\.10\.14 周三/);
-  const brief = JSON.parse(readFileSync(join(issue, "00-brief.json"), "utf8"));
+  const brief = JSON.parse(readFileSync(join(issue, "brief.json"), "utf8"));
   assert.equal(brief.date, "2026.10.14 周三");
   assert.equal(brief.creature, false);
   assert.equal(brief.think, false);
   assert.deepEqual(Object.keys(brief.sections), ["cover", "comic", "words", "story", "challenge", "english", "news", "check", "serial", "mailbox"]);
   assert.equal(brief.masthead.zh, "小满早知道", "其余字段原样保留");
   const p = createPipeline(issue);
-  assert.equal(p.done("00-brief"), true);
+  assert.equal(p.done("brief"), true);
   p.assemble();
-  const now = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
+  const now = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
   const strip = o => { const { _meta, ...rest } = o; return rest; };
   assert.deepEqual(strip(now), strip(old));
 });
@@ -133,17 +133,17 @@ test("a sections brief drops optional pages it leaves out and counts a Monday cr
   writeFileSync(join(root, "magazine.yaml"), readFileSync(join(demo, "magazine.yaml"), "utf8").replace("  - words\n", "").replace("  - english\n", ""));
   scheduleIssue(issue);
   createPipeline(issue).assemble();
-  const out = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
-  assert.match(spawnSync(process.execPath, [new URL("../scripts/pipeline.mjs", import.meta.url).pathname, "status", issue], { encoding: "utf8" }).stdout, /➖ 09-creature .*本期不出/);
+  const out = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
+  assert.match(spawnSync(process.execPath, [new URL("../scripts/pipeline.mjs", import.meta.url).pathname, "status", issue], { encoding: "utf8" }).stdout, /➖ creature .*本期不出/);
   assert.equal(out.words, undefined);
   assert.equal(out.challenge.english, undefined);
   const mon = scheduleIssue(issue, "2026-10-12");
   assert.equal(mon.creature, true);
   assert.equal(mon.date, "2026.10.12 周一");
   const status = spawnSync(process.execPath, [new URL("../scripts/pipeline.mjs", import.meta.url).pathname, "status", issue], { encoding: "utf8" }).stdout;
-  assert.match(status, /👉 09-creature/);
-  assert.match(status, /➖ 08-think .*本期不出/);
-  assert.match(status, /现在可以做：09-creature/);
+  assert.match(status, /👉 creature/);
+  assert.match(status, /➖ think .*本期不出/);
+  assert.match(status, /现在可以做：creature/);
 });
 
 test("template magazine.yaml parses, validates and equals the engine defaults", () => {

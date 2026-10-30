@@ -9,11 +9,11 @@
    - `state/serial-book/config.md`：家长写的书目、分集计划、角色认领（哪位编辑部成员认领哪个书中角色）、连载由谁念
    - `state/serial-book/log.jsonl`：讲过的各回，一回一行
    - 数据目录还没有 `state/serial-book/` 时，这些都在旧档案 `serial-bible.md` 里
-3. 读 `profile.md` 的英文档位，写 `issue/18-serial.json`，字段见同目录 `schema.json`
+3. 读 `profile.md` 的英文档位，写 `issue/serial.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "18-serial", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "serial", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "kind": "book",
   "ep": 3,
   "book_zh": "柳林风声", "book_en": "The Wind in the Willows", "author": "Kenneth Grahame · 1908",
@@ -41,12 +41,12 @@
 
 ## 图片
 
-第 20 步把 `photo_url` 下载成 `20-assets/serial-book/serial.jpg`（`node scripts/assets.mjs fetch <url> <issue>/20-assets/serial-book/serial.jpg --min 800 --max 1600`），`assets.json` 的 `serial` 写 `serial-book/serial.jpg`。旧期的 `20-assets/serial.jpg` 照旧能用。
+assets 这一步把 `photo_url` 下载成 `assets/serial-book/serial.jpg`（`node scripts/assets.mjs fetch <url> <issue>/assets/serial-book/serial.jpg --min 800 --max 1600`），`assets.json` 的 `serial` 写 `serial-book/serial.jpg`。旧期的 `assets/serial.jpg` 照旧能用。
 
 ## 状态
 
-本步只写 `18-serial.json`。第 90 步归档时：有 `state/serial-book/` 就把 `summary` 追加进 `log.jsonl`；旧数据目录照旧写 `bible_update`（追加到 `serial-bible.md`「进度」的一行），归档追加进 `serial-bible.md`。
+本步只写 `serial.json`。archive 这一步归档时：有 `state/serial-book/` 就把 `summary` 追加进 `log.jsonl`；旧数据目录照旧写 `bible_update`（追加到 `serial-bible.md`「进度」的一行），归档追加进 `serial-bible.md`。
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[18]` 报错；字数；`quote` 和原著逐字一致；本回情节和分集计划对得上；插画对得上情节；没有照抄中文译本。
+`node scripts/pipeline.mjs check <issue>` 没有 `[serial]` 报错；字数；`quote` 和原著逐字一致；本回情节和分集计划对得上；插画对得上情节；没有照抄中文译本。

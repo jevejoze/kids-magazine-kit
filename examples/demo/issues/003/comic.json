@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "stage": "comic",
+    "by": "示例",
+    "at": "2026-10-14T06:00:00+08:00"
+  },
+  "fact": "不是整个挪威都有极昼，要看地点和季节。北极出现极昼时，南极附近正是冬天。",
+  "panels": [
+    {
+      "title": "明明已经半夜了",
+      "bubbles": [
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "半夜十二点还这么亮，太阳不下班吗？"
+        }
+      ],
+      "chars": [
+        "dog:surprise:130:eyemask"
+      ]
+    },
+    {
+      "title": "关键是地球的倾斜",
+      "bubbles": [
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "地球斜着转。北极附近转一圈，也可能一直晒到太阳。"
+        }
+      ],
+      "chars": [
+        "owl:talk:130"
+      ]
+    },
+    {
+      "title": "那冬天会怎样？",
+      "bubbles": [
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "那北极的冬天呢？"
+        },
+        {
+          "who": "owl",
+          "lang": "zh",
+          "text": "朝向背光一侧，可能整天见不到太阳。"
+        }
+      ],
+      "chars": [
+        "dog:think:110",
+        "owl:talk:110"
+      ]
+    },
+    {
+      "title": "自己动手找一找",
+      "bubbles": [
+        {
+          "who": "mouse",
+          "lang": "en",
+          "text": "Still in the light!"
+        },
+        {
+          "who": "dog",
+          "lang": "zh",
+          "text": "拿手电照地球仪，转一圈找找看！"
+        }
+      ],
+      "chars": [
+        "mouse:wave:110",
+        "dog:happy:110"
+      ]
+    }
+  ],
+  "theme_icon": "🌍",
+  "title_en": "Why is the sun still up at midnight?",
+  "title_zh": "半夜了，太阳怎么还没下班？",
+  "diagram": "diagram.svg",
+  "sources": [
+    "https://science.nasa.gov/earth/facts/",
+    "https://pmel.noaa.gov/arctic-zone/gallery_np_seasons.html",
+    "https://www.lpi.usra.edu/education/skytellers/day_night/"
+  ],
+  "diagram_title": "先看整球，再到放大窗跟着红点转一圈",
+  "takeaway": "地球斜着转，让北极附近的夏天出现极昼。",
+  "fact_title": "💡 再发现"
+}

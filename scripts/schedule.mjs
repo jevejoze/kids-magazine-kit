@@ -1,7 +1,7 @@
 // 杂志配置和调度：magazine.yaml + 日期 + 课表 → brief 的 sections（本期出哪些栏目、顺序、合并后的 params）
 //   loadMagazine(dataDir, registry)   读 data/magazine.yaml，没有就用默认配置；校验不过抛错，错误逐条列出
 //   schedule({ magazine, date, dataDir, issueNo, registry })   算出本期的 weekday_theme 和 sections
-//   scheduleIssue(issueDir, date?)   第 00 步用：算好写进 00-brief.json（没有就新建），返回写进去的内容
+//   scheduleIssue(issueDir, date?)   第 00 步用：算好写进 brief.json（没有就新建），返回写进去的内容
 // 栏目迁移成 sections/ 栏目包之前，旧版页面用下面的 LEGACY 表当 manifest
 import { readFileSync, existsSync, readdirSync, mkdirSync, writeFileSync, renameSync, rmSync } from "node:fs";
 import { join, resolve, dirname, basename } from "node:path";
@@ -21,18 +21,18 @@ const text = { type: "string", default: "" };
 // rules：要守的 core/rules（红线由任务单自动加）；consumes：要读的上游值；state：跨期状态文件
 // params 里 open 的才能在 magazine.yaml 里改；其余由调度填（周五轮换、课表）
 export const LEGACY = {
-  cover:     { stage: "10-cover",    required: true, rules: ["images"], params: { narration_lines: lines("cover") } },
-  comic:     { stage: "11-comic",    required: true, consumes: ["cover.question"], params: { narration_lines: lines("comic") } },
-  creature:  { stage: "09-creature", rules: ["images"], state: { file: "creature-log.md" }, params: { narration_lines: lines("creature") } },
-  words:     { stage: "12-words",    optional: true, rules: ["english-level"], params: { narration_lines: lines("words") } },
-  story:     { stage: "13-story",    required: true, state: { file: "story-bible.md" }, params: { narration_lines: lines("story") } },
-  challenge: { stage: "14-puzzle",   required: true, params: { narration_lines: lines("challenge") } },
-  english:   { stage: "15-english",  optional: true, rules: ["english-level"], params: {} },
-  news:      { stage: "17-news",     rules: ["images", "english-level"], params: { narration_lines: lines("news") } },
-  check:     { stage: "19-check",    rules: ["no-visible-pedagogy"], params: { narration_lines: lines("check"), skill: text, choices: text, tools: text } },
-  serial:    { stage: "18-serial",   rules: ["images", "english-level"], state: { file: "serial-bible.md" }, params: { narration_lines: lines("serial"), kind: { type: "string", default: "book", enum: SERIAL_KINDS } } },
-  think:     { stage: "08-think",    rules: ["no-visible-pedagogy"], state: { file: "think-log.md" }, params: { narration_lines: lines("think"), skill: text, friday_topic: text } },
-  mailbox:   { stage: "16-mailbox",  required: true, params: { narration_lines: lines("mailbox") } },
+  cover:     { stage: "cover",    required: true, rules: ["images"], params: { narration_lines: lines("cover") } },
+  comic:     { stage: "comic",    required: true, consumes: ["cover.question"], params: { narration_lines: lines("comic") } },
+  creature:  { stage: "creature", rules: ["images"], state: { file: "creature-log.md" }, params: { narration_lines: lines("creature") } },
+  words:     { stage: "words",    optional: true, rules: ["english-level"], params: { narration_lines: lines("words") } },
+  story:     { stage: "story",    required: true, state: { file: "story-bible.md" }, params: { narration_lines: lines("story") } },
+  challenge: { stage: "challenge",   required: true, params: { narration_lines: lines("challenge") } },
+  english:   { stage: "english",  optional: true, rules: ["english-level"], params: {} },
+  news:      { stage: "news",     rules: ["images", "english-level"], params: { narration_lines: lines("news") } },
+  check:     { stage: "check",    rules: ["no-visible-pedagogy"], params: { narration_lines: lines("check"), skill: text, choices: text, tools: text } },
+  serial:    { stage: "serial",   rules: ["images", "english-level"], state: { file: "serial-bible.md" }, params: { narration_lines: lines("serial"), kind: { type: "string", default: "book", enum: SERIAL_KINDS } } },
+  think:     { stage: "think",    rules: ["no-visible-pedagogy"], state: { file: "think-log.md" }, params: { narration_lines: lines("think"), skill: text, friday_topic: text } },
+  mailbox:   { stage: "mailbox",  required: true, params: { narration_lines: lines("mailbox") } },
 };
 // 首批开放给家长改的参数；周五轮换在 schedule.friday 里写
 const OPEN = ["narration_lines", "image_policy"];
@@ -202,13 +202,13 @@ export function curriculumWeek(file, date) {
   return null;
 }
 
-// 周五轮换到第几个：之前各期里周五出过几次非 book（读每期 00-brief 的 sections.serial.params.kind，旧期读 serial.kind）
+// 周五轮换到第几个：之前各期里周五出过几次非 book（读每期 brief 的 sections.serial.params.kind，旧期读 serial.kind）
 function fridayCount(dataDir, issueNo) {
   const dir = join(dataDir, "issues");
   if (!existsSync(dir)) return 0;
   return readdirSync(dir).filter(n => /^\d{3}$/.test(n) && +n < issueNo).filter(n => {
     try {
-      const b = JSON.parse(readFileSync(join(dir, n, "00-brief.json"), "utf8"));
+      const b = JSON.parse(readFileSync(join(dir, n, "brief.json"), "utf8"));
       const kind = b.sections?.serial?.params?.kind ?? b.serial?.kind ?? "book";
       return kind !== "book";
     } catch { return false; }
@@ -247,7 +247,7 @@ export function scheduledIn(brief, id) {
 // 写进任务书：sections、weekday_theme，以及旧字段 creature、think（还没迁移的步骤照旧读它们）
 export function scheduleIssue(issueDir, date) {
   issueDir = resolve(issueDir);
-  const dataDir = resolve(issueDir, "..", ".."), file = join(issueDir, "00-brief.json");
+  const dataDir = resolve(issueDir, "..", ".."), file = join(issueDir, "brief.json");
   const issueNo = Number(basename(issueDir));
   if (!Number.isInteger(issueNo)) throw new Error(`期号文件夹要是三位数字：${issueDir}`);
   const brief = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : { issue: issueNo };

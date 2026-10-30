@@ -12,7 +12,7 @@ const run = (...args) => spawnSync(process.execPath, [regress, ...args], { encod
 function data(t) {
   const root = mkdtempSync(join(tmpdir(), "kids-regress-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  cpSync(new URL("../examples/demo/", import.meta.url), join(root, "data"), { recursive: true, filter: src => !["40-cards", "60-audio", "70-final"].includes(basename(src)) });
+  cpSync(new URL("../examples/demo/", import.meta.url), join(root, "data"), { recursive: true, filter: src => !["cards", "audio", "final"].includes(basename(src)) });
   return root;
 }
 
@@ -63,7 +63,7 @@ test("baseline then compare matches; a changed issue is reported", { skip: !chro
   assert.match(same.stdout, /003 一致/);
 
   const issue = join(dir, "issues/003");
-  for (const f of ["10-cover.json", "30-issue.json"]) {
+  for (const f of ["cover.json", "issue.json"]) {
     const j = JSON.parse(readFileSync(join(issue, f), "utf8"));
     j.question.zh = "换了一个封面问题？";
     writeFileSync(join(issue, f), JSON.stringify(j));

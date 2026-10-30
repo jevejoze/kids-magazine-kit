@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// 第 70 步：把 40-cards 的图片和 60-audio 的语音合成讲读视频（Node 22+ 零依赖版）。
+// 第 70 步：把 cards 的图片和 audio 的语音合成讲读视频（Node 22+ 零依赖版）。
 // 用法: node scripts/make_video.mjs <issue 目录>
-// 读:   50-narration.json、60-audio/c{card}_{序号}.wav、40-cards/card-N.png、
+// 读:   narration.json、audio/c{card}_{序号}.wav、cards/card-N.png、
 //       数据目录 sfx/<名字>.wav|mp3（可选音效；sfx/page 是翻页声，sfx/bgm 是垫乐，都可选）
-// 写:   70-final/讲读版.mp4，并把 40-cards 里的 PDF 复制进 70-final/
+// 写:   final/讲读版.mp4，并把 cards 里的 PDF 复制进 final/
 import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync, readdirSync, copyFileSync } from "node:fs";
 import { execFileSync, spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
@@ -134,13 +134,13 @@ const issueArg = process.argv[2];
 if (!issueArg) { console.error("用法: node scripts/make_video.mjs <issue 目录>"); process.exit(1); }
 const issue = resolve(issueArg);
 const pipeline = createPipeline(issue);
-if (!["40-render", "60-audio"].every(stage => pipeline.done(stage))) {
+if (!["render", "audio"].every(stage => pipeline.done(stage))) {
   console.error("页图或音频未完成、已过期，请重新制作后再合成视频");
   process.exit(2);
 }
-const buildInputs = inputFingerprint(issue, "70-video");
-const nar = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
-const audioDir = join(issue, "60-audio"), cardsDir = join(issue, "40-cards");
+const buildInputs = inputFingerprint(issue, "video");
+const nar = JSON.parse(readFileSync(join(issue, "narration.json"), "utf8")).narration;
+const audioDir = join(issue, "audio"), cardsDir = join(issue, "cards");
 const stagingDir = mkdtempSync(join(issue, ".kids-video-"));
 const tmp = mkdtempSync(join(tmpdir(), "narrate-"));
 
@@ -242,11 +242,11 @@ try {
   if (existsSync(cardsDir)) {
     for (const f of readdirSync(cardsDir)) if (f.endsWith(".pdf")) copyFileSync(join(cardsDir, f), join(stagingDir, f));
   }
-  recordBuild(issue, "70-video", buildInputs, readdirSync(stagingDir).filter(p => p.endsWith(".mp4") || p.endsWith(".pdf")).map(p => join(stagingDir, p)), stagingDir);
-  publishDirectory(stagingDir, join(issue, "70-final"), name => name === "讲读版.mp4" || name === "build.json" || /-第\d+期\.pdf$/.test(name));
+  recordBuild(issue, "video", buildInputs, readdirSync(stagingDir).filter(p => p.endsWith(".mp4") || p.endsWith(".pdf")).map(p => join(stagingDir, p)), stagingDir);
+  publishDirectory(stagingDir, join(issue, "final"), name => name === "讲读版.mp4" || name === "build.json" || /-第\d+期\.pdf$/.test(name));
   let note = "";
   if (holds.length && !drawn) note = `（hold 提示没有画上：${!font ? "没找到中文字体，设置 FONT 环境变量" : "这个 ffmpeg 不带 drawtext"}）`;
-  console.log(`${join(issue, "70-final", "讲读版.mp4")}  ${(total / 60).toFixed(1)} 分钟；翻页时间点 ${starts.slice(1).map(s => `${s.toFixed(1)}s`).join(" ")}${note}`);
+  console.log(`${join(issue, "final", "讲读版.mp4")}  ${(total / 60).toFixed(1)} 分钟；翻页时间点 ${starts.slice(1).map(s => `${s.toFixed(1)}s`).join(" ")}${note}`);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
   rmSync(stagingDir, { recursive: true, force: true });

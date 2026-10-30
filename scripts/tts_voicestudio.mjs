@@ -29,14 +29,14 @@ if (!existsSync(confFile)) { console.log("没有 voices/voicestudio.json，不�
 const conf = JSON.parse(readFileSync(confFile, "utf8"));
 const URL_ = (process.env.VOICESTUDIO_URL || "http://127.0.0.1:3900").replace(/\/$/, "");
 
-const outDir = join(issue, "60-audio"), manPath = join(outDir, "manifest.json");
+const outDir = join(issue, "audio"), manPath = join(outDir, "manifest.json");
 if (!existsSync(manPath) || JSON.parse(readFileSync(manPath, "utf8"))._meta?.complete === false) {
   console.error("先跑完整期合成：node scripts/tts_azure.mjs <issue>（数据目录有 voices/mimo.json 时用 tts_mimo.mjs）"); process.exit(1);
 }
-const inputs = inputFingerprint(issue, "60-audio");
+const inputs = inputFingerprint(issue, "audio");
 const man = JSON.parse(readFileSync(manPath, "utf8"));
-const nar = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
-const data = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
+const nar = JSON.parse(readFileSync(join(issue, "narration.json"), "utf8")).narration;
+const data = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
 const serialCard = serialCardOf(data);
 
 const plain = s => s.replace(/<[^>]+>/g, "");
@@ -117,5 +117,5 @@ function save(complete) {
 function finish() {
   for (const key of Object.keys(conf)) if (key.includes("/")) man.voices[key.replace("@serial", "（连载）")] = `VoiceStudio ${conf[key]}`;
   save(true);
-  recordBuild(issue, "60-audio", inputs, [manPath, ...man.files.map(f => join(outDir, f.file))]);
+  recordBuild(issue, "audio", inputs, [manPath, ...man.files.map(f => join(outDir, f.file))]);
 }

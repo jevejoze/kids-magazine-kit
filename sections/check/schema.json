@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "真的假的 19-check.json",
+  "title": "真的假的 check.json",
   "type": "object",
   "required": ["where", "claim", "clues", "verdict", "explain", "sources"],
   "properties": {

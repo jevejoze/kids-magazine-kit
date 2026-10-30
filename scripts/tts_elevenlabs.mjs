@@ -37,14 +37,14 @@ const conf = JSON.parse(readFileSync(confFile, "utf8"));
 const MODEL = conf.model || "eleven_v3", tags = { ...TAGS, ...conf.tags };
 const BASE = "https://api.elevenlabs.io/v1", KEY = process.env.ELEVENLABS_API_KEY;
 
-const outDir = join(issue, "60-audio"), manPath = join(outDir, "manifest.json");
+const outDir = join(issue, "audio"), manPath = join(outDir, "manifest.json");
 if (!existsSync(manPath) || JSON.parse(readFileSync(manPath, "utf8"))._meta?.complete === false) {
   console.error("先跑完整期合成：node scripts/tts_azure.mjs <issue>（数据目录有 voices/mimo.json 时用 tts_mimo.mjs）"); process.exit(1);
 }
-const inputs = inputFingerprint(issue, "60-audio");
+const inputs = inputFingerprint(issue, "audio");
 const man = JSON.parse(readFileSync(manPath, "utf8"));
-const nar = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
-const data = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
+const nar = JSON.parse(readFileSync(join(issue, "narration.json"), "utf8")).narration;
+const data = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
 // 连载页按渲染顺序定位；周五的音乐盒、放映室、动手做不算
 const serialCard = data.serial && (data.serial.kind ?? "book") === "book" ? pageOrder(data).indexOf("serial") + 1 : 0;
 
@@ -145,5 +145,5 @@ function finish() {
     man.voices[key.replace("@serial", "（连载）")] = `ElevenLabs ${v.name ?? v.voice_id}（${MODEL}）${v.pitch ? ` ${v.pitch > 0 ? "+" : ""}${v.pitch} 半音` : ""}${v.speed && v.speed !== 1 ? ` 语速 ×${v.speed}` : ""}`;
   }
   save(true);
-  recordBuild(issue, "60-audio", inputs, [manPath, ...man.files.map(f => join(outDir, f.file))]);
+  recordBuild(issue, "audio", inputs, [manPath, ...man.files.map(f => join(outDir, f.file))]);
 }

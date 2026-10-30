@@ -13,7 +13,7 @@ const cli = new URL("../scripts/pipeline.mjs", import.meta.url).pathname;
 const tmp = t => { const d = mkdtempSync(join(tmpdir(), "kids-ticket-")); t.after(() => rmSync(d, { recursive: true, force: true })); return d; };
 const copyDemo = t => {
   const root = tmp(t);
-  cpSync(demo, root, { recursive: true, filter: src => !["40-cards", "60-audio", "70-final"].includes(basename(src)) });
+  cpSync(demo, root, { recursive: true, filter: src => !["cards", "audio", "final"].includes(basename(src)) });
   return { root, issue: join(root, "issues", "003") };
 };
 const json = f => JSON.parse(readFileSync(f, "utf8"));
@@ -23,7 +23,7 @@ const run = (...args) => spawnSync(process.execPath, [cli, ...args], { encoding:
 
 test("ticket fingerprint is stable and names rules, cast slots, params, state, upstream values and outputs", t => {
   const { issue } = copyDemo(t);
-  const a = ticket(issue, "story"), b = ticket(issue, "13-story");
+  const a = ticket(issue, "story"), b = ticket(issue, "story");
   assert.equal(a.fingerprint, b.fingerprint, "栏目 id 和步骤 id 领到同一张任务单");
   assert.equal(fp(issue, "story"), a.fingerprint);
   assert.match(a.fingerprint, /^[a-f0-9]{64}$/);
@@ -31,11 +31,11 @@ test("ticket fingerprint is stable and names rules, cast slots, params, state, u
   assert.equal(a.content.cast.slots.trickster, "raccoon");
   assert.equal(a.content.brief.story.ep, 3);
   assert.deepEqual(a.content.state, ["data/state/story/config.md", "data/state/story/log.jsonl", "data/state/story/open-threads.md"]);
-  assert.deepEqual(a.content.output, ["issue/13-story.json"]);
+  assert.deepEqual(a.content.output, ["issue/story.json"]);
   assert.equal(a.content.params.narration_lines, 30);
   assert.deepEqual(ticket(issue, "news").content.rules.map(r => r.id), ["red-lines", "images", "english-level"]);
   assert.deepEqual(ticket(issue, "narration").content.rules.map(r => r.id), ["red-lines", "narration", "no-visible-pedagogy"]);
-  assert.equal(ticket(issue, "50-narration").fingerprint, fp(issue, "narration"));
+  assert.equal(ticket(issue, "narration").fingerprint, fp(issue, "narration"));
   assert.match(ticket(issue, "comic").content.consumes["cover.question"].en, /midnight/);
   assert.match(a.markdown, /指纹：[a-f0-9]{64}，写进输出的 _meta\.ticket$/);
 });
@@ -43,7 +43,7 @@ test("ticket fingerprint is stable and names rules, cast slots, params, state, u
 test("the narration ticket's skeleton is built from this issue's actual page order and each pack's narrate.md", t => {
   const { issue } = copyDemo(t);
   const { skeleton } = ticket(issue, "narration").content;
-  const merged = json(join(issue, "30-issue.json"));
+  const merged = json(join(issue, "issue.json"));
   assert.deepEqual(skeleton.map(p => p.card), skeleton.map((_, i) => i + 1));
   assert.deepEqual(skeleton.map(p => p.section), ["cover", "comic", "words", "story", "challenge", "news", "check", "serial", "mailbox"]);
   const challenge = skeleton.find(p => p.section === "challenge");
@@ -52,44 +52,44 @@ test("the narration ticket's skeleton is built from this issue's actual page ord
   assert.ok(skeleton.every(p => p.narrate), "每个已注册的栏目包都有自己的 narrate.md");
   void merged;
 
-  // 渲染过就按 40-cards/pages.json 的页序，不用重算
-  mkdirSync(join(issue, "40-cards"), { recursive: true });
-  writeFileSync(join(issue, "40-cards", "pages.json"), JSON.stringify([{ card: 1, section: "cover", id: "cover" }, { card: 2, section: "mailbox", id: "mailbox" }]));
+  // 渲染过就按 cards/pages.json 的页序，不用重算
+  mkdirSync(join(issue, "cards"), { recursive: true });
+  writeFileSync(join(issue, "cards", "pages.json"), JSON.stringify([{ card: 1, section: "cover", id: "cover" }, { card: 2, section: "mailbox", id: "mailbox" }]));
   const fromPages = ticket(issue, "narration").content.skeleton;
   assert.deepEqual(fromPages.map(p => p.section), ["cover", "mailbox"]);
 
-  edit(join(issue, "00-brief.json"), b => { b.sections = { ...b.sections, news: { params: { narration_lines: 7 } } }; });
-  writeFileSync(join(issue, "40-cards", "pages.json"), JSON.stringify([{ card: 1, section: "news", id: "news" }]));
+  edit(join(issue, "brief.json"), b => { b.sections = { ...b.sections, news: { params: { narration_lines: 7 } } }; });
+  writeFileSync(join(issue, "cards", "pages.json"), JSON.stringify([{ card: 1, section: "news", id: "news" }]));
   assert.equal(ticket(issue, "narration").content.skeleton[0].max_lines, 7, "任务书写的句数上限直接用，不缩放");
 });
 
 test("the review ticket unions every active section's rules and flags cross-section topic overlaps", t => {
   const { issue } = copyDemo(t);
-  edit(join(issue, "00-brief.json"), b => { b.sections = Object.fromEntries(["cover", "comic", "news", "check", "serial"].map(k => [k, { params: {} }])); });
+  edit(join(issue, "brief.json"), b => { b.sections = Object.fromEntries(["cover", "comic", "news", "check", "serial"].map(k => [k, { params: {} }])); });
   const review = ticket(issue, "review");
   assert.deepEqual(review.content.rules.map(r => r.id).sort(), ["english-level", "images", "narration", "no-visible-pedagogy", "red-lines"]);
   assert.deepEqual(review.content.topic_warnings, [], "示例数据本来不撞题");
   assert.match(review.markdown, /没发现明显撞题/);
 
-  edit(join(issue, "19-check.json"), k => { k.claim = "挪威夏天半夜十二点太阳还在天上"; });
+  edit(join(issue, "check.json"), k => { k.claim = "挪威夏天半夜十二点太阳还在天上"; });
   const warned = ticket(issue, "review");
   assert.match(warned.content.topic_warnings.join("\n"), /cover.*check.*可能撞题|check.*cover.*可能撞题/);
   assert.match(warned.markdown, /可能撞题，请确认/);
 
   // 只出信箱、单词屋这类没有「主题」字段的栏目时不报错
-  edit(join(issue, "00-brief.json"), b => { b.sections = { mailbox: { params: {} }, words: { params: {} } }; });
+  edit(join(issue, "brief.json"), b => { b.sections = { mailbox: { params: {} }, words: { params: {} } }; });
   assert.deepEqual(ticket(issue, "review").content.topic_warnings, []);
 });
 
 test("fingerprint changes with the brief, params, a rule file, the cast and a consumed value", t => {
   const { root, issue } = copyDemo(t);
   const base = { story: fp(issue, "story"), comic: fp(issue, "comic"), cover: fp(issue, "cover") };
-  edit(join(issue, "00-brief.json"), b => { b.weather = "🌧️ 小雨"; });
+  edit(join(issue, "brief.json"), b => { b.weather = "🌧️ 小雨"; });
   assert.equal(fp(issue, "story"), base.story, "任务单不收的字段不影响指纹");
-  edit(join(issue, "00-brief.json"), b => { b.story.plan = "换个结尾"; });
+  edit(join(issue, "brief.json"), b => { b.story.plan = "换个结尾"; });
   assert.notEqual(fp(issue, "story"), base.story, "任务书");
   assert.equal(fp(issue, "cover"), base.cover, "别的栏目的任务书块不影响封面");
-  edit(join(issue, "00-brief.json"), b => { b.sections = { cover: { params: { narration_lines: 9 } }, comic: { params: {} }, story: { params: {} }, challenge: { params: {} }, mailbox: { params: {} } }; });
+  edit(join(issue, "brief.json"), b => { b.sections = { cover: { params: { narration_lines: 9 } }, comic: { params: {} }, story: { params: {} }, challenge: { params: {} }, mailbox: { params: {} } }; });
   assert.notEqual(fp(issue, "cover"), base.cover, "参数");
 
   const eng = tmp(t);
@@ -107,7 +107,7 @@ test("fingerprint changes with the brief, params, a rule file, the cast and a co
   assert.notEqual(fp(issue, "story"), story, "数据目录的 cast 覆盖引擎的");
 
   const comic = fp(issue, "comic");
-  edit(join(issue, "10-cover.json"), c => { c.question.zh = "换一个问题？"; });
+  edit(join(issue, "cover.json"), c => { c.question.zh = "换一个问题？"; });
   assert.notEqual(fp(issue, "comic"), comic, "上游值");
 });
 
@@ -125,9 +125,9 @@ test("red-lines stays in the ticket when a section pack declares no rules; unkno
   assert.ok(tk.content.consumes["cover.question"]);
   edit(join(dir, "manifest.json"), m => { m.rules = ["no-such-rule"]; });
   assert.throws(() => ticket(issue, "fun-facts"), /声明的规则不存在：no-such-rule/);
-  edit(join(issue, "00-brief.json"), b => { b.sections = { cover: { params: {} } }; });
+  edit(join(issue, "brief.json"), b => { b.sections = { cover: { params: {} } }; });
   assert.throws(() => ticket(issue, "story"), /本期不出/);
-  assert.throws(() => ticket(issue, "20-assets"), /不属于哪个栏目/);
+  assert.throws(() => ticket(issue, "assets"), /不属于哪个栏目/);
   assert.throws(() => ticket(issue, "nope"), /没有这个栏目/);
 });
 
@@ -151,25 +151,25 @@ test("a cast needs two characters and every slot filled by a known character", t
 
 test("status and check mark an output stale when its _meta.ticket no longer matches", t => {
   const { issue } = copyDemo(t);
-  const story = join(issue, "13-story.json");
+  const story = join(issue, "story.json");
   edit(story, s => { s._meta.ticket = fp(issue, "story"); });
   const p = createPipeline(issue);
-  assert.equal(p.done("13-story"), true);
+  assert.equal(p.done("story"), true);
   assert.deepEqual(p.check().filter(e => /任务单/.test(e)), []);
-  edit(join(issue, "00-brief.json"), b => { b.story.plan = "换个结尾"; });
-  assert.equal(p.done("13-story"), false);
-  assert.match(p.check().join("\n"), /\[13\] 任务单变了，输出已过期，请按新任务单重做/);
-  assert.match(run("status", issue).stdout, /👉 13-story .*（未完成、输出无效或已过期）/);
+  edit(join(issue, "brief.json"), b => { b.story.plan = "换个结尾"; });
+  assert.equal(p.done("story"), false);
+  assert.match(p.check().join("\n"), /\[story\] 任务单变了，输出已过期，请按新任务单重做/);
+  assert.match(run("status", issue).stdout, /👉 story .*（未完成、输出无效或已过期）/);
   assert.throws(() => p.assemble(), /任务单变了/);
   edit(story, s => { s._meta.ticket = fp(issue, "story"); });
-  assert.equal(p.done("13-story"), true, "按新任务单重做后恢复");
+  assert.equal(p.done("story"), true, "按新任务单重做后恢复");
 });
 
 test("ticket CLI prints the ticket and asks for a skill", t => {
   const { issue } = copyDemo(t);
   const r = run("ticket", issue, "story");
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /# 任务单 · story（第 13 步）/);
+  assert.match(r.stdout, /# 任务单 · story/);
   assert.match(r.stdout, /## 规则 · red-lines/);
   assert.match(r.stdout, /trickster：捣蛋浣熊/);
   assert.ok(r.stdout.trim().endsWith(`指纹：${fp(issue, "story")}，写进输出的 _meta.ticket`));

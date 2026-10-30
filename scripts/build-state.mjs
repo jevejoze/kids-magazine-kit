@@ -18,14 +18,17 @@ export function atomicWrite(path, value) {
   finally { rmSync(tmp, { force: true }); }
 }
 
+// 流水线里合并、审稿、渲染、讲读、语音、视频、归档这几步不算内容来源，只有它们依赖的内容和图片才算
+const DOWNSTREAM = ["assemble", "review", "render", "narration", "audio", "video", "archive"];
+
 function sources(issue) {
-  const brief = read(join(issue, "00-brief.json"));
+  const brief = read(join(issue, "brief.json"));
   // 本期出的栏目才算；旧任务书没有 sections 时，creature、think 要明确写 true
-  const files = stages.filter(s => Number(s.id.slice(0, 2)) <= 20 && (scheduledIn(brief, s.section) ?? !DAY_SECTIONS.includes(s.section)))
+  const files = stages.filter(s => !DOWNSTREAM.includes(s.id) && (scheduledIn(brief, s.section) ?? !DAY_SECTIONS.includes(s.section)))
     .flatMap(s => s.outputs).filter(p => p.startsWith("issue/")).map(p => p.slice(6));
   // Track all downloaded assets, including replacements under the same filename.
-  const assets = join(issue, "20-assets");
-  if (existsSync(assets)) files.push(...readdirSync(assets, { recursive: true }).filter(f => statSync(join(assets, f)).isFile()).map(f => "20-assets/" + f));
+  const assets = join(issue, "assets");
+  if (existsSync(assets)) files.push(...readdirSync(assets, { recursive: true }).filter(f => statSync(join(assets, f)).isFile()).map(f => "assets/" + f));
   return [...new Set(files)].sort().map(p => [p, join(issue, p)]);
 }
 
@@ -44,44 +47,44 @@ function snapshot(files) {
 
 export function contentFingerprint(issue) {
   issue = resolve(issue);
-  return hash(JSON.stringify(snapshot([...sources(issue), ["30-issue.json", join(issue, "30-issue.json")]])));
+  return hash(JSON.stringify(snapshot([...sources(issue), ["issue.json", join(issue, "issue.json")]])));
 }
 
 export function inputFingerprint(issue, stage) {
   issue = resolve(issue);
   const local = (...files) => files.map(p => [p, join(issue, p)]);
   let files;
-  if (stage === "30-assemble") files = [...sources(issue), ...engineFiles("scripts/pipeline-lib.mjs", "scripts/contracts.mjs", "scripts/schedule.mjs", "pipeline/stages.json")];
-  else if (stage === "40-render") files = [...sources(issue), ...local("30-issue.json", "31-review.md"),
+  if (stage === "assemble") files = [...sources(issue), ...engineFiles("scripts/pipeline-lib.mjs", "scripts/contracts.mjs", "scripts/schedule.mjs", "pipeline/stages.json")];
+  else if (stage === "render") files = [...sources(issue), ...local("issue.json", "review.md"),
     ...engineFiles("scripts/render.mjs", "scripts/contracts.mjs", "scripts/character-pack.mjs", "scripts/sections.mjs", "assets/template.html", "assets/style.css", "assets/characters.js", "assets/kit.js"), ...sectionFiles(issue),
-    ...characterPackFiles(read(join(issue, "30-issue.json")).character_pack).map(p => ["engine/" + relative(engine, p), p])];
-  else if (stage === "60-audio") files = [...local("50-narration.json"),
+    ...characterPackFiles(read(join(issue, "issue.json")).character_pack).map(p => ["engine/" + relative(engine, p), p])];
+  else if (stage === "audio") files = [...local("narration.json"),
     ["voices/azure.json", join(issue, "../../voices/azure.json")], ["voices/polyphones.json", join(issue, "../../voices/polyphones.json")],
     ...engineFiles("scripts/tts_azure.mjs", "scripts/polyphones.json")];
-  else if (stage === "70-video") {
-    const narration = read(join(issue, "50-narration.json")).narration;
+  else if (stage === "video") {
+    const narration = read(join(issue, "narration.json")).narration;
     const sfx = new Set(["page", "bgm", ...narration.flatMap(p => p.lines.map(l => l.sfx)).filter(Boolean)]);
-    files = [...local("30-issue.json", "31-review.md", "50-narration.json", "40-cards/build.json", "60-audio/build.json", "60-audio/manifest.json"),
-      ...narration.flatMap(p => local(`40-cards/card-${p.card}.png`, ...p.lines.map((_, i) => `60-audio/c${p.card}_${String(i).padStart(2, "0")}.wav`))),
-      ...readdirSync(join(issue, "40-cards")).filter(p => p.endsWith(".pdf")).flatMap(p => local("40-cards/" + p)),
+    files = [...local("issue.json", "review.md", "narration.json", "cards/build.json", "audio/build.json", "audio/manifest.json"),
+      ...narration.flatMap(p => local(`cards/card-${p.card}.png`, ...p.lines.map((_, i) => `audio/c${p.card}_${String(i).padStart(2, "0")}.wav`))),
+      ...readdirSync(join(issue, "cards")).filter(p => p.endsWith(".pdf")).flatMap(p => local("cards/" + p)),
       ...[...sfx].flatMap(name => ["wav", "mp3", "m4a", "ogg"].map(ext => [`sfx/${name}.${ext}`, join(issue, `../../sfx/${name}.${ext}`)])),
       ...engineFiles("scripts/make_video.mjs", "scripts/make_video.py")];
   } else throw new Error(`不支持的制作步骤：${stage}`);
   // 用克隆声音时，配置和替换脚本也算输入
-  if (stage === "60-audio" && existsSync(join(issue, "../../voices/voicestudio.json")))
+  if (stage === "audio" && existsSync(join(issue, "../../voices/voicestudio.json")))
     files.push(["voices/voicestudio.json", join(issue, "../../voices/voicestudio.json")], ...engineFiles("scripts/tts_voicestudio.mjs"));
   // 用 ElevenLabs 时，配置和替换脚本也算输入
-  if (stage === "60-audio" && existsSync(join(issue, "../../voices/elevenlabs.json")))
+  if (stage === "audio" && existsSync(join(issue, "../../voices/elevenlabs.json")))
     files.push(["voices/elevenlabs.json", join(issue, "../../voices/elevenlabs.json")], ...engineFiles("scripts/tts_elevenlabs.mjs"));
   // 用 MiMo 时，配置、克隆参照音频和脚本也算输入
   const mimo = join(issue, "../../voices/mimo.json");
-  if (stage === "60-audio" && existsSync(mimo)) files.push(["voices/mimo.json", mimo], ...engineFiles("scripts/tts_mimo.mjs"),
+  if (stage === "audio" && existsSync(mimo)) files.push(["voices/mimo.json", mimo], ...engineFiles("scripts/tts_mimo.mjs"),
     ...Object.values(read(mimo)).flatMap(v => v?.clone ? [[`voices/${v.clone}`, join(issue, "../../voices", v.clone)]] : []));
   files.push(...engineFiles("scripts/build-state.mjs"));
   return hash(JSON.stringify(snapshot(files)));
 }
 
-const receiptPath = (issue, stage, dir) => stage === "30-assemble" ? join(issue, "30-build.json") : join(dir || join(issue, { "40-render": "40-cards", "60-audio": "60-audio", "70-video": "70-final" }[stage]), "build.json");
+const receiptPath = (issue, stage, dir) => stage === "assemble" ? join(issue, "build.json") : join(dir || join(issue, { "render": "cards", "audio": "audio", "video": "final" }[stage]), "build.json");
 
 export function recordBuild(issue, stage, inputs, outputs, dir) {
   if (inputs !== inputFingerprint(issue, stage)) throw new Error(`${stage} 制作期间输入发生变化，请重做`);
@@ -117,8 +120,8 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (command === "fingerprint") console.log(inputFingerprint(issue, stage));
     else if (command === "finish-video") {
       const dir = resolve(staging);
-      recordBuild(issue, "70-video", expected, readdirSync(dir).filter(p => p.endsWith(".mp4") || p.endsWith(".pdf")).map(p => join(dir, p)), dir);
-      publishDirectory(dir, join(resolve(issue), "70-final"), name => name === "讲读版.mp4" || name === "build.json" || /-第\d+期\.pdf$/.test(name));
-    } else throw new Error("用法：build-state.mjs fingerprint <issue> <stage> | finish-video <issue> 70-video <fingerprint> <staging>");
+      recordBuild(issue, "video", expected, readdirSync(dir).filter(p => p.endsWith(".mp4") || p.endsWith(".pdf")).map(p => join(dir, p)), dir);
+      publishDirectory(dir, join(resolve(issue), "final"), name => name === "讲读版.mp4" || name === "build.json" || /-第\d+期\.pdf$/.test(name));
+    } else throw new Error("用法：build-state.mjs fingerprint <issue> <stage> | finish-video <issue> video <fingerprint> <staging>");
   } catch (error) { console.error(error.message); process.exitCode = 2; }
 }

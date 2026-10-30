@@ -1,7 +1,0 @@
-{
-  "stage": "30-assemble",
-  "inputs": "0ca22b203b54ca2517023e251985de30fb21c98d595fe583b7aaaf849f1c13de",
-  "outputs": {
-    "30-issue.json": "c792129132cdeda2452bc2726f8cb316dd0ceb4c3cc3b8e0b9cc8dec6be310aa"
-  }
-}

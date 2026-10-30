@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "挑战 14-puzzle.json",
+  "title": "挑战 challenge.json",
   "type": "object",
   "required": ["title", "body", "answer", "solution", "taunt_zh", "question"],
   "properties": {

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "单词屋 12-words.json",
+  "title": "单词屋 words.json",
   "type": "object",
   "required": ["intro", "grammar", "items", "task"],
   "properties": {

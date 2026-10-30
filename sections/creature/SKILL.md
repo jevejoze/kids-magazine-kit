@@ -6,11 +6,11 @@
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> creature`，照单上的规则、参数、角色槽位写；最后一行的指纹写进 `_meta.ticket`
 2. 读任务书、`data/profile.md`（兴趣）、任务单「要读、要更新的状态」里的档案：`data/state/creature/config.md`（选题偏好）和 `log.jsonl`（发过哪些、最后一个编号）；数据目录还没建 `state/creature/` 时是 `data/creature-log.md`
-3. 写 `issue/09-creature.json`，字段见同目录 `schema.json`
+3. 写 `issue/creature.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "09-creature", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "creature", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "no": 1,
   "name_zh": "大海蛇",
   "parts": [{"en": "Sea", "zh": "海"}, {"en": "Serpent", "zh": "大蛇"}],
@@ -48,14 +48,14 @@
 - `boxes` 3 格，顺序固定：传说里说 → 科学家怎么说 → 真实原型，各 ≤ 60 字。"科学家怎么说"讲人们是**怎么查出来的**（标本、照片、目击误认），让孩子看到证据怎么推翻传说
 - `fast`、`slow` 各 ≤ 24 字：asker 的快脑袋一下子信了，expert 的慢脑袋提一个查证的问题，和「真的假的」用同一套说法
 - 传说里吞船、吃人这类情节一句带过，写成好笑或神秘的样子；不写血腥、恐怖画面
-- `sources` 至少 2 个独立来源，科学事实都要查得到；`log_update` 是第 90 步写进档案的一句
+- `sources` 至少 2 个独立来源，科学事实都要查得到；`log_update` 是archive 这一步写进档案的一句
 
 ## 图片
 
-两张图放 `20-assets/creature/`：
+两张图放 `assets/creature/`：
 
 ```sh
-node sections/creature/fetch.mjs <issue>                       # 用 09-creature.json 的 legend_url、photo_url
+node sections/creature/fetch.mjs <issue>                       # 用 creature.json 的 legend_url、photo_url
 node sections/creature/fetch.mjs <issue> <传说图直链> <照片直链>  # 直链另给
 ```
 
@@ -63,4 +63,4 @@ node sections/creature/fetch.mjs <issue> <传说图直链> <照片直链>  # 直
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[09]` 报错；编号接得上；传说图是公有领域老图、画的是这只怪物；照片拍的是原型、授权写清；`stats` 和 `boxes` 里的数字和来源一致。
+`node scripts/pipeline.mjs check <issue>` 没有 `[creature]` 报错；编号接得上；传说图是公有领域老图、画的是这只怪物；照片拍的是原型、授权写清；`stats` 和 `boxes` 里的数字和来源一致。

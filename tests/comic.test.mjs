@@ -10,7 +10,7 @@ import { issueHtml } from "../scripts/sections.mjs";
 import vm from "node:vm";
 import { validateStructure, validateIssue, validateComicContent } from "../scripts/contracts.mjs";
 const read = file => readFileSync(new URL(file, import.meta.url), "utf8");
-const issue = () => JSON.parse(read("../examples/demo/issues/003/30-issue.json"));
+const issue = () => JSON.parse(read("../examples/demo/issues/003/issue.json"));
 function render(data) {
   const root = { outerHTML: "" }, cardIds = html => JSON.parse(html.match(/const CARD_IDS = (.*);/)[1]);
   let ids = [];
@@ -45,7 +45,7 @@ test("malformed new comic fields are rejected before template rendering", () => 
   const data = issue().comic;
   data.takeaway = { text: "不能把对象直接当成文字" };
   data.panels[0].title = null;
-  const errors = validateStructure("11-comic.json", data);
+  const errors = validateStructure("comic.json", data);
   assert.ok(errors.some(e => e.includes("takeaway")));
   assert.ok(errors.some(e => e.includes("panels[0].title")));
 });
@@ -76,7 +76,7 @@ test("full comic budgets with two-line headings and 130px roles fit in SVG and P
   c.title_zh = "问".repeat(18) + "<br>" + "题".repeat(18);
   c.title_en = "Can you follow the clue all the way around?<br>Look closely, then tell us what changes.";
   c.diagram_title = "图".repeat(28); c.takeaway = "结".repeat(28); c.fact = "知".repeat(45); c.fact_title = "延".repeat(8);
-  c.diagram = read("../examples/demo/issues/003/11-diagram.svg");
+  c.diagram = read("../examples/demo/issues/003/diagram.svg");
   c.panels.forEach((p, i) => {
     p.title = "题".repeat(12);
     p.chars = (i < 2 ? ["dog:normal:130"] : ["dog:normal:130", "owl:normal:130"]);

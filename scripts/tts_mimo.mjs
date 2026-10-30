@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 第 60 步的另一种做法：用小米 MiMo 语音把 50-narration.json 每一句合成成 wav。需要 Node 22+，不用装依赖。
+// 第 60 步的另一种做法：用小米 MiMo 语音把 narration.json 每一句合成成 wav。需要 Node 22+，不用装依赖。
 //   node scripts/tts_mimo.mjs <issue 目录>            合成整期（已经合成过、内容和声音没变的句子跳过，可随时中断重跑）
 //   node scripts/tts_mimo.mjs <issue 目录> --dry      只列出要合成几句，不调用 MiMo
 //   node scripts/tts_mimo.mjs --audition <数据目录>   每个角色合成一句试听，写到 <数据目录>/voices/试听/mimo-*.wav（加 --only owl 只试一个角色）
@@ -125,13 +125,13 @@ if (audition) {
 }
 
 const issue = resolve(target);
-if (!dry && !createPipeline(issue).done("50-narration")) throw new Error("讲读稿未通过检查或内容已过期，请先重新审稿并更新讲读稿");
-const inputs = inputFingerprint(issue, "60-audio");
-const nar = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
-const data = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
+if (!dry && !createPipeline(issue).done("narration")) throw new Error("讲读稿未通过检查或内容已过期，请先重新审稿并更新讲读稿");
+const inputs = inputFingerprint(issue, "audio");
+const nar = JSON.parse(readFileSync(join(issue, "narration.json"), "utf8")).narration;
+const data = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
 // 连载页按渲染顺序定位；周五的音乐盒、放映室、动手做不算
 const serialCard = data.serial && (data.serial.kind ?? "book") === "book" ? pageOrder(data).indexOf("serial") + 1 : 0;
-const outDir = join(issue, "60-audio"), manPath = join(outDir, "manifest.json");
+const outDir = join(issue, "audio"), manPath = join(outDir, "manifest.json");
 if (!dry) mkdirSync(outDir, { recursive: true });
 const old = existsSync(manPath) ? JSON.parse(readFileSync(manPath, "utf8")) : { files: [] };
 const oldByFile = Object.fromEntries((old.files ?? []).map(f => [f.file, f]));
@@ -153,7 +153,7 @@ console.log(`整期 ${files.length} 句：已合成可跳过 ${skipped} 句，�
 if (dry) { for (const [role, v] of Object.entries(used)) console.log(`  ${role}  ${v}`); process.exit(0); }
 
 const save = complete => atomicWrite(manPath, JSON.stringify({
-  _meta: { stage: "60-audio", by: "MiMo 语音", at: new Date().toISOString(), complete },
+  _meta: { stage: "audio", by: "MiMo 语音", at: new Date().toISOString(), complete },
   voices: used, files: complete ? files : files.filter(f => f.audio_hash),
 }, null, 2));
 // MiMo 每分钟 100 次请求，4 路并发足够快又不会被限流
@@ -172,5 +172,5 @@ await Promise.all(Array.from({ length: 4 }, async () => {
 }));
 if (failed) { save(false); console.error(`\n${failed} 句失败，重跑同一命令补上`); process.exit(1); }
 save(true);
-recordBuild(issue, "60-audio", inputs, [manPath, ...files.map(f => join(outDir, f.file))]);
+recordBuild(issue, "audio", inputs, [manPath, ...files.map(f => join(outDir, f.file))]);
 console.log(`\n${files.length} 句完成：本次合成 ${jobs.length} 句，跳过 ${skipped} 句`);

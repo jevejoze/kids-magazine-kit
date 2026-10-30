@@ -19,21 +19,21 @@ export const cloneProfile = (conf, line, card, serialCard) => (card === serialCa
 
 // Paths with [] validate every array item, as well as the array itself.
 const contracts = {
-  "00-brief.json": { issue: "number", date: "string", "masthead.zh": "string", "masthead.en": "string", "story.ep": "number" },
-  "08-think.json": { title: "string", story: "string", "sides[].who": "string", "sides[].say": "string", "deeper[]": "string" },
-  "09-creature.json": { name_zh: "string", "parts[]": "object", "stats[]": "object", "meters[].n": "number", "boxes[].text": "string" },
-  "10-cover.json": { "question.zh": "string", "question.en": "string", "photo.license": "string", "crew[]": "string" },
-  "11-comic.json": { title_zh: "string", title_en: "string", "panels[].bubbles[].text": "string", "panels[].chars[]": "string", fact: "string" },
-  "12-words.json": { "items[].word": "string", "items[].example": "string" },
-  "13-story.json": { ep: "number", "paragraphs[]": "string", "scene[]": "string", clue: "string" },
-  "14-puzzle.json": { title: "string", body: "string", answer: "string", solution: "string" },
-  "15-english.json": { "english[].en": "string" },
-  "16-mailbox.json": { hello: "string" },
-  "17-news.json": { "items[].title": "string", "items[].text": "string", "items[].word.en": "string", "items[].word.zh": "string", "items[].sources[]": "string", "items[].talk.background": "string", "items[].talk.scale": "string", "items[].talk.follow_up": "string", "items[].photo_shows": "string" },
-  "18-serial.json": { kind: "string", "paragraphs[]": "string", "crew.who": "string", "crew.say": "string" },
-  "19-check.json": { claim: "string", "clues[]": "string", "sources[]": "string", verdict: "string" },
-  "20-assets/assets.json": { cover: "string", "news[]": "string" },
-  "50-narration.json": { "narration[].card": "number", "narration[].lines[].who": "string", "narration[].lines[].lang": "string", "narration[].lines[].text": "string" },
+  "brief.json": { issue: "number", date: "string", "masthead.zh": "string", "masthead.en": "string", "story.ep": "number" },
+  "think.json": { title: "string", story: "string", "sides[].who": "string", "sides[].say": "string", "deeper[]": "string" },
+  "creature.json": { name_zh: "string", "parts[]": "object", "stats[]": "object", "meters[].n": "number", "boxes[].text": "string" },
+  "cover.json": { "question.zh": "string", "question.en": "string", "photo.license": "string", "crew[]": "string" },
+  "comic.json": { title_zh: "string", title_en: "string", "panels[].bubbles[].text": "string", "panels[].chars[]": "string", fact: "string" },
+  "words.json": { "items[].word": "string", "items[].example": "string" },
+  "story.json": { ep: "number", "paragraphs[]": "string", "scene[]": "string", clue: "string" },
+  "challenge.json": { title: "string", body: "string", answer: "string", solution: "string" },
+  "english.json": { "english[].en": "string" },
+  "mailbox.json": { hello: "string" },
+  "news.json": { "items[].title": "string", "items[].text": "string", "items[].word.en": "string", "items[].word.zh": "string", "items[].sources[]": "string", "items[].talk.background": "string", "items[].talk.scale": "string", "items[].talk.follow_up": "string", "items[].photo_shows": "string" },
+  "serial.json": { kind: "string", "paragraphs[]": "string", "crew.who": "string", "crew.say": "string" },
+  "check.json": { claim: "string", "clues[]": "string", "sources[]": "string", verdict: "string" },
+  "assets/assets.json": { cover: "string", "news[]": "string" },
+  "narration.json": { "narration[].card": "number", "narration[].lines[].who": "string", "narration[].lines[].lang": "string", "narration[].lines[].text": "string" },
 };
 
 export function validateStructure(file, value, omit = []) {
@@ -57,7 +57,7 @@ export function validateStructure(file, value, omit = []) {
     };
     visit(value, path.split("."), "");
   }
-  if (file === "11-comic.json") {
+  if (file === "comic.json") {
     errors.push(...validateComicContent(value).map(error => `[${file}] ${error}`));
     for (const key of ["diagram_title", "takeaway", "fact_title"]) {
       if (value[key] !== undefined && (typeof value[key] !== "string" || !value[key].trim())) errors.push(`[${file}] ${key} 必须是非空 string`);
@@ -66,7 +66,7 @@ export function validateStructure(file, value, omit = []) {
       if (panel?.title !== undefined && (typeof panel.title !== "string" || !panel.title.trim())) errors.push(`[${file}] panels[${i}].title 必须是非空 string`);
     });
   }
-  if (file === "14-puzzle.json") errors.push(...validatePuzzleLayout(value));
+  if (file === "challenge.json") errors.push(...validatePuzzleLayout(value));
   return [...new Set(errors)];
 }
 
@@ -79,7 +79,7 @@ export function validateIssue(issue) {
   if (!Number.isInteger(issue.issue) || issue.issue < 1) errors.push("期号必须是正整数");
   if (typeof issue.masthead?.zh !== "string" || !issue.masthead.zh.trim()) errors.push("整期缺少 masthead.zh");
   if (typeof issue.question?.zh !== "string" || !issue.question.zh.trim()) errors.push("整期缺少 question.zh");
-  const sections = { creature: "09-creature.json", think: "08-think.json", check: "19-check.json", comic: "11-comic.json", words: "12-words.json", story: "13-story.json", news: "17-news.json", serial: "18-serial.json", mailbox: "16-mailbox.json" };
+  const sections = { creature: "creature.json", think: "think.json", check: "check.json", comic: "comic.json", words: "words.json", story: "story.json", news: "news.json", serial: "serial.json", mailbox: "mailbox.json" };
   // Sources and narration-only news fields are intentionally omitted from assembled data.
   for (const [key, file] of Object.entries(sections)) {
     if (!issue[key]) continue;

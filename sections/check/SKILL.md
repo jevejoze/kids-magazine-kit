@@ -5,12 +5,12 @@
 ## 开工
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> check`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`
-2. 读 `issue/00-brief.json`（日期）、`data/thinking-plan.md`（可选，本周练什么）、`data/profile.md`（兴趣）、最近几期的 `issue/19-check.json`（避免重复）、任务单的 `skill`/`choices`/`tools` 参数（本周课表）
-3. 写 `issue/19-check.json`，字段见同目录 `schema.json`
+2. 读 `issue/brief.json`（日期）、`data/thinking-plan.md`（可选，本周练什么）、`data/profile.md`（兴趣）、最近几期的 `issue/check.json`（避免重复）、任务单的 `skill`/`choices`/`tools` 参数（本周课表）
+3. 写 `issue/check.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "19-check", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "check", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "where": "某短视频 · 科普小达人",
   "claim": "金鱼的记忆只有 7 秒，所以它永远不会无聊。",
   "likes": "23万", "comments": "4,512",
@@ -56,4 +56,4 @@
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[19]` 报错；真假结论两个来源说法一致；3 条线索不剧透；最近一周的答案不是同一个选项（真、假、一半对，或者事实、观点、都有，都出现过）；有课表时 `skill` 和任务单参数一致
+`node scripts/pipeline.mjs check <issue>` 没有 `[check]` 报错；真假结论两个来源说法一致；3 条线索不剧透；最近一周的答案不是同一个选项（真、假、一半对，或者事实、观点、都有，都出现过）；有课表时 `skill` 和任务单参数一致

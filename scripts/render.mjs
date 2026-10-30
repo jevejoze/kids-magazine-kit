@@ -43,7 +43,7 @@ const characterPack = loadCharacterPack(raw.character_pack);
 const errors = validateIssue(raw);
 if (!preview) {
   const pipeline = createPipeline(jsonDir);
-  if (!pipeline.reviewPassed()) errors.push("正式渲染需要 31-review.md 的结论为「通过」；草稿请加 --preview");
+  if (!pipeline.reviewPassed()) errors.push("正式渲染需要 review.md 的结论为「通过」；草稿请加 --preview");
   errors.push(...pipeline.assemblyErrors());
 }
 if (errors.length) {
@@ -51,7 +51,7 @@ if (errors.length) {
   if (!preview) process.exit(2);
   console.error("（--preview：以上问题只提示，照常渲染草稿）");
 }
-const inputs = preview ? null : inputFingerprint(jsonDir, "40-render");
+const inputs = preview ? null : inputFingerprint(jsonDir, "render");
 const data = embed(raw);
 const N = String(data.issue).padStart(3, "0");
 const targetDir = flat ? resolve(outRoot) : resolve(outRoot, `issue-${N}`);
@@ -173,7 +173,7 @@ const once = method => new Promise((ok, fail) => {
   // pages.json：第几张图是哪个栏目，讲读稿按它对页
   const keyOf = Object.fromEntries(order.map((key, i) => [expected[i], key]));
   writeFileSync(join(outDir, "pages.json"), JSON.stringify(rects.map((r, i) => ({ card: i + 1, section: keyOf[r.id], id: r.id })), null, 2) + "\n");
-  if (!preview) recordBuild(jsonDir, "40-render", inputs, readdirSync(outDir).map(f => join(outDir, f)), outDir);
+  if (!preview) recordBuild(jsonDir, "render", inputs, readdirSync(outDir).map(f => join(outDir, f)), outDir);
   publishDirectory(outDir, targetDir, name => name === "issue.html" || name === "build.json" || name === "pages.json" || /^card-\d+\.png$/.test(name) || /-第\d+期\.pdf$/.test(name));
 } finally {
   for (const t of timers) clearTimeout(t);

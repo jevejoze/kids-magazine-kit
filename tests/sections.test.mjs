@@ -95,14 +95,14 @@ test("sectionOrder keeps the legacy order and puts new registered sections with 
 const chrome = process.env.CHROME || ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome", "/usr/bin/chromium"].find(existsSync);
 function demoIssue(t) {
   const root = tmp(t);
-  cpSync(new URL("../examples/demo/", import.meta.url), root, { recursive: true, filter: src => !["40-cards", "60-audio", "70-final"].includes(basename(src)) });
+  cpSync(new URL("../examples/demo/", import.meta.url), root, { recursive: true, filter: src => !["cards", "audio", "final"].includes(basename(src)) });
   const issue = join(root, "issues/003"), p = createPipeline(issue);
   p.assemble();
   const fingerprint = p.fingerprint();
-  writeFileSync(join(issue, "31-review.md"), `结论：通过\n内容指纹：${fingerprint}\n`);
-  const n = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8"));
+  writeFileSync(join(issue, "review.md"), `结论：通过\n内容指纹：${fingerprint}\n`);
+  const n = JSON.parse(readFileSync(join(issue, "narration.json"), "utf8"));
   n._meta.content_hash = fingerprint;
-  writeFileSync(join(issue, "50-narration.json"), JSON.stringify(n));
+  writeFileSync(join(issue, "narration.json"), JSON.stringify(n));
   return { root, issue };
 }
 const render = (json, out, ...flags) => spawnSync(process.execPath, ["scripts/render.mjs", json, out, "--flat", ...flags], {
@@ -110,27 +110,27 @@ const render = (json, out, ...flags) => spawnSync(process.execPath, ["scripts/re
 });
 
 test("rendering writes pages.json that matches the page order and the narration cards", { skip: !chrome, timeout: 90000 }, t => {
-  const { issue } = demoIssue(t), out = join(issue, "40-cards");
-  const r = render(join(issue, "30-issue.json"), out);
+  const { issue } = demoIssue(t), out = join(issue, "cards");
+  const r = render(join(issue, "issue.json"), out);
   assert.equal(r.status, 0, r.stderr);
   const pages = JSON.parse(readFileSync(join(out, "pages.json"), "utf8"));
-  const data = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
+  const data = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
   assert.deepEqual(pages.map(p => p.section), pageOrder(data));
   assert.deepEqual(pages.map(p => p.card), pages.map((_, i) => i + 1));
   assert.ok(pages.every(p => existsSync(join(out, `card-${p.card}.png`))));
-  const narration = JSON.parse(readFileSync(join(issue, "50-narration.json"), "utf8")).narration;
+  const narration = JSON.parse(readFileSync(join(issue, "narration.json"), "utf8")).narration;
   assert.deepEqual(narration.map(p => p.card), pages.map(p => p.card));
   assert.deepEqual(createPipeline(issue).check(), []);
 
   // pages.json 和本期栏目对不上（比如栏目变了没重新渲染），讲读稿检查要报出来
   writeFileSync(join(out, "pages.json"), JSON.stringify(pages.filter(p => p.section !== "news")));
-  assert.match(createPipeline(issue).check().join("\n"), /\[40\].*pages\.json/);
+  assert.match(createPipeline(issue).check().join("\n"), /\[render\].*pages\.json/);
 });
 
 test("a data-repo section renders through its page.js with scoped CSS and shows up in pages.json", { skip: !chrome, timeout: 90000 }, t => {
   const { root, issue } = demoIssue(t), out = join(root, "preview");
   section(root, "pet-diary");
-  const data = JSON.parse(readFileSync(join(issue, "30-issue.json"), "utf8"));
+  const data = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
   data["pet-diary"] = { text: "今天小乌龟晒了太阳" };
   const json = join(issue, "preview.json");
   writeFileSync(json, JSON.stringify(data));

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "小剧场 13-story.json",
+  "title": "小剧场 story.json",
   "type": "object",
   "required": ["ep", "title_zh", "title_en", "paragraphs", "scene", "clue", "tbc", "secret"],
   "properties": {

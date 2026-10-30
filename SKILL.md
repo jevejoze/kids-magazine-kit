@@ -18,7 +18,7 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 **目录固定**：子文件夹和文件名照 `pipeline/README.md`「目录」一节的结构放，期号三位数（`issues/007/`、`成品/007/`），不新建别的文件夹、不改名
 
 - 引擎仓库只放代码和规则；孩子的名字、照片、来信、反馈只放在数据目录
-- **同步靠 `scripts/sync.sh`**（在数据目录里运行）。开工前 `sync.sh start`：拉最新，打印最新一期哪步做完。一期做完第 90 步，`sync.sh push "NNN: 出刊"` 提交推送一次；改了档案、反馈、随手记，也用 `sync.sh push "<说明>"`
+- **同步靠 `scripts/sync.sh`**（在数据目录里运行）。开工前 `sync.sh start`：拉最新，打印最新一期哪步做完。一期做完archive 这一步，`sync.sh push "NNN: 出刊"` 提交推送一次；改了档案、反馈、随手记，也用 `sync.sh push "<说明>"`
 - **成品上传网盘**：第 40、70 步出了成品，把 card 图片、PDF、讲读视频按固定文件名传到网盘 `成品/NNN/`。讲读视频体积大，只放网盘，不进 git
 - 第一次使用：把 `templates/data/` 整个复制成数据目录
 - 示例数据在 `examples/demo/`，读者是虚构的孩子「小满」
@@ -32,7 +32,7 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 
 ## 每期流程：流水线
 
-一期拆成 20 步，每步读上游文件、写自己的输出，都放在 `data/issues/NNN/` 里。家长会指定某个 agent 做某一步（如"做第 10 步"），agent 只做这一步：
+一期拆成几十个步骤，每步读上游文件、写自己的输出，都放在 `data/issues/NNN/` 里。家长会指定某个 agent 做某一步（如"做 cover 这一步"），agent 只做这一步：
 
 1. 读 `pipeline/stages/<步骤>.md`，按里面的输入、输出、规则和自检完成
 2. 依赖的步骤没完成就停下，告诉家长先做哪一步
@@ -42,14 +42,14 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 
 ### 没有指定步骤时：一个 agent 走完全程
 
-家长只说"出下一期""做第 N 期"、没有指定做哪一步时，由当前 agent 从第 00 步一直做到第 90 步：
+家长只说"出下一期""做第 N 期"、没有指定做哪一步时，由当前 agent 从brief 这一步一直做到archive 这一步：
 
 1. 按 `pipeline/stages.json` 的依赖顺序逐步做；能派子 agent 的环境，可以把 00 之后互不依赖的步骤（09、10、12、13、14、16、17、18、19）并行交出去
 2. 先跑 `sync.sh start`，按它打印的进度从缺的那一步接着做（家长可能已经让 agent 做了几步）。每步照常写中间文件、做自检
-3. 第 31 步审核后记录 `pipeline.mjs fingerprint <issue>` 输出的内容指纹，第 50 步讲读稿也把同一指纹放进 `_meta.content_hash`；内容或图片变化后，旧审稿和下游制作记录自动失效，须重做。第 31 步审稿结论是"需修改"时，回到对应步骤改完，重新合并、再审，直到"通过"
+3. review 这一步审核后记录 `pipeline.mjs fingerprint <issue>` 输出的内容指纹，narration 这一步讲读稿也把同一指纹放进 `_meta.content_hash`；内容或图片变化后，旧审稿和下游制作记录自动失效，须重做。review 这一步审稿结论是"需修改"时，回到对应步骤改完，重新合并、再审，直到"通过"
 4. 脚本步骤（30、40、70）在当前环境里直接运行；环境缺 Node、Chrome 或 ffmpeg 时，做到能做的最后一步，告诉家长缺什么、剩下哪几步
-5. 第 60 步语音：默认用 Azure（`node scripts/tts_azure.mjs <issue>`，环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`，可选付费兜底 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`）；数据目录有 `voices/voicestudio.json` 时，Azure 跑完再跑 `node scripts/tts_voicestudio.mjs <issue>` 换成克隆声音（VoiceStudio 连不上就报错停下，第 60 步算没完成，不拿 Azure 的替身出视频）；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`node scripts/tts_mimo.mjs <issue>`，环境变量 `MIMO_API_KEY`），代替 Azure，跑完同样再跑 `tts_voicestudio.mjs` 把旁白换成克隆声音；数据目录有 `voices/elevenlabs.json` 时，在 `tts_voicestudio.mjs` 之前先跑 `node scripts/tts_elevenlabs.mjs <issue>` 把编辑部成员换成 ElevenLabs 声音（环境变量 `ELEVENLABS_API_KEY`，连不上就沿用原版）；没有密钥也没有别的语音合成时，跳过 60、70，把讲读稿整理成 `70-final/家长讲读稿.md`
-6. 最后做第 90 步，`sync.sh push` 推送数据仓库、网盘上成品传齐了，然后告诉家长：成品在网盘哪里、哪几步没做成以及原因、审稿里值得家长看一眼的地方
+5. audio 这一步语音：默认用 Azure（`node scripts/tts_azure.mjs <issue>`，环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`，可选付费兜底 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`）；数据目录有 `voices/voicestudio.json` 时，Azure 跑完再跑 `node scripts/tts_voicestudio.mjs <issue>` 换成克隆声音（VoiceStudio 连不上就报错停下，audio 这一步算没完成，不拿 Azure 的替身出视频）；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`node scripts/tts_mimo.mjs <issue>`，环境变量 `MIMO_API_KEY`），代替 Azure，跑完同样再跑 `tts_voicestudio.mjs` 把旁白换成克隆声音；数据目录有 `voices/elevenlabs.json` 时，在 `tts_voicestudio.mjs` 之前先跑 `node scripts/tts_elevenlabs.mjs <issue>` 把编辑部成员换成 ElevenLabs 声音（环境变量 `ELEVENLABS_API_KEY`，连不上就沿用原版）；没有密钥也没有别的语音合成时，跳过 60、70，把讲读稿整理成 `final/家长讲读稿.md`
+6. 最后做 archive 这一步，`sync.sh push` 推送数据仓库、网盘上成品传齐了，然后告诉家长：成品在网盘哪里、哪几步没做成以及原因、审稿里值得家长看一眼的地方
 
 ## 编辑部角色
 
@@ -79,16 +79,16 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 |---|---|---|---|
 | 封面 | 封面（不计页码） | `issue` `date` `weather` `masthead{zh,en,by}` `cover.*` `question{zh,en}` | 顶部刊名条 + **一张真实照片占满下方**，一眼能看懂、自带悬念（如半夜 00:44 的太阳）。刊名条颜色取自照片顶部，照片顶端渐隐进去，刊名不压主体，所以主体放在照片中上部（用 `photo_pos` 调）。封面只放**一个问题**，反直觉、四年级学生答不上来，≤ 24 字；答案留给今日一问讲。`cover.stamp` 是问题上方的时间/地点水印，`cover.credit` 写照片作者和协议，`cover.asked_by` 填了就显示带 💡 图标和奶油黄底色的"本期问题由 XX 提出"标签，`cover.strip` 可手动指定刊名条颜色。`cover.crew` 最多 2 个编辑部成员（带主题道具），`cover.crew_say` 一句 ≤ 12 字的单行台词，角色列宽随成员尺寸与台词自适应 |
 | 1 | 今日一问 | `comic.panels[4]` `comic.diagram` `comic.fact` | 4 格漫画：提问 → 原理 → 追问一层"那为什么……" → 验证或收尾；版面按前两格 → 主图 → 后两格阅读。必须讲清一个**机制**（历史题用证据链），带一个**可核实的数字**，纠正一个常见误解。单人气泡 ≤ 26 字、双人每句 ≤ 20 字，均为纯文本；角色按 spec 显示且尺寸 ≤ 130px。`diagram` 指向一张 agent 画的 SVG 图解（`viewBox="0 0 880 300"`，中文标注 ≥ 24 号字），把机制画出来，可以为了看清适度夸张比例；`diagram_title` 用一句话告诉孩子看哪里，`takeaway` 是图后一行结论（≤ 28 字），`panels[].title` 可写短场景标题。`fact` 是紧扣主问题的可查证延伸，≤ 45 字，`fact_title` 可改标题 |
-| 周一 | 传说怪物档案 | `creature.*` | 每周一一张可收集的怪物卡，编号从 No.001 往上排：两张图并排（古人画的传说图 + 真实原型的自由授权照片）、名字（中文 + 拆开的英文词）、3 格数据、2–3 条打分、「传说里说 / 科学家怎么说 / 真实原型」3 格（各 ≤ 60 字）、团子狗的快脑袋和咕咕博士的慢脑袋各一句。默认选海里的传说怪物。发过的记在数据目录的 `creature-log.md`。规则见 `pipeline/stages/09-creature.md` |
+| 周一 | 传说怪物档案 | `creature.*` | 每周一一张可收集的怪物卡，编号从 No.001 往上排：两张图并排（古人画的传说图 + 真实原型的自由授权照片）、名字（中文 + 拆开的英文词）、3 格数据、2–3 条打分、「传说里说 / 科学家怎么说 / 真实原型」3 格（各 ≤ 60 字）、团子狗的快脑袋和咕咕博士的慢脑袋各一句。默认选海里的传说怪物。发过的记在数据目录的 `creature-log.md`。规则见 `pipeline/stages/creature.md` |
 | 2 | 小剧场 | `story.*` | 每集都是中文，≤ 300 字；波波鼠可以自然地冒一两句简单英文。场景是阁楼，`night: true` 时窗外是夜空。**推理结构**：真相要能从文中线索推出来，至少放 1 个干扰线索。`clue` 是一句"侦探笔记"提问，引导孩子回头找线索。结尾留悬念 |
 | 3 | 挑战 | `challenge.taunt_zh` `challenge.taunt_en` `challenge.prop` `challenge.puzzle` | 默认只显示捣蛋浣熊一句中文挑衅 + 一道谜题，不显示旧稿英文台词与英文三关。按四五年级奥数入门难度出：4 个以上对象、3–4 条线索的逻辑排序，或者需要两步以上推理的数学题，唯一解写进 `_answers`。按情境 `body`、条件列表 `clues`、提问 `question` 分层排版，适合平板阅读；不留手写草稿或填空区，答案在本页底部倒印，不等下一期。周六、周日也照常出谜题 |
 | 4 | 环球小报 | `news{week,items[3],ask_zh,ask_en,credits}` | 3 条最近 7 天的真实新闻：1 条头条 + 2 条短讯。每条 `flag` `place` `photo` `title` `text`（≤ 50 字）`word{en,zh}`，另有只给讲读版用的 `photo_shows`（照片里拍到了什么）和 `talk`（背景、尺度类比、追问）。照片必须一眼看懂拍的是什么。`ask_zh` 是一道需要说理由的"你怎么看"。规则见"图片与新闻" |
-| 5 | 真的假的 | `check{where,claim,clues[3],verdict}` | 一条孩子真会在网上碰到的说法（≤ 30 字，大约三分之一是真的），先让快脑袋选「真 / 假 / 说不清」，再给 3 条线索（来源、证据、别处怎么说）让慢脑袋查，留两行写结论，答案 `verdict` 倒印在页面底部。数据目录有思维课表 `thinking-plan.md` 时，每周练一样思维本领（找证据、事实还是观点、理由合理吗……），选项 `choices` 和查证工具 `tools` 跟着换，周五的周末思辨接着用这个本领。课表只给编辑部排题用：页面和讲读里不提"练""本领""今天学"这类字眼，孩子只当是在玩一道题。规则见 `pipeline/stages/19-check.md` |
-| 6 | 经典连载 | `serial.*` | 平时连载一本公版经典儿童书（`kind:"book"`），一期一回 ≤ 280 字，停在悬念上：一张公版原版插画、一句原著英文金句（`quote`）、认领这个书中角色的编辑部成员吐槽一句（`crew`）、"猜一猜接下来"（`guess`，下一回开头揭晓）、下回预告（`tbc`）。周五换成「音乐盒」（`kind:"music"`）、「放映室」（`kind:"film"`）或「动手做」（`kind:"make"`），按片单轮换：音乐盒、放映室介绍一首曲子或一部电影，配 3 个边听边找 / 看完回答的任务（`tasks`）；动手做是一件折纸或一个 3D 打印模型：折纸用一张完整图式教（每一步都画出来，`tasks` 给每一步配一句提示），3D 打印配模型照片和 4–8 步做法。书目、分集计划、角色认领和周五片单记在数据目录的 `serial-bible.md`。规则见 `pipeline/stages/18-serial.md` |
-| 周五 | 周末思辨 | `think.*` | 每周五一页、周六和家人聊的话题：两边都有道理、孩子生活里碰得到（玩笑和嘲笑、帮手和偷懒、英雄和坏人、守规则）。一个 ≤ 120 字的小故事 → 两个编辑部成员各站一边说理由（各 ≤ 36 字）→ 「换你来」角色代入一问 → 2 个追问 → 孩子写"我的想法……因为……"，周六聊完圈"想法变没变"。给家长的聊法写在 `_answers.think_guide`。话题池和用过的记在数据目录的 `think-log.md`。规则见 `pipeline/stages/08-think.md` |
+| 5 | 真的假的 | `check{where,claim,clues[3],verdict}` | 一条孩子真会在网上碰到的说法（≤ 30 字，大约三分之一是真的），先让快脑袋选「真 / 假 / 说不清」，再给 3 条线索（来源、证据、别处怎么说）让慢脑袋查，留两行写结论，答案 `verdict` 倒印在页面底部。数据目录有思维课表 `thinking-plan.md` 时，每周练一样思维本领（找证据、事实还是观点、理由合理吗……），选项 `choices` 和查证工具 `tools` 跟着换，周五的周末思辨接着用这个本领。课表只给编辑部排题用：页面和讲读里不提"练""本领""今天学"这类字眼，孩子只当是在玩一道题。规则见 `pipeline/stages/check.md` |
+| 6 | 经典连载 | `serial.*` | 平时连载一本公版经典儿童书（`kind:"book"`），一期一回 ≤ 280 字，停在悬念上：一张公版原版插画、一句原著英文金句（`quote`）、认领这个书中角色的编辑部成员吐槽一句（`crew`）、"猜一猜接下来"（`guess`，下一回开头揭晓）、下回预告（`tbc`）。周五换成「音乐盒」（`kind:"music"`）、「放映室」（`kind:"film"`）或「动手做」（`kind:"make"`），按片单轮换：音乐盒、放映室介绍一首曲子或一部电影，配 3 个边听边找 / 看完回答的任务（`tasks`）；动手做是一件折纸或一个 3D 打印模型：折纸用一张完整图式教（每一步都画出来，`tasks` 给每一步配一句提示），3D 打印配模型照片和 4–8 步做法。书目、分集计划、角色认领和周五片单记在数据目录的 `serial-bible.md`。规则见 `pipeline/stages/serial.md` |
+| 周五 | 周末思辨 | `think.*` | 每周五一页、周六和家人聊的话题：两边都有道理、孩子生活里碰得到（玩笑和嘲笑、帮手和偷懒、英雄和坏人、守规则）。一个 ≤ 120 字的小故事 → 两个编辑部成员各站一边说理由（各 ≤ 36 字）→ 「换你来」角色代入一问 → 2 个追问 → 孩子写"我的想法……因为……"，周六聊完圈"想法变没变"。给家长的聊法写在 `_answers.think_guide`。话题池和用过的记在数据目录的 `think-log.md`。规则见 `pipeline/stages/think.md` |
 | 7 | 信箱（最后一页） | `mailbox{hello,answers,ask_zh,send_note}` | 收反馈的一页。`hello` ≤ 60 字的问候，收到上期打卡就接住孩子的一句话；`answers` 一行公布上期封面和谜题答案；`ask_zh`（可选）一个和本期有关、要说理由的问题。下面固定 5 个问题由模板生成：👍 最喜欢哪一页、👎 哪一页不太喜欢、今天难不难、💡 今天想到了什么有趣的问题、👀 今天看到了什么有意思的事。`send_note` 是页脚的"说给谁听" |
 
-**可选栏目**：单词屋（第 12 步）和英文三关（第 15 步）目前暂停，默认不排。家长要哪一栏，就把 `words` 或 `english` 写进 `data/magazine.yaml` 的 `sections`；做了，模板会自动把单词屋排在今日一问后面、英文三关放回挑战页。
+**可选栏目**：单词屋（words 这一步）和英文三关（english 这一步）目前暂停，默认不排。家长要哪一栏，就把 `words` 或 `english` 写进 `data/magazine.yaml` 的 `sections`；做了，模板会自动把单词屋排在今日一问后面、英文三关放回挑战页。
 
 ## 图片与新闻
 

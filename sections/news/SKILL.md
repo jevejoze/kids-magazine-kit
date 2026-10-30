@@ -6,11 +6,11 @@
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> news`，照单上的规则、参数、角色槽位写；最后一行的指纹写进 `_meta.ticket`
 2. 读任务书、`data/profile.md`（兴趣）
-3. 写 `issue/17-news.json`，字段见同目录 `schema.json`
+3. 写 `issue/news.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "17-news", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "news", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "week": "10.06–10.12",
   "items": [
     {"flag": "🇪🇸", "place": "西班牙 · 巴塞罗那", "title": "长颈鹿会做加法！", "text": "≤ 50 字",
@@ -41,7 +41,7 @@
 
 ## 图片
 
-3 张照片放 `20-assets/news/`：
+3 张照片放 `assets/news/`：
 
 ```sh
 node sections/news/fetch.mjs <issue>                    # 用每条的 photo_url
@@ -52,4 +52,4 @@ node sections/news/fetch.mjs <issue> <直链 1> <直链 2> <直链 3>
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[17]` 报错；每条两个来源说法一致；只看照片能认出是什么；`talk` 的事实来源里查得到；日期在最近 7 天内（以报道日期为准，事件较早时在 `text` 里交代）。
+`node scripts/pipeline.mjs check <issue>` 没有 `[news]` 报错；每条两个来源说法一致；只看照片能认出是什么；`talk` 的事实来源里查得到；日期在最近 7 天内（以报道日期为准，事件较早时在 `text` 里交代）。

@@ -5,12 +5,12 @@
 ## 开工
 
 1. 领任务单：`node scripts/pipeline.mjs ticket <issue> words`，照单上的规则、参数、角色槽位写，最后一行的指纹写进 `_meta.ticket`
-2. 读 `issue/00-brief.json`（主题、`english_level`）、`data/vocab.json`（已学单词，避免重复）
-3. 写 `issue/12-words.json`，字段见同目录 `schema.json`
+2. 读 `issue/brief.json`（主题、`english_level`）、`data/vocab.json`（已学单词，避免重复）
+3. 写 `issue/words.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "12-words", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "words", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "intro": "Hi, it's Boba Mouse! 🐝 Today we count sides with the bees. Buzz buzz! 嗡嗡！",
   "grammar": "比较级 more / less / better",
   "items": [
@@ -34,4 +34,4 @@
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[12]` 报错；数每句例句的词数；查 `vocab.json` 无重复
+`node scripts/pipeline.mjs check <issue>` 没有 `[words]` 报错；数每句例句的词数；查 `vocab.json` 无重复

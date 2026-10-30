@@ -9,11 +9,11 @@
    - `state/story/config.md`：家长写的设定（场景、人物关系、口吻）
    - `state/story/log.jsonl`：前几集，一集一行
    - `state/story/open-threads.md`：还没回收的伏笔
-3. 写 `issue/13-story.json`，字段见同目录 `schema.json`
+3. 写 `issue/story.json`，字段见同目录 `schema.json`
 
 ```json
 {
-  "_meta": {"stage": "13-story", "by": "", "at": "", "ticket": "<任务单指纹>"},
+  "_meta": {"stage": "story", "by": "", "at": "", "ticket": "<任务单指纹>"},
   "ep": 5, "night": false,
   "title_zh": "……", "title_en": "……",
   "paragraphs": ["……", "……"],
@@ -42,9 +42,9 @@
 ## 状态
 
 - `threads_after` 是本集之后的完整伏笔清单：旧伏笔这集回收了就删掉，新埋的加上；都回收了写 `[]`
-- 本步只写 `13-story.json`。第 90 步归档时才把本集追加进 `log.jsonl`、用 `threads_after` 重写 `open-threads.md`，所以一期定稿后状态才变
+- 本步只写 `story.json`。archive 这一步归档时才把本集追加进 `log.jsonl`、用 `threads_after` 重写 `open-threads.md`，所以一期定稿后状态才变
 - 数据目录还没有 `state/story/`（旧档案 `story-bible.md`）时照旧写 `bible_update`，归档追加进 `story-bible.md`
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[13]` 报错；字数；只看正文能不能推出 `secret` 里的真相。
+`node scripts/pipeline.mjs check <issue>` 没有 `[story]` 报错；字数；只看正文能不能推出 `secret` 里的真相。

@@ -10,7 +10,7 @@ import { issueHtml } from "../scripts/sections.mjs";
 import vm from "node:vm";
 import { validateIssue, validateStructure } from "../scripts/contracts.mjs";
 
-const issue = () => JSON.parse(readFileSync(new URL("../examples/demo/issues/003/30-issue.json", import.meta.url), "utf8"));
+const issue = () => JSON.parse(readFileSync(new URL("../examples/demo/issues/003/issue.json", import.meta.url), "utf8"));
 function render(data) {
   const root = { outerHTML: "" }, cardIds = html => JSON.parse(html.match(/const CARD_IDS = (.*);/)[1]);
   let ids = [];
@@ -63,11 +63,11 @@ test("missing answers and malformed structured conditions are blocked before ren
   assert.ok(validateIssue(data).some(e => e.includes("_answers.puzzle")));
   data.challenge.puzzle.clues = "不是数组";
   assert.ok(validateIssue(data).some(e => e.includes("clues")));
-  const puzzle = JSON.parse(readFileSync(new URL("../examples/demo/issues/003/14-puzzle.json", import.meta.url), "utf8"));
+  const puzzle = JSON.parse(readFileSync(new URL("../examples/demo/issues/003/challenge.json", import.meta.url), "utf8"));
   puzzle.clues = [null];
-  assert.ok(validateStructure("14-puzzle.json", puzzle).some(e => e.includes("clues")));
+  assert.ok(validateStructure("challenge.json", puzzle).some(e => e.includes("clues")));
   puzzle.clues = ["条件一"]; delete puzzle.question;
-  assert.ok(validateStructure("14-puzzle.json", puzzle).some(e => e.includes("question")));
+  assert.ok(validateStructure("challenge.json", puzzle).some(e => e.includes("question")));
 });
 
 test("standard challenge samples omit optional English and each has one solution", () => {

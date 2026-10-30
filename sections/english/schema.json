@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "英文三关 15-english.json",
+  "title": "英文三关 english.json",
   "type": "object",
   "required": ["english", "answers"],
   "properties": {
