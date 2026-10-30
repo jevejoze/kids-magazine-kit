@@ -26,11 +26,11 @@ import {
   SPEAKER_NAMES,
   EMOTIONS,
   PAGE_TITLES,
-  NARRATION_MAX_LINES,
 } from "./contracts.mjs";
 import { scheduledIn, LEGACY, parseDate } from "./schedule.mjs";
 import { ticket, ticketSkillOf } from "./ticket.mjs";
 import { loadSections, packFor } from "./sections.mjs";
+import { scaledMaxLines } from "./narration-budget.mjs";
 import { createRequire } from "node:module";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -196,10 +196,11 @@ export function createPipeline(issueArg) {
       if (rendered) need(JSON.stringify(rendered.filter(k => PAGE_KEYS.includes(k))) === JSON.stringify(pageOrder()), "40", "40-cards/pages.json 的页序和本期栏目对不上，请重新渲染");
       const order = rendered ?? pageOrder(), cards = order.length;
       if (hasStages) need(pages.length === cards && pages.every((p, i) => p.card === i + 1), "50", `${cards} 页都要按顺序讲读，不可重复或遗漏`);
-      // 每页最多几句，按页的种类定；card 编号和渲染出来的 card-N.png 顺序一致（有英文三关时挑战页多 6 句）
-      const MAX = { ...NARRATION_MAX_LINES, challenge: useEnglish() ? 18 : NARRATION_MAX_LINES.challenge };
-      // 任务书 sections 里的讲读句数上限优先（magazine.yaml 的 params.<栏目>.narration_lines）
-      for (const [id, sec] of Object.entries(brief()?.sections ?? {})) if (Number.isFinite(sec?.params?.narration_lines)) MAX[id] = sec.params.narration_lines;
+      // 每页最多几句：按栏目包自己声明的上限（manifest.narration.lines），本期页数比平时多就按比例收紧，
+      // 总长才落在 10–12 分钟；有英文三关时挑战页的默认上限先换成 18；任务书 sections 里写了就直接用那个数，不缩放
+      const paramsOverrides = Object.fromEntries(Object.entries(brief()?.sections ?? {})
+        .filter(([, sec]) => Number.isFinite(sec?.params?.narration_lines)).map(([id, sec]) => [id, sec.params.narration_lines]));
+      const MAX = scaledMaxLines(order, registry, { baseOverrides: useEnglish() ? { challenge: 18 } : {}, paramsOverrides });
       const max = c => (hasStages ? MAX[order[c - 1]] : undefined) ?? 30;
       let total = 0;
       // 照页面念的检查：各页的叙述文字（引号里的角色对白不算）
@@ -217,12 +218,9 @@ export function createPipeline(issueArg) {
       const OPENER_CLICHE = /看完|讲完|做完|听完|查完|弄懂|明白了|完了|合上/;
       const DOG_TRANSLATION = /[A-Za-z]{3,}\s*(?:[，,：:]\s*(?:就是|是)?|就是|意思是?|指(?:的是)?|是(?!什么|啥|哪))\s*[\u4e00-\u9fa5]/;
       let all = 0, narr = 0, zh = 0, calm = 0, cliche = 0, waitCount = 0;
-      const FAMILY = /爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人/g;
-      const sendTo = String(brief()?.send_note ?? "").match(FAMILY) ?? [];
       const storyTbc = plain(src("13-story.json").tbc);
       const newsWords = (src("17-news.json").items ?? []).map(i => i.word?.en).filter(Boolean);
       const serialSrc = src("18-serial.json");
-      const serialCrew = serialSrc.kind === "book" ? String(serialSrc.crew?.who ?? "").split(":")[0] || null : null;
       pages.forEach(p => {
         const kind = order[p.card - 1];
         need(p.thread && len(p.thread) <= 30, "50", `第 ${p.card} 页缺 thread（这一页的主线，≤ 30 字），先定主线再写台词`);
@@ -233,7 +231,6 @@ export function createPipeline(issueArg) {
           need(nn <= p.lines.length * 0.6, "50", `第 ${p.card} 页旁白 ${nn}/${p.lines.length} 句，超过六成；对白交给角色说，旁白只串词、交代场景`);
         }
         if (p.card > 1 && p.lines[0] && OPENER_CLICHE.test(p.lines[0].text)) cliche++;
-        if (kind === "challenge") need(!p.lines.some(l => /答案.*(明天|下一期|信箱)|(明天|信箱).*答案/.test(l.text)), "50", `第 ${p.card} 页挑战的答案倒印在本页底部，不说"明天 / 信箱公布答案"`);
         const plains = p.lines.map(l => l.lang === "zh" ? plain(l.text) : "");
         for (let i = 0; i < plains.length; i++) for (let j = i + 1; j < plains.length; j++)
           if (shares(plains[i], plains[j], 8)) problems.push(`[50] 第 ${p.card} 页第 ${i + 1}、${j + 1} 句说了同一件事（连续 8 字相同），只留一处`);
@@ -253,15 +250,15 @@ export function createPipeline(issueArg) {
         if (kind !== "challenge") zhText.filter(t => YEAR_DATE.test(t)).forEach(t => problems.push(`[50] 第 ${p.card} 页念了年份或日期，删掉或改成"十几年前""上个星期"：${t}`));
         const copiedEx = zhText.filter(t => NARRATION_EXAMPLES.some(e => shares(plain(t), e, 8)));
         need(!copiedEx.length, "50", `第 ${p.card} 页照抄了 50-narration.md 的例句，例句只示范结构，用本期内容重新造句：${copiedEx.join(" / ")}`);
-        if (kind === "news") newsWords.forEach(w => need(p.lines.some(l => l.lang === "en" && new RegExp(`\\b${w}`, "i").test(l.text)), "50", `第 ${p.card} 页没讲到关键词 ${w} 那条新闻；三条新闻的关键词都由波波鼠放进英文短句里说`));
-        if (kind === "comic") {
-          const at = p.lines.findIndex(l => /试试|试一试/.test(l.text));
-          need(at < 0 || at >= p.lines.length - 2, "50", `第 ${p.card} 页"试试"后面还有 ${p.lines.length - 1 - at} 句，"你也可以试试"放在最后`);
-        }
-        if (kind === "mailbox") {
-          zhText.forEach(t => [...t.matchAll(/(?:说给|讲给|发给|告诉|拿给)(爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人)/g)]
-            .forEach(m => need(!sendTo.length || sendTo.includes(m[1]), "50", `第 ${p.card} 页说"${m[0]}"，send_note 写的是"${brief()?.send_note}"`)));
-          if (storyTbc) zhText.filter(t => shares(plain(t), storyTbc, 5)).forEach(t => problems.push(`[50] 第 ${p.card} 页的预告重复了小剧场的 tbc，换一个新悬念：${t}`));
+        if (kind === "mailbox" && storyTbc) zhText.filter(t => shares(plain(t), storyTbc, 5)).forEach(t => problems.push(`[50] 第 ${p.card} 页的预告重复了小剧场的 tbc，换一个新悬念：${t}`));
+        // 这一页自己的讲读规矩交给它的栏目包：checkNarration(lines, ctx)（规矩 7、11、12、13、16、17）
+        {
+          const pack = packFor(kind, registry, has("30-issue.json") ? read("30-issue.json") : {});
+          const narrationCtx = { keywords: newsWords, sendNote: brief()?.send_note, crewWho: serialSrc.crew?.who };
+          if (pack && existsSync(join(pack.dir, "check.mjs"))) {
+            const { checkNarration } = require(join(pack.dir, "check.mjs"));
+            checkNarration?.(p.lines, narrationCtx).forEach(m => problems.push(`[50] 第 ${p.card} 页${m}`));
+          }
         }
         // 英文走完一个来回：波波鼠的英文句后 3 句内，有人用中文接住时把原词带上
         if (["comic", "creature", "news"].includes(kind)) p.lines.forEach((l, i) => {
@@ -277,13 +274,10 @@ export function createPipeline(issueArg) {
           const later = p.lines.slice(i + 1).find(n => n.who === "narrator" && n.lang === "zh" && !/[？?]/.test(n.text) && shares(plain(l.text), plain(n.text), 4));
           if (later) problems.push(`[50] 第 ${p.card} 页第 ${i + 1} 句先问了旁白后面才交代的事，把交代挪到前面：${l.text} → ${later.text}`);
         });
-        if (kind === "serial" && serialCrew) need(p.lines.some(l => l.who === serialCrew), "50", `第 ${p.card} 页认领角色的吐槽（crew.say）由 ${serialCrew} 自己说，旁白只用一句引出`);
-        if (kind === "mailbox") zhText.filter(t => /你猜/.test(t)).forEach(t => problems.push(`[50] 第 ${p.card} 页信箱不再出猜谜题，只念 ask_zh 和打卡问题：${t}`));
         let run = 0;
         const noEmo = [];
         p.lines.forEach((l, i) => {
           const at = `第 ${p.card} 页第 ${i + 1} 句`;
-          if (order[p.card - 1] === "mailbox") need(!/上期答案|上期.*谜题.*答案/.test(l.text), "50", `${at} 信箱不再公布上期答案`);
           need(SPEAKERS.includes(l.who), "50", `${at} who 不对：${l.who}`);
           need(["zh", "en"].includes(l.lang), "50", `${at} lang 不对：${l.lang}`);
           need(!l.emotion || EMOTIONS.includes(l.emotion), "50", `${at} emotion 不在可选范围：${l.emotion}`);

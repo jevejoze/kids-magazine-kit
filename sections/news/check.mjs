@@ -15,3 +15,15 @@ export function check(n) {
   });
   return problems;
 }
+
+// 这一页的讲读校验：checkNarration(lines, ctx) → 问题列表
+//   规矩 11：三条新闻都要讲到：每条的 word.en 都要在波波鼠的英文句里出现
+//   ctx.keywords：这期三条新闻的 word.en（取自 17-news.json）
+export function checkNarration(lines, ctx) {
+  const problems = [];
+  (ctx.keywords ?? []).forEach(w => {
+    if (!lines.some(l => l.lang === "en" && new RegExp(`\\b${w}`, "i").test(l.text)))
+      problems.push(`没讲到关键词 ${w} 那条新闻；三条新闻的关键词都由波波鼠放进英文短句里说`);
+  });
+  return problems;
+}

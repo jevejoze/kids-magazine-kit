@@ -6,7 +6,7 @@
 
 ### 写法：`narration` 字段
 
-讲读稿是第 50 步的 `issue/50-narration.json`，按页排列，`card` 对应 card-N.png，按渲染出来的顺序编号（平时 1 = 封面，2 今日一问，3 小剧场，4 挑战，5 环球小报，6 真的假的，7 经典连载，8 信箱；周一在今日一问后面多一张怪物档案，往后顺延；周五在经典连载后面多一张周末思辨，信箱顺延）：
+讲读稿是第 50 步的 `issue/50-narration.json`，按页排列，`card` 对应 card-N.png，按本期实际渲染出来的页序编号——领任务单（`node scripts/pipeline.mjs ticket <issue> narration`）时，「本期骨架」一节已经按这一期实际出的栏目列好每页的卡号、句数上限和这个栏目自己的 `narrate.md` 写法，不用照哪个栏目固定排第几页去猜：
 
 ```json
 {"narration": [
@@ -45,7 +45,7 @@
 
 ### 怎么写
 
-每页怎么讲、写稿顺序、错例和对例全在 `pipeline/stages/50-narration.md`，写稿照它走，写完跑 `node scripts/pipeline.mjs check <issue>` 改到没有 `[50]` 报错。最要紧的几条：
+写稿顺序、错例和对例在 `pipeline/stages/50-narration.md`；每一页具体怎么讲，照任务单「本期骨架」里那个栏目自己的 `narrate.md`（也能在 `sections/<id>/narrate.md` 单独翻看）。写完跑 `node scripts/pipeline.mjs check <issue>` 改到没有 `[50]` 报错：全期共用的规矩（旁白占比、语气起伏、数字读法、总长……）在这里统一查，这一页专属的规矩（如挑战不说答案在哪公布、环球小报三条都讲到）由那个栏目包自己的 `check.mjs` 查。最要紧的几条：
 
 - **一页一条主线**：先写 `thread`，和主线无关的细节不讲；一页只讲一个数字，配一个孩子摸得着的比较，年份、日期不念
 - **只听也跟得上**：每句提到的人和东西前面都交代过；`50-narration.md` 的例句只示范结构，用本期内容重新造句

@@ -40,6 +40,29 @@ test("ticket fingerprint is stable and names rules, cast slots, params, state, u
   assert.match(a.markdown, /指纹：[a-f0-9]{64}，写进输出的 _meta\.ticket$/);
 });
 
+test("the narration ticket's skeleton is built from this issue's actual page order and each pack's narrate.md", t => {
+  const { issue } = copyDemo(t);
+  const { skeleton } = ticket(issue, "narration").content;
+  const merged = json(join(issue, "30-issue.json"));
+  assert.deepEqual(skeleton.map(p => p.card), skeleton.map((_, i) => i + 1));
+  assert.deepEqual(skeleton.map(p => p.section), ["cover", "comic", "words", "story", "challenge", "news", "check", "serial", "mailbox"]);
+  const challenge = skeleton.find(p => p.section === "challenge");
+  assert.equal(challenge.max_lines, 18, "本期挑战页带英文三关，上限先换成 18 再缩放（9 页不超基线，不缩放）");
+  assert.match(challenge.narrate, /捣蛋浣熊/);
+  assert.ok(skeleton.every(p => p.narrate), "每个已注册的栏目包都有自己的 narrate.md");
+  void merged;
+
+  // 渲染过就按 40-cards/pages.json 的页序，不用重算
+  mkdirSync(join(issue, "40-cards"), { recursive: true });
+  writeFileSync(join(issue, "40-cards", "pages.json"), JSON.stringify([{ card: 1, section: "cover", id: "cover" }, { card: 2, section: "mailbox", id: "mailbox" }]));
+  const fromPages = ticket(issue, "narration").content.skeleton;
+  assert.deepEqual(fromPages.map(p => p.section), ["cover", "mailbox"]);
+
+  edit(join(issue, "00-brief.json"), b => { b.sections = { ...b.sections, news: { params: { narration_lines: 7 } } }; });
+  writeFileSync(join(issue, "40-cards", "pages.json"), JSON.stringify([{ card: 1, section: "news", id: "news" }]));
+  assert.equal(ticket(issue, "narration").content.skeleton[0].max_lines, 7, "任务书写的句数上限直接用，不缩放");
+});
+
 test("fingerprint changes with the brief, params, a rule file, the cast and a consumed value", t => {
   const { root, issue } = copyDemo(t);
   const base = { story: fp(issue, "story"), comic: fp(issue, "comic"), cover: fp(issue, "cover") };

@@ -25,3 +25,12 @@ export function check(c, ctx = {}) {
   }
   return problems;
 }
+
+// 这一页的讲读校验：checkNarration(lines) → 问题列表。lines 是这一页的 50-narration.json 台词数组
+//   规矩 12：今日一问以"你也可以试试"收尾，说了"试试"之后最多再有一句
+export function checkNarration(lines) {
+  const problems = [];
+  const at = lines.findIndex(l => /试试|试一试/.test(l.text));
+  if (at >= 0 && at < lines.length - 2) problems.push(`"试试"后面还有 ${lines.length - 1 - at} 句，"你也可以试试"放在最后`);
+  return problems;
+}

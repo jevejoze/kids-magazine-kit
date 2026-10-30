@@ -14,3 +14,11 @@ export function check(p, ctx) {
   problems.push(...(ctx.checkProp?.(p.prop) ?? []));
   return problems;
 }
+
+// 这一页的讲读校验：checkNarration(lines) → 问题列表
+//   规矩 7：不说答案在哪一期公布（答案倒印在本页底部，不说"明天 / 信箱公布答案"）
+export function checkNarration(lines) {
+  const problems = [];
+  if (lines.some(l => /答案.*(明天|下一期|信箱)|(明天|信箱).*答案/.test(l.text))) problems.push(`答案倒印在本页底部，不说"明天 / 信箱公布答案"`);
+  return problems;
+}

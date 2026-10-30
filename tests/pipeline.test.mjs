@@ -436,7 +436,7 @@ test("narration style rules catch stiff scripts", t => {
   has(errors(p => { for (const page of p) for (const l of page.lines) if (l.lang === "zh") l.emotion = "平静"; }), /"平静"语气/);
   has(errors(p => { delete p[1].lines[0].emotion; }), /第 2 页第 1 句是中文却没写 emotion/);
   has(errors(p => { p[1].lines.splice(3, 0, { ...p[1].lines[2], who: "dog" }); }), /第 2 页第 3、4 句说了同一件事/);
-  has(errors(p => { p[4].lines.push({ who: "raccoon", lang: "zh", text: "答案明天揭晓，哼！", emotion: "得意" }); }), /挑战的答案倒印在本页底部/);
+  has(errors(p => { p[4].lines.push({ who: "raccoon", lang: "zh", text: "答案明天揭晓，哼！", emotion: "得意" }); }), /答案倒印在本页底部/);
   has(errors(p => { p[5].lines.find(l => l.lang === "en").text = "record"; }), /英文只有单词/);
   has(errors(p => { for (const page of p.slice(1, 4)) page.lines[0].text = "看完了，我们去下一页！"; }), /收尾式串词/);
   has(errors((p, issue) => {

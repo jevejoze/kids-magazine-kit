@@ -8,7 +8,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { LEGACY, loadMagazine, scheduledIn } from "./schedule.mjs";
-import { loadSections, packFor } from "./sections.mjs";
+import { loadSections, packFor, sectionOrder } from "./sections.mjs";
+import { scaledMaxLines } from "./narration-budget.mjs";
 
 const ENGINE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const { stages } = JSON.parse(readFileSync(join(ENGINE, "pipeline", "stages.json"), "utf8"));
@@ -97,6 +98,30 @@ export function stateFiles(sp, dataDir) {
 // 栏目的输出文件：有步骤就是步骤的 outputs，栏目包没有步骤就是 issue/<id>.json
 const outputsOf = sp => sp.stage ? stages.find(s => s.id === sp.stage).outputs : [`issue/${sp.id}.json`];
 
+// 讲读骨架：本期实际页序（渲染过就按 40-cards/pages.json，否则按 30-issue.json 算）+ 每页栏目包自己的 narrate.md + 缩放后的句数上限
+//   卡号完全由这期实际出的栏目决定，不依赖哪个栏目固定排第几页
+function narrationSkeleton(issue, registry, brief) {
+  const issueFile = join(issue, "30-issue.json");
+  if (!existsSync(issueFile)) throw new Error("讲读要先合并出整期：issue/30-issue.json 还没有，先做第 30 步");
+  const merged = readJson(issueFile);
+  const pagesFile = join(issue, "40-cards", "pages.json");
+  const order = existsSync(pagesFile) ? readJson(pagesFile).map(p => p.section) : sectionOrder(merged, registry);
+  const paramsOverrides = Object.fromEntries(Object.entries(brief.sections ?? {})
+    .filter(([, sec]) => Number.isFinite(sec?.params?.narration_lines)).map(([id, sec]) => [id, sec.params.narration_lines]));
+  const baseOverrides = merged.challenge?.english?.length ? { challenge: 18 } : {};
+  const max = scaledMaxLines(order, registry, { baseOverrides, paramsOverrides });
+  return order.map((kind, i) => {
+    const pack = packFor(kind, registry, merged);
+    const narrateFile = pack ? join(pack.dir, "narrate.md") : null;
+    return {
+      card: i + 1,
+      section: kind,
+      max_lines: max[kind] ?? 30,
+      narrate: narrateFile && existsSync(narrateFile) ? readFileSync(narrateFile, "utf8").trim() : null,
+    };
+  });
+}
+
 export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
   const issue = resolve(issueDir), dataDir = resolve(issue, "..", "..");
   const { sections: registry, errors } = loadSections({ engine, data: dataDir });
@@ -148,6 +173,7 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
     state: stateFiles(sp, dataDir),
     consumes,
     output: outputsOf(sp),
+    ...(sp.id === "narration" ? { skeleton: narrationSkeleton(issue, registry, brief) } : {}),
   };
   const fingerprint = createHash("sha256").update(JSON.stringify(stable(content))).digest("hex");
   return { content, fingerprint, markdown: markdown(content, fingerprint) };
@@ -163,6 +189,13 @@ function markdown(c, fingerprint) {
   ];
   if (c.state.length) out.push("## 要读、要更新的状态", "", ...c.state.map(f => `- ${f}`), "");
   if (Object.keys(c.consumes).length) out.push("## 上游值", "", ...Object.entries(c.consumes).map(([k, v]) => `- ${k}：${JSON.stringify(v)}`), "");
+  if (c.skeleton) {
+    out.push("## 本期骨架", "", "按渲染出来的页序排，卡号不固定、每期按实际出的栏目重新编号；每页的句数上限已按本期页数缩放", "");
+    for (const p of c.skeleton) {
+      out.push(`### 第 ${p.card} 页 · ${p.section}（最多 ${p.max_lines} 句）`, "");
+      out.push(p.narrate ? p.narrate : "（这个栏目没有 narrate.md）", "");
+    }
+  }
   out.push("## 输出", "", ...c.output.map(f => `- ${f}`), "");
   for (const r of c.rules) out.push(`## 规则 · ${r.id}（${r.file}）`, "", r.text.trim().replace(/^# .*\n+/, ""), "");
   out.push(`指纹：${fingerprint}，写进输出的 _meta.ticket`);
