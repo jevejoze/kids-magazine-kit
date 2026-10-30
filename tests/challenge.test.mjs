@@ -53,7 +53,7 @@ test("legacy body-only puzzles render without writing areas or English answers w
 
 test("mailbox ignores stale prior-issue answers", () => {
   const data = issue(); data.mailbox.answers = "上期谜题答案不应出现在信箱";
-  const card = render(data)("c6");
+  const card = render(data)("mailbox");
   assert.doesNotMatch(card, /上期|class="box answers/);
   assert.ok(card.includes(data.mailbox.hello));
 });

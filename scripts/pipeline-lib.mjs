@@ -180,31 +180,6 @@ export function createPipeline(issueArg) {
         } catch {}
       }
     },
-    "12-words.json": w => {
-      fields(w, "12", ["intro", "grammar", "items", "task"]);
-      need(w.items?.length === 3, "12", "单词要 3 个");
-      need(w.items?.some(x => x.new), "12", "至少 1 个新词（new: true）");
-      const vocab = existsSync(join(dataDir, "vocab.json")) ? JSON.parse(readFileSync(join(dataDir, "vocab.json"), "utf8")) : [];
-      const self = Number(read("00-brief.json").issue ?? -1);
-      w.items?.forEach(x => {
-        const n = words(x.example);
-        need(n >= 8 && n <= 12, "12", `${x.word} 的例句 ${n} 个词，要 8–12 个`);
-        need(new RegExp(`\\b${x.word}`, "i").test(x.example), "12", `${x.word} 的例句里没出现这个词`);
-        const old = vocab.find(v => v.word.toLowerCase() === x.word.toLowerCase());
-        need(!old || old.issue === self, "12", `${x.word} 已经在第 ${old?.issue} 期学过`);
-      });
-    },
-    "15-english.json": e => {
-      fields(e, "15", ["english", "answers"]);
-      need(e.english?.length === 3, "15", "英文要 3 关");
-      e.english?.forEach((x, i) => need(words(x.en) <= 45, "15", `第 ${i + 1} 关 ${words(x.en)} 个单词，超过 45`));
-      checkProp(e.prop, "15");
-    },
-    "16-mailbox.json": m => {
-      fields(m, "16", ["hello", "send_note"]);
-      need(len(m.hello) <= 60, "16", `开头问候 ${len(m.hello)} 字，超过 60`);
-      need(len(m.ask_zh) <= 30, "16", `本期问题 ${len(m.ask_zh)} 字，超过 30`);
-    },
     // 各 kind 自己的字段和字数交给 sections/serial-<kind>/check.mjs（下面的栏目包循环接上）
     "18-serial.json": r => {
       need(["book", "music", "film", "make"].includes(r.kind), "18", `kind 要写 book、music、film 或 make：${r.kind}`);
@@ -243,7 +218,7 @@ export function createPipeline(issueArg) {
       const DOG_TRANSLATION = /[A-Za-z]{3,}\s*(?:[，,：:]\s*(?:就是|是)?|就是|意思是?|指(?:的是)?|是(?!什么|啥|哪))\s*[\u4e00-\u9fa5]/;
       let all = 0, narr = 0, zh = 0, calm = 0, cliche = 0, waitCount = 0;
       const FAMILY = /爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人/g;
-      const sendTo = String(src("16-mailbox.json").send_note ?? "").match(FAMILY) ?? [];
+      const sendTo = String(brief()?.send_note ?? "").match(FAMILY) ?? [];
       const storyTbc = plain(src("13-story.json").tbc);
       const newsWords = (src("17-news.json").items ?? []).map(i => i.word?.en).filter(Boolean);
       const serialSrc = src("18-serial.json");
@@ -285,7 +260,7 @@ export function createPipeline(issueArg) {
         }
         if (kind === "mailbox") {
           zhText.forEach(t => [...t.matchAll(/(?:说给|讲给|发给|告诉|拿给)(爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人)/g)]
-            .forEach(m => need(!sendTo.length || sendTo.includes(m[1]), "50", `第 ${p.card} 页说"${m[0]}"，send_note 写的是"${src("16-mailbox.json").send_note}"`)));
+            .forEach(m => need(!sendTo.length || sendTo.includes(m[1]), "50", `第 ${p.card} 页说"${m[0]}"，send_note 写的是"${brief()?.send_note}"`)));
           if (storyTbc) zhText.filter(t => shares(plain(t), storyTbc, 5)).forEach(t => problems.push(`[50] 第 ${p.card} 页的预告重复了小剧场的 tbc，换一个新悬念：${t}`));
         }
         // 英文走完一个来回：波波鼠的英文句后 3 句内，有人用中文接住时把原词带上
@@ -440,7 +415,7 @@ export function createPipeline(issueArg) {
       challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, clues: p.clues, question: p.question }, english: e.english },
       check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict, choices: ckChoices, tools: ckTools } : undefined,
       think: th ? { title: th.title, title_en: th.title_en, story: th.story, photo: asset(a.think), photo_pos: th.photo_pos, credit: th.photo_credit, sides: th.sides, role: th.role, deeper: th.deeper } : undefined,
-      mailbox: { ...strip(mb), answers: undefined },
+      mailbox: { ...strip(mb), answers: undefined, send_note: b.send_note ?? mb.send_note },
       _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { skill: ck.skill ?? (ckParams.skill || undefined), truth: ck.truth ?? ck.answer, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
     };
     if (nw) {

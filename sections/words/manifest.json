@@ -1,0 +1,10 @@
+{
+  "id": "words",
+  "title": "单词屋",
+  "consumes": [],
+  "params": {},
+  "rules": ["english-level"],
+  "image_policy": "free-only",
+  "narration": { "lines": 22 },
+  "state": null
+}

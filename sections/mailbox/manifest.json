@@ -1,0 +1,10 @@
+{
+  "id": "mailbox",
+  "title": "信箱",
+  "consumes": [],
+  "params": {},
+  "rules": [],
+  "image_policy": "free-only",
+  "narration": { "lines": 10 },
+  "state": null
+}

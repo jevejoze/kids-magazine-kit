@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "英文三关 15-english.json",
+  "type": "object",
+  "required": ["english", "answers"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "taunt_zh": { "type": "string" },
+    "taunt_en": { "type": "string" },
+    "prop": { "type": "string" },
+    "english": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": { "type": "object", "required": ["stars", "cn", "en"], "properties": { "stars": { "type": "integer", "minimum": 1, "maximum": 3 }, "cn": { "type": "string" }, "en": { "type": "string" } } }
+    },
+    "answers": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string" } }
+  }
+}

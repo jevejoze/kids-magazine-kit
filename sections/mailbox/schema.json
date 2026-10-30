@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "信箱 16-mailbox.json",
+  "type": "object",
+  "required": ["hello"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "hello": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "letter": { "type": "string" },
+    "ask_zh": { "type": "string", "maxLength": 30 },
+    "send_note": { "type": "string" },
+    "answers": { "type": "string" }
+  }
+}

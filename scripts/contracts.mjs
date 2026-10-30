@@ -28,7 +28,7 @@ const contracts = {
   "13-story.json": { ep: "number", "paragraphs[]": "string", "scene[]": "string", clue: "string" },
   "14-puzzle.json": { title: "string", body: "string", answer: "string", solution: "string" },
   "15-english.json": { "english[].en": "string" },
-  "16-mailbox.json": { hello: "string", send_note: "string" },
+  "16-mailbox.json": { hello: "string" },
   "17-news.json": { "items[].title": "string", "items[].text": "string", "items[].word.en": "string", "items[].word.zh": "string", "items[].sources[]": "string", "items[].talk.background": "string", "items[].talk.scale": "string", "items[].talk.follow_up": "string", "items[].photo_shows": "string" },
   "18-serial.json": { kind: "string", "paragraphs[]": "string", "crew.who": "string", "crew.say": "string" },
   "19-check.json": { claim: "string", "clues[]": "string", "sources[]": "string", verdict: "string" },

@@ -29,35 +29,6 @@ svg.ch{display:block}
 .lines{margin-top:6px}
 .lines i{display:block;height:52px;border-bottom:3px dashed rgba(74,59,50,.35)}
 
-/* card 3 单词屋 */
-#c3{background:#E3F2FF}
-#c3 .intro{display:flex;align-items:center;gap:16px;margin-top:14px;position:relative}
-#c3 .intro .bub{font-size:30px;width:auto;flex:1;margin:0}
-#c3 .intro .bub:after{left:-26px;bottom:auto;top:50%;margin-top:-14px;margin-left:0;border-top-color:transparent;border-right-color:var(--ink)}
-#c3 .w{display:flex;align-items:stretch;margin-top:20px;overflow:hidden;flex:none}
-#c3 .w .ico{flex:0 0 190px;display:flex;align-items:center;justify-content:center;font-size:110px;border-right:5px solid var(--ink)}
-#c3 .w.c0 .ico{background:#FFE58F}#c3 .w.c1 .ico{background:#C9F0E3}#c3 .w.c2 .ico{background:#FFD3DC}
-#c3 .w .wd{padding:16px 28px 18px}
-#c3 .w .word{font-size:72px;line-height:1;color:#2F6FB5;font-weight:800}
-#c3 .w .word em{font-style:normal;font-size:24px;background:var(--tomato);color:#fff;border-radius:999px;padding:2px 14px;margin-left:14px;vertical-align:middle}
-#c3 .w .cn{font-size:34px;margin-top:4px}
-#c3 .w .ex{font-size:30px;line-height:1.35;margin-top:8px}
-#c3 .w .ex b{color:var(--tomato);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:6px}
-#c3 .task{margin-top:22px;font-size:30px;padding:18px 30px 14px;background:#FFFDF2;flex:none}
-
-/* card 6 信箱 */
-#c6{background:#FFEFD9}
-#c6 .letter{padding:24px 34px;margin-top:20px;font-size:30px;line-height:1.6;background:#FFFDF7;flex:none}
-#c6 .checkin{margin-top:22px;padding:18px 30px 16px;background:#F3FBFF;flex:none}
-#c6 .checkin h3{font-size:34px;font-weight:400;color:#2F6FB5}
-#c6 .checkin .row{margin-top:10px;font-size:28px}
-#c6 .checkin .row b{font-weight:400}
-#c6 .pick{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
-#c6 .pick span{border:3px solid var(--ink);border-radius:999px;padding:2px 16px;font-size:25px;background:#fff}
-/* 有经典连载时"最喜欢哪一页"有 7 个选项，自适应换行并保持紧凑 */
-#c6 .pick.many{gap:8px 8px;flex-wrap:wrap}
-#c6 .pick.many span{padding:3px 12px;font-size:22px;white-space:nowrap}
-#c6 .checkin .lines i{height:44px}
 @page{size:1080px 1440px;margin:0}
 @media print{body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0;break-after:page}.card.is-last{break-after:auto}}
 

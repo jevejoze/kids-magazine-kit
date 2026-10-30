@@ -1,0 +1,10 @@
+{
+  "id": "english",
+  "title": "英文三关",
+  "consumes": [],
+  "params": {},
+  "rules": ["english-level"],
+  "image_policy": "free-only",
+  "narration": { "lines": 1 },
+  "state": null
+}

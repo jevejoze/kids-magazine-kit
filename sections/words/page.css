@@ -1,0 +1,15 @@
+/* 单词屋 · 页面 id 是 #words，卡片在里面的 .card */
+#words .card{background:#E3F2FF}
+#words .card .intro{display:flex;align-items:center;gap:16px;margin-top:14px;position:relative}
+#words .card .intro .bub{font-size:30px;width:auto;flex:1;margin:0}
+#words .card .intro .bub:after{left:-26px;bottom:auto;top:50%;margin-top:-14px;margin-left:0;border-top-color:transparent;border-right-color:var(--ink)}
+#words .card .w{display:flex;align-items:stretch;margin-top:20px;overflow:hidden;flex:none}
+#words .card .w .ico{flex:0 0 190px;display:flex;align-items:center;justify-content:center;font-size:110px;border-right:5px solid var(--ink)}
+#words .card .w.c0 .ico{background:#FFE58F}#words .card .w.c1 .ico{background:#C9F0E3}#words .card .w.c2 .ico{background:#FFD3DC}
+#words .card .w .wd{padding:16px 28px 18px}
+#words .card .w .word{font-size:72px;line-height:1;color:#2F6FB5;font-weight:800}
+#words .card .w .word em{font-style:normal;font-size:24px;background:var(--tomato);color:#fff;border-radius:999px;padding:2px 14px;margin-left:14px;vertical-align:middle}
+#words .card .w .cn{font-size:34px;margin-top:4px}
+#words .card .w .ex{font-size:30px;line-height:1.35;margin-top:8px}
+#words .card .w .ex b{color:var(--tomato);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:6px}
+#words .card .task{margin-top:22px;font-size:30px;padding:18px 30px 14px;background:#FFFDF2;flex:none}

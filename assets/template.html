@@ -18,7 +18,6 @@ const CAST = {{CAST}};
 
 {{KIT}}
 const kit = makeKit(D, CAST);
-const { N, ch, bub, topBar, foot, coverFoot, next: NEXT, toc: TOC, cast: GANG, escapeText, wrapChineseWords } = kit;
 // 注册了的栏目（sections/<id>/page.js）登记在这里；有数据时按页序调用 render(data, kit)，返回一页或几页的内容
 const SECTIONS = {};
 {{SECTIONS}}
@@ -46,17 +45,8 @@ const legacy = key => {
   return false;
 };
 
-const hl = (text, word) => word ? text.replace(new RegExp(`\\b(${word}\\w*)`, "i"), "<b>$1</b>") : text;
-const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
-
-const W = D.words;
-if (legacy("words") && W) cards.push(`<section class="card" id="c3">${topBar("🔤 波波鼠单词屋 · Word House", W.grammar ? `✏️ ${W.grammar}` : undefined)}
-  <div class="intro">${ch("mouse:wave:190")}<div class="bub en">${W.intro}</div></div>
-  ${W.items.map((w, i) => `<div class="box w c${i}"><div class="ico">${w.icon}</div><div class="wd">
-    <div class="word en">${w.word}${w.new ? `<em class="fun">新词</em>` : ""}</div>
-    <div class="cn fun">${w.cn}</div><div class="ex en">${hl(w.example, w.word)}</div></div></div>`).join("")}
-  <div class="box task"><div class="fun">✍️ 轮到你：${W.task}</div>${lines(W.lines || 2)}</div>
-  ${foot("主持：波波鼠 Boba Mouse")}</section>`);
+// 单词屋：sections/words
+legacy("words");
 
 // 挑战：sections/challenge
 legacy("challenge");
@@ -70,20 +60,8 @@ legacy("serial");
 // 周末思辨：sections/think
 legacy("think");
 
-// 信箱（最后一页）：几句关于本期的问题，孩子口头答、家长拍照或转述都行
-const M = D.mailbox;
-const picks = (items, many) => `<div class="pick${many ? " many" : ""}">${items.map(x => `<span>${x}</span>`).join("")}</div>`;
-const PAGES = TOC.filter(([, t]) => t !== "信箱").map(([e, t]) => e + t);
-if (legacy("mailbox") && M) cards.push(`<section class="card" id="c6">${topBar("💌 编辑部信箱 · Mailbox")}
-  <div class="box letter fun">${M.hello || M.letter}</div>
-  <div class="box checkin fun"><h3>📝 今天这期，告诉编辑部</h3>
-    <div class="row"><b>👍 最喜欢哪一页？</b>${picks(PAGES, PAGES.length > 5)}</div>
-    <div class="row"><b>👎 哪一页不太喜欢？</b>${picks(PAGES, PAGES.length > 5)}</div>
-    <div class="row"><b>今天难不难？</b>${picks(["😴 太简单", "🤔 刚刚好", "🤯 有点难"])}</div>
-    <div class="row"><b>💡 今天想到了什么有趣的问题？</b>${lines(2)}</div>
-    <div class="row"><b>👀 今天看到了什么有意思的事？</b>${lines(2)}</div>
-    ${M.ask_zh ? `<div class="row"><b>❓ ${M.ask_zh}</b>${lines(1)}</div>` : ""}</div>
-  ${foot((M.send_note || "说给家长听") + " · 明天见！See you tomorrow!")}</section>`);
+// 信箱：sections/mailbox
+legacy("mailbox");
 
 upTo(null);
 document.getElementById("root").outerHTML = cards.join("\n").replaceAll("{{TOTAL}}", kit.pages());
