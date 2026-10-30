@@ -1,0 +1,180 @@
+{
+  "issue": 1,
+  "date": "2026.11.02 周一",
+  "masthead": {
+    "zh": "小满早知道",
+    "en": "XIAOMAN KNOWS!",
+    "by": "🐶🦉 迷你编辑部 出品"
+  },
+  "question": {
+    "zh": "蜂巢的格子为啥都是六边形？",
+    "en": "Why are honeycomb cells hexagons?"
+  },
+  "cover": {
+    "photo": "assets/cover.jpg",
+    "photo_pos": "center",
+    "stamp": "📷 示例蜂场",
+    "asked_by": "",
+    "crew": [
+      "dog:surprise:160"
+    ],
+    "crew_say": "六边形？好整齐！",
+    "credit": "示例占位图 · CC0"
+  },
+  "comic": {
+    "title_zh": "蜂巢为什么全是六边形",
+    "title_en": "Why honeycombs are hexagons",
+    "panels": [
+      {
+        "title": "发现蜂巢",
+        "chars": [
+          "dog:surprise:120"
+        ],
+        "bubbles": [
+          {
+            "who": "dog",
+            "lang": "zh",
+            "text": "这些格子怎么全是六边形？"
+          }
+        ]
+      },
+      {
+        "title": "最省材料",
+        "chars": [
+          "owl:talk:120"
+        ],
+        "bubbles": [
+          {
+            "who": "owl",
+            "lang": "zh",
+            "text": "六边形拼起来不留缝，用蜂蜡最少。"
+          }
+        ]
+      },
+      {
+        "title": "追问一层",
+        "chars": [
+          "dog:think:120"
+        ],
+        "bubbles": [
+          {
+            "who": "dog",
+            "lang": "zh",
+            "text": "三角形、正方形不行吗？"
+          }
+        ]
+      },
+      {
+        "title": "验证",
+        "chars": [
+          "owl:happy:120"
+        ],
+        "bubbles": [
+          {
+            "who": "owl",
+            "lang": "zh",
+            "text": "同样面积，六边形周长最短，蜂蜡最省。"
+          }
+        ]
+      }
+    ],
+    "diagram": "diagram.svg",
+    "diagram_title": "同样装得下，六边形周长最短",
+    "takeaway": "六边形拼接零浪费，蜜蜂靠直觉找到了最省材料的形状。",
+    "fact": "蜂巢六边形的夹角都是 120 度，三个角正好拼成一个平面，不留缝隙。",
+    "fact_title": "💡 再发现"
+  },
+  "check": {
+    "where": "某短视频",
+    "claim": "蜂巢是蜜蜂一只一只量出来的六边形",
+    "likes": "3万",
+    "comments": "521",
+    "clues": [
+      "蜂蜡软的时候格子其实是圆的。",
+      "挤在一起后圆圈自己变成了六边形。",
+      "好几种昆虫搭巢都会出现类似的形状。"
+    ],
+    "verdict": "假的！六边形是软蜂蜡挤压后自然形成的，不是量出来的。"
+  },
+  "mailbox": {
+    "hello": "小满早上好！今天的蜂巢六边形，你猜对了吗？",
+    "ask_zh": "你还见过哪些六边形的东西？",
+    "send_note": "拍照发给妈妈"
+  },
+  "_answers": {
+    "check": {
+      "truth": "false",
+      "verdict": "假的！六边形是软蜂蜡挤压后自然形成的，不是量出来的。",
+      "explain": "蜜蜂先做出圆形小房间，蜂蜡变软后彼此挤压，角度自然变成接近 120 度的六边形。",
+      "sources": [
+        "https://example.org/g",
+        "https://example.org/h"
+      ]
+    },
+    "news_sources": [
+      "https://example.org/a",
+      "https://example.org/b",
+      "https://example.org/c",
+      "https://example.org/d",
+      "https://example.org/e",
+      "https://example.org/f"
+    ]
+  },
+  "_order": [
+    "cover",
+    "comic",
+    "news",
+    "check",
+    "riddle",
+    "mailbox"
+  ],
+  "news": {
+    "week": "示例周",
+    "ask_zh": "你觉得这件事怎么样？",
+    "ask_en": "What do you think?",
+    "credits": "示例占位图 · CC0",
+    "items": [
+      {
+        "flag": "🐝",
+        "place": "示例蜂场",
+        "title": "科学家给蜜蜂编号追踪飞行路线",
+        "text": "研究者给几百只蜜蜂贴上小标签，记录它们一天飞多远。",
+        "word": {
+          "en": "track",
+          "zh": "追踪"
+        },
+        "photo": "assets/news-1.jpg",
+        "photo_pos": "center"
+      },
+      {
+        "flag": "🌻",
+        "place": "示例农场",
+        "title": "向日葵的螺旋暗藏数学规律",
+        "text": "向日葵籽排成的螺旋数目是一组特别的数字。",
+        "word": {
+          "en": "spiral",
+          "zh": "螺旋"
+        },
+        "photo": "assets/news-2.jpg",
+        "photo_pos": "center"
+      },
+      {
+        "flag": "🧪",
+        "place": "示例实验室",
+        "title": "小朋友设计的实验登上科学展",
+        "text": "一个小学生用厨房材料做的实验拿了奖。",
+        "word": {
+          "en": "experiment",
+          "zh": "实验"
+        },
+        "photo": "assets/news-3.jpg",
+        "photo_pos": "center"
+      }
+    ]
+  },
+  "riddle": {
+    "riddle": "什么东西六个面，蜜蜂最爱住？",
+    "hint": "想一想今天封面上的格子",
+    "answer": "蜂巢"
+  }
+}

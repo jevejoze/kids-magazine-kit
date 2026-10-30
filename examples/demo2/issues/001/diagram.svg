@@ -1,0 +1,5 @@
+<svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="880" height="300" fill="#FFF8EE"/>
+  <polygon points="440,60 500,95 500,165 440,200 380,165 380,95" fill="#FFD45C" stroke="#4A3B32" stroke-width="4"/>
+  <text x="440" y="150" font-size="28" text-anchor="middle" fill="#4A3B32">六边形最省蜂蜡</text>
+</svg>

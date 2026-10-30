@@ -35,7 +35,7 @@ import { createRequire } from "node:module";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
-const { stages } = JSON.parse(readFileSync(join(here, "..", "pipeline", "stages.json"), "utf8"));
+const { stages: moduleStages } = JSON.parse(readFileSync(join(here, "..", "pipeline", "stages.json"), "utf8"));
 // narration.md「写法：错的和对的」里的例句，讲读稿照抄就报错
 const NARRATION_EXAMPLES = (() => {
   const md = readFileSync(join(here, "..", "pipeline", "stages", "narration.md"), "utf8");
@@ -51,6 +51,13 @@ export function createPipeline(issueArg) {
   const issue = resolve(issueArg);
   const dataDir = resolve(issue, "..", "..");
   const registry = loadSections({ engine: resolve(here, ".."), data: dataDir }).sections;
+  // 数据仓库自带的自定义栏目（引擎的 stages.json 不认识）：按它自己的 manifest 现算一条步骤，status/done 才找得到它；
+  // 合并整期也要等它做完，把它的 id 接进 assemble 的 depends（这里新建一个对象，不改 moduleStages 的共享数据）
+  const knownIds = new Set(moduleStages.map(s => s.id));
+  const customStages = registry
+    .filter(pack => !pack.manifest.slot && !knownIds.has(pack.id))
+    .map(pack => ({ id: pack.id, title: pack.manifest.title, kind: "agent", section: pack.id, depends: ["brief"], outputs: [`issue/${pack.id}.json`] }));
+  const stages = moduleStages.map(s => s.id === "assemble" ? { ...s, depends: [...s.depends, ...customStages.map(c => c.id)] } : s).concat(customStages);
 
   const out = p => p.startsWith("issue/") ? join(issue, p.slice(6)) : join(dataDir, p.slice(5));
   const read = name => JSON.parse(readFileSync(join(issue, name), "utf8"));
@@ -61,6 +68,8 @@ export function createPipeline(issueArg) {
       && md.match(/^内容指纹[:：][ \t]*([a-f0-9]{64})[ \t]*$/m)?.[1] === contentFingerprint(issue);
   })();
   const nonempty = f => existsSync(f) && statSync(f).isFile() && statSync(f).size > 0;
+  // brief.json 的 story.ep 只在这期真的排了小剧场时才要求，不然结构校验跳过它
+  const structuralOmit = (name, value) => name === "brief.json" && "sections" in value && !("story" in (value.sections ?? {})) ? ["story.ep"] : [];
   const done = s => {
     try {
       if (s.id === "archive") {
@@ -104,7 +113,7 @@ export function createPipeline(issueArg) {
         if (!nonempty(f)) return false;
         if (!p.endsWith(".json")) return true;
         const name = p.slice(6), value = read(name);
-        if (validateStructure(name, value).length || staleTicket(name, value)) return false;
+        if (validateStructure(name, value, structuralOmit(name, value)).length || staleTicket(name, value)) return false;
         const before = problems.length;
         checks[name]?.(value);
         const valid = problems.length === before;
@@ -132,11 +141,18 @@ export function createPipeline(issueArg) {
   const useWords = () => has("words.json") && inIssue("words") !== false;
   const useEnglish = () => has("english.json") && inIssue("english") !== false;
 
-  // 渲染出来的页面顺序（card-1..N），和 template.html 一致；怪物档案、单词屋、新闻、真的假的、连载、周末思辨有才出
-  const pageOrder = () => issuePageOrder({ cover: {}, comic: {}, creature: useCreature() ? {} : undefined,
-    words: useWords() ? {} : undefined, story: {}, challenge: {}, news: has("news.json") ? {} : undefined,
-    check: has("check.json") ? {} : undefined, serial: has("serial.json") ? {} : undefined,
-    think: useThink() ? {} : undefined, mailbox: {} });
+  // 渲染出来的页面顺序（card-1..N），和 template.html 一致；怪物档案、单词屋、新闻、真的假的、连载、周末思辨有才出；
+  // 已经合并出 issue.json 的，直接用它记的 _order（含数据仓库自带的自定义栏目），比按旧栏目拼凑更准
+  const pageOrder = () => {
+    if (has("issue.json")) {
+      const merged = read("issue.json");
+      if (Array.isArray(merged._order)) return issuePageOrder(merged);
+    }
+    return issuePageOrder({ cover: {}, comic: {}, creature: useCreature() ? {} : undefined,
+      words: useWords() ? {} : undefined, story: {}, challenge: {}, news: has("news.json") ? {} : undefined,
+      check: has("check.json") ? {} : undefined, serial: has("serial.json") ? {} : undefined,
+      think: useThink() ? {} : undefined, mailbox: {} });
+  };
 
   // ---------- check ----------
   const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
@@ -162,8 +178,11 @@ export function createPipeline(issueArg) {
 
   const checks = {
     "brief.json": b => {
-      fields(b, "brief", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level", "story"]);
+      fields(b, "brief", ["issue", "date", "weekday_theme", "masthead", "send_note", "english_level"]);
       try { parseDate(b.date); } catch (e) { need(false, "brief", e.message); }
+      // story 字段只在这期真的出小剧场时才要求；旧任务书没有 sections 时照旧当作出小剧场
+      const storyScheduled = "sections" in b ? "story" in (b.sections ?? {}) : true;
+      need(!storyScheduled || (b.story !== undefined && b.story !== null && b.story !== ""), "brief", "缺少字段 story");
       if ("sections" in b) {
         const ok = b.sections && typeof b.sections === "object" && !Array.isArray(b.sections)
           && Object.values(b.sections).every(x => x && typeof x.params === "object" && !Array.isArray(x.params));
@@ -173,7 +192,7 @@ export function createPipeline(issueArg) {
         for (const id of ["creature", "think"]) if (ok && typeof b[id] === "boolean") need(b[id] === id in b.sections, "brief", `${id}=${b[id]} 和 sections 对不上`);
       }
       const prevIssue = join(issue, "..", String(Number(b.issue) - 1).padStart(3, "0"), "issue.json");
-      if (existsSync(prevIssue)) {
+      if (storyScheduled && existsSync(prevIssue)) {
         try {
           const prev = JSON.parse(readFileSync(prevIssue, "utf8"));
           need(b.story?.ep === (prev.story?.ep ?? 0) + 1, "brief", `小剧场集数 ep=${b.story?.ep} 与上期 ep=${prev.story?.ep} 不连续`);
@@ -361,7 +380,8 @@ export function createPipeline(issueArg) {
       if (file === "think.json" && !useThink()) continue;
       if (file === "creature.json" && !useCreature()) continue;
       try {
-        const value = read(file), structural = validateStructure(file, value);
+        const value = read(file);
+        const structural = validateStructure(file, value, structuralOmit(file, value));
         problems.push(...structural);
         if (!structural.length) fn(value);
         const stale = staleTicket(file, value);
@@ -384,10 +404,10 @@ export function createPipeline(issueArg) {
   }
   // 只按源稿拼出整期 JSON，不校验、不写文件；回归比对也用它
   function buildIssue() {
-    const b = read("brief.json"), c = read("cover.json"), m = read("comic.json"),
-      s = read("story.json"), p = read("challenge.json"), mb = read("mailbox.json"),
+    const b = read("brief.json"), c = read("cover.json"), m = read("comic.json"), mb = read("mailbox.json"),
       a = read("assets/assets.json");
-    // 单词屋、英文三关是可选栏目，有文件才合并
+    // 小剧场、挑战、单词屋、英文三关这几栏不是每本杂志都选，有文件才合并
+    const s = has("story.json") ? read("story.json") : null, p = has("challenge.json") ? read("challenge.json") : null;
     const w = useWords() ? read("words.json") : null, e = useEnglish() ? read("english.json") : {};
     const nw = has("news.json") ? read("news.json") : null;
     const cr = useCreature() ? read("creature.json") : null, ck = has("check.json") ? read("check.json") : null;
@@ -405,12 +425,14 @@ export function createPipeline(issueArg) {
       comic: { ...strip(m), theme_icon: m.theme_icon || c.theme_icon, sources: undefined },
       creature: cr ? { ...strip(cr), photo: asset(a.creature), credit: cr.photo_credit, legend: asset(a.creature_legend), legend_url: undefined, photo_url: undefined, photo_credit: undefined, sources: undefined, log_update: undefined } : undefined,
       words: w ? strip(w) : undefined,
-      story: { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
-      challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, clues: p.clues, question: p.question }, english: e.english },
+      story: s ? { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc } : undefined,
+      challenge: p ? { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, clues: p.clues, question: p.question }, english: e.english } : undefined,
       check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict, choices: ckChoices, tools: ckTools } : undefined,
       think: th ? { title: th.title, title_en: th.title_en, story: th.story, photo: asset(a.think), photo_pos: th.photo_pos, credit: th.photo_credit, sides: th.sides, role: th.role, deeper: th.deeper } : undefined,
       mailbox: { ...strip(mb), answers: undefined, send_note: b.send_note ?? mb.send_note },
-      _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { skill: ck.skill ?? (ckParams.skill || undefined), truth: ck.truth ?? ck.answer, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
+      _answers: { puzzle: p?.answer, puzzle_solution: p?.solution, english: e.answers, story_secret: s?.secret, check: ck ? { skill: ck.skill ?? (ckParams.skill || undefined), truth: ck.truth ?? ck.answer, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
+      // 调度算出的页序（magazine.yaml 的 sections 列表顺序）：旧任务书没有就不写，渲染按旧页序退回默认顺序
+      ...(b.section_order ? { _order: b.section_order } : {}),
     };
     if (nw) {
       issueJson.news = {
@@ -422,6 +444,14 @@ export function createPipeline(issueArg) {
     if (has("serial.json")) {
       const r = read("serial.json");
       issueJson.serial = { ...strip(r), photo: asset(a.serial), diagram: asset(a.serial_diagram), steps: a.serial_steps?.map(asset), photo_url: undefined, diagram_url: undefined, bible_update: undefined };
+    }
+    // 数据仓库自带的自定义栏目（引擎不认识的 id，且不是上面已经特殊处理过的字段）：
+    // 本期排了、也写了输出，就原样把这份 JSON 整个塞进去；english 虽然注册成包，内容并进 challenge，不单独占一个字段
+    const HANDLED = new Set([...Object.keys(issueJson), "english"]);
+    for (const pack of registry) {
+      if (pack.manifest.slot || HANDLED.has(pack.id)) continue;
+      if (!(b.sections && pack.id in b.sections)) continue;
+      if (has(`${pack.id}.json`)) issueJson[pack.id] = strip(read(`${pack.id}.json`));
     }
     return issueJson;
   }

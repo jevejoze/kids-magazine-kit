@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "脑筋急转弯 riddle.json",
+  "type": "object",
+  "required": ["riddle", "hint", "answer"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "riddle": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "hint": { "type": "string", "minLength": 1, "maxLength": 20 },
+    "answer": { "type": "string", "minLength": 1, "maxLength": 20 }
+  }
+}

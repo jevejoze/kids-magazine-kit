@@ -89,14 +89,13 @@ test("check hands each kind's fields to its pack", t => {
   assert.match(errors().join("\n"), /guess/, "book 包管 book 的字段");
 });
 
-test("a free-only magazine cannot rotate a private-ok serial pack in on Fridays", () => {
+test("a free-only magazine can still rotate a private-ok serial pack in on Fridays (editorial choice)", () => {
   const base = parseYaml(readFileSync(join(demo, "magazine.yaml"), "utf8"));
   const reg = registry();
   const free = { ...base, image_policy: "free-only", params: undefined };
   delete free.params;
-  const errs = validateMagazine({ ...free, schedule: { ...base.schedule, friday: { serial: ["make"] } } }, reg).join("\n");
-  assert.match(errs, /栏目包 serial-make（serial 的 make）.*free-only/);
-  assert.doesNotMatch(validateMagazine({ ...free, schedule: { ...base.schedule, friday: { serial: [] } } }, reg).join("\n"), /栏目包 serial-/);
+  assert.deepEqual(validateMagazine({ ...free, schedule: { ...base.schedule, friday: { serial: ["make"] } } }, reg), []);
+  assert.deepEqual(validateMagazine({ ...free, schedule: { ...base.schedule, friday: { serial: [] } } }, reg), []);
 });
 
 test("pack assets live in assets/<pack id>/", { skip: !hasFfmpeg && "没有 ffmpeg" }, t => {

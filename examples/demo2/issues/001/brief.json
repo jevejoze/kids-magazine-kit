@@ -1,0 +1,67 @@
+{
+  "issue": 1,
+  "date": "2026.11.02 周一",
+  "weekday_theme": "自然科学",
+  "creature": false,
+  "think": false,
+  "sections": {
+    "cover": {
+      "params": {
+        "narration_lines": 12,
+        "image_policy": "free-only"
+      }
+    },
+    "comic": {
+      "params": {
+        "narration_lines": 26,
+        "image_policy": "free-only"
+      }
+    },
+    "news": {
+      "params": {
+        "narration_lines": 24,
+        "image_policy": "free-only"
+      }
+    },
+    "check": {
+      "params": {
+        "skill": "",
+        "choices": "",
+        "tools": "",
+        "narration_lines": 12,
+        "image_policy": "free-only"
+      }
+    },
+    "riddle": {
+      "params": {
+        "narration_lines": 8,
+        "image_policy": "free-only"
+      }
+    },
+    "mailbox": {
+      "params": {
+        "narration_lines": 10,
+        "image_policy": "free-only"
+      }
+    }
+  },
+  "section_order": [
+    "cover",
+    "comic",
+    "news",
+    "check",
+    "riddle",
+    "mailbox"
+  ],
+  "masthead": {
+    "zh": "小满早知道",
+    "en": "XIAOMAN KNOWS!",
+    "by": "🐶🦉 迷你编辑部 出品"
+  },
+  "send_note": "拍照发给妈妈",
+  "english_level": "L2",
+  "_meta": {
+    "stage": "brief",
+    "by": "示例"
+  }
+}

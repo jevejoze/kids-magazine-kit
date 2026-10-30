@@ -1,0 +1,16 @@
+{
+  "_meta": { "stage": "comic", "by": "示例" },
+  "title_zh": "蜂巢为什么全是六边形",
+  "title_en": "Why honeycombs are hexagons",
+  "panels": [
+    { "title": "发现蜂巢", "chars": ["dog:surprise:120"], "bubbles": [{ "who": "dog", "lang": "zh", "text": "这些格子怎么全是六边形？" }] },
+    { "title": "最省材料", "chars": ["owl:talk:120"], "bubbles": [{ "who": "owl", "lang": "zh", "text": "六边形拼起来不留缝，用蜂蜡最少。" }] },
+    { "title": "追问一层", "chars": ["dog:think:120"], "bubbles": [{ "who": "dog", "lang": "zh", "text": "三角形、正方形不行吗？" }] },
+    { "title": "验证", "chars": ["owl:happy:120"], "bubbles": [{ "who": "owl", "lang": "zh", "text": "同样面积，六边形周长最短，蜂蜡最省。" }] }
+  ],
+  "diagram": "diagram.svg",
+  "diagram_title": "同样装得下，六边形周长最短",
+  "takeaway": "六边形拼接零浪费，蜜蜂靠直觉找到了最省材料的形状。",
+  "fact": "蜂巢六边形的夹角都是 120 度，三个角正好拼成一个平面，不留缝隙。",
+  "fact_title": "💡 再发现"
+}

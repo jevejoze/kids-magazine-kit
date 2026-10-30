@@ -1,0 +1,12 @@
+{
+  "_meta": { "stage": "cover", "by": "示例" },
+  "question": { "zh": "蜂巢的格子为啥都是六边形？", "en": "Why are honeycomb cells hexagons?" },
+  "answer": "软蜂蜡互相挤压后自然变成六边形",
+  "photo": { "url": "https://example.org/honeycomb.jpg", "license": "CC0 占位图", "author": "示例" },
+  "photo_pos": "center",
+  "stamp": "📷 示例蜂场",
+  "asked_by": "",
+  "crew": ["dog:surprise:160"],
+  "crew_say": "六边形？好整齐！",
+  "credit": "示例占位图 · CC0"
+}

@@ -1,0 +1,8 @@
+/* 脑筋急转弯 · 页面 id 是 #riddle，卡片在里面的 .card */
+#riddle .card{background:#FFF0E6}
+#riddle .card .riddle-box{display:flex;align-items:center;gap:24px;margin-top:30px}
+#riddle .card .riddle-box .txt{flex:1}
+#riddle .card .riddle{font-size:40px;line-height:1.4}
+#riddle .card .hint{font-size:26px;color:var(--soft);margin-top:14px}
+#riddle .card .answer-key{margin-top:auto;align-self:flex-end;padding:10px 14px;border:1px dashed #D2C7DD;border-radius:10px}
+#riddle .card .answer-content{transform:rotate(180deg);font-size:24px;color:#81758D}

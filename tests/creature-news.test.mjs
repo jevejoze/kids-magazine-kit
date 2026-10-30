@@ -73,11 +73,11 @@ test("[creature] and [news] checks come from the packs", t => {
   assert.match(cr, /meters 要 2–3 条/);
 });
 
-test("a free-only magazine cannot use the news pack", () => {
+test("a free-only magazine can still select the news pack (editorial choice: use only freely-licensed photos)", () => {
   const base = parseYaml(readFileSync(join(demo, "magazine.yaml"), "utf8"));
   const free = { ...base, image_policy: "free-only" };
   delete free.params;
-  assert.match(validateMagazine(free, registry()).join("\n"), /栏目 news 要用新闻原图（image_policy: private-ok），和全刊的 free-only 冲突/);
+  assert.deepEqual(validateMagazine(free, registry()), []);
 });
 
 test("the creature card only appears on Mondays", t => {

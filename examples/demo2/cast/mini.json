@@ -1,0 +1,15 @@
+{
+  "id": "mini",
+  "title": "迷你编辑部",
+  "characters": {
+    "dog": { "name": "团子狗", "emoji": "🐶", "lang": "zh", "persona": "懒、贪吃、爱问为什么，憨憨的，也爱嘴硬出题" },
+    "owl": { "name": "咕咕博士", "aliases": ["博士"], "emoji": "🦉", "lang": "zh+en", "persona": "戴眼镜，博学，中英文都讲得清楚" }
+  },
+  "slots": {
+    "asker": "dog",
+    "expert": "owl",
+    "english": "owl",
+    "trickster": "dog",
+    "narrator": "narrator"
+  }
+}

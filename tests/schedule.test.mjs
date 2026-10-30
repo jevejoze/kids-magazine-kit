@@ -58,8 +58,8 @@ test("Friday serial follows the rotation, counting earlier non-book Fridays", t 
 
 test("magazine.yaml validation names unknown sections, undeclared, scheduler-owned and out-of-range params", () => {
   assert.match(errorsOf({ sections: [...DEFAULT_MAGAZINE.sections, "fun-facts"] }), /未知栏目：fun-facts/);
-  assert.match(errorsOf({ sections: DEFAULT_MAGAZINE.sections.filter(s => s !== "comic") }), /必须有这几页：comic/);
-  assert.match(errorsOf({ sections: ["cover", "story", "comic", "challenge", "mailbox"] }), /旧版页面还不能调顺序/);
+  assert.equal(errorsOf({ sections: DEFAULT_MAGAZINE.sections.filter(s => s !== "comic") }), "", "栏目可以自由挑选子集，不再强制要有哪几页");
+  assert.equal(errorsOf({ sections: ["cover", "story", "comic", "challenge", "mailbox"], schedule: {}, params: {} }), "", "栏目顺序交给调度，渲染按这个顺序排，不再锁死旧页序");
   assert.match(errorsOf({ colour: "red" }), /未知的配置项：colour/);
   assert.match(errorsOf({ params: { news: { headline_count: 2 } } }), /params\.news\.headline_count：栏目没有声明这个参数/);
   assert.match(errorsOf({ params: { serial: { kind: "film" } } }), /params\.serial\.kind：这个参数由调度填写/);
@@ -72,13 +72,16 @@ test("magazine.yaml validation names unknown sections, undeclared, scheduler-own
   assert.match(errorsOf({ voices: { cat: { zh: "x" } } }), /voices/);
 });
 
-test("free-only magazine rejects a section pack that needs private images", t => {
+test("free-only magazine can still include a pack whose default is private-ok; a minimal section list loads fine", t => {
   const root = tmp(t);
+  // 一个栏目包默认写 private-ok（图可以用家里的私人照片），不等于全刊 free-only 就不能选它：
+  // 作者自己决定能不能只用自由授权的图把这一页做出来，magazine.yaml 不替他把路堵死
   const registry = [{ id: "fun-facts", manifest: { id: "fun-facts", params: {}, image_policy: "private-ok", narration: { lines: 6 } } }];
   const yaml = { image_policy: "free-only", sections: [...DEFAULT_MAGAZINE.sections.slice(0, -1), "fun-facts", "mailbox"] };
-  assert.match(validateMagazine(yaml, registry).join("\n"), /栏目 fun-facts 要用新闻原图/);
+  assert.deepEqual(validateMagazine(yaml, registry), []);
+  // 栏目可以随意挑子集，不用凑够旧版那一整套
   writeFileSync(join(root, "magazine.yaml"), "sections: [cover, comic]\n");
-  assert.throws(() => loadMagazine(root), /magazine\.yaml 有问题：[\s\S]*必须有这几页/);
+  assert.deepEqual(loadMagazine(root).sections, ["cover", "comic"]);
 });
 
 test("curriculum fills check and think params by week; defaults apply without the file", t => {
@@ -124,8 +127,10 @@ test("schedule CLI writes the brief, and the demo still assembles to the same st
   assert.equal(p.done("brief"), true);
   p.assemble();
   const now = JSON.parse(readFileSync(join(issue, "issue.json"), "utf8"));
-  const strip = o => { const { _meta, ...rest } = o; return rest; };
+  const strip = o => { const { _meta, _order, ...rest } = o; return rest; };
   assert.deepEqual(strip(now), strip(old));
+  // 重新调度以后，issue.json 带上了按 magazine.yaml 的 sections 顺序算出来的 _order
+  assert.deepEqual(now._order, ["cover", "comic", "words", "story", "challenge", "english", "news", "check", "serial", "mailbox"]);
 });
 
 test("a sections brief drops optional pages it leaves out and counts a Monday creature", t => {

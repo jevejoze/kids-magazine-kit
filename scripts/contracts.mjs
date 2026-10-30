@@ -11,7 +11,8 @@ export const SPEAKERS = ["narrator", "dog", "mouse", "owl", "raccoon"];
 export const SPEAKER_NAMES = { narrator: "🎙 旁白", dog: "🐶 团子狗", mouse: "🐭 波波鼠", owl: "🦉 咕咕博士", raccoon: "🦝 捣蛋浣熊" };
 export const COMIC_LIMITS = Object.freeze({ solo: 26, pair: 20, takeaway: 28, fact: 45, character: 130 });
 export const EMOTIONS = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
-export const pageOrder = issue => PAGE_KEYS.filter(key => issue[key] != null);
+// issue._order（调度按 magazine.yaml 的 sections 顺序算出来）存在就按它排，不然退回旧的固定页序
+export const pageOrder = issue => Array.isArray(issue._order) ? issue._order.filter(key => issue[key] != null) : PAGE_KEYS.filter(key => issue[key] != null);
 // 经典连载（读书）页在渲染顺序里是第几张；周五的音乐盒、放映室、动手做不算，返回 0
 export const serialCardOf = issue => issue.serial && (issue.serial.kind ?? "book") === "book" ? pageOrder(issue).indexOf("serial") + 1 : 0;
 // voices/voicestudio.json 里这句该用哪个克隆档案：键是 角色/语言，加 @serial 只用于连载页；不用克隆返回 undefined
@@ -73,7 +74,9 @@ export function validateStructure(file, value, omit = []) {
 export function validateIssue(issue) {
   const errors = [];
   if (!issue || typeof issue !== "object" || Array.isArray(issue)) return ["整期必须是对象"];
-  for (const key of ["cover", "comic", "story", "challenge", "mailbox"]) {
+  // 旧版杂志固定这五页都有；有 _order（按 magazine.yaml 的 sections 排的）时，只要求这期真的选了的那几栏
+  const required = Array.isArray(issue._order) ? ["cover", "comic", "story", "challenge", "mailbox"].filter(k => issue._order.includes(k)) : ["cover", "comic", "story", "challenge", "mailbox"];
+  for (const key of required) {
     if (!issue[key] || typeof issue[key] !== "object" || Array.isArray(issue[key])) errors.push(`整期缺少 ${key}`);
   }
   if (!Number.isInteger(issue.issue) || issue.issue < 1) errors.push("期号必须是正整数");
@@ -86,9 +89,10 @@ export function validateIssue(issue) {
     const omit = key === "news" ? ["items[].sources[]", "items[].photo_shows", "items[].talk.background", "items[].talk.scale", "items[].talk.follow_up"] : key === "check" ? ["sources[]"] : [];
     errors.push(...validateStructure(file, issue[key], omit));
   }
-  if (!issue.challenge?.puzzle || typeof issue.challenge.puzzle.title !== "string" || typeof issue.challenge.puzzle.body !== "string") errors.push("整期缺少 challenge.puzzle 的标题或题干");
+  const hasChallenge = !Array.isArray(issue._order) || issue._order.includes("challenge");
+  if (hasChallenge && (!issue.challenge?.puzzle || typeof issue.challenge.puzzle.title !== "string" || typeof issue.challenge.puzzle.body !== "string")) errors.push("整期缺少 challenge.puzzle 的标题或题干");
   if (issue.challenge?.puzzle) errors.push(...validatePuzzleLayout(issue.challenge.puzzle));
-  if (typeof issue._answers?.puzzle !== "string" || !issue._answers.puzzle.trim()) errors.push("整期缺少本页倒印的谜题答案 _answers.puzzle");
+  if (hasChallenge && (typeof issue._answers?.puzzle !== "string" || !issue._answers.puzzle.trim())) errors.push("整期缺少本页倒印的谜题答案 _answers.puzzle");
   if (issue.challenge?.english?.length && (!Array.isArray(issue._answers?.english) || issue._answers.english.length !== issue.challenge.english.length || issue._answers.english.some(a => typeof a !== "string" || !a.trim()))) errors.push("英文三关必须有逐关对应的本页答案 _answers.english");
   return errors;
 }

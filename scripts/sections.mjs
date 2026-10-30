@@ -153,8 +153,10 @@ export function packFor(key, sections = [], issue = {}) {
 }
 const slotPack = s => Boolean(s.manifest?.slot);
 
-// 本期的页序：旧页序里有数据的键；注册了而旧页序里没有的新栏目，有数据就排在信箱前面（分担旧页位的包不另排）
+// 本期的页序：调度算出来、存在 issue._order 里的就按它排（magazine.yaml 的 sections 顺序，可以自由调整）；
+// 没有 _order 的旧期退回旧页序：旧页序里有数据的键，注册了而旧页序里没有的新栏目排在信箱前面（分担旧页位的包不另排）
 export function sectionOrder(issue, sections = []) {
+  if (Array.isArray(issue._order)) return issue._order.filter(key => issue[key] != null);
   const extra = sections.filter(s => !slotPack(s)).map(s => s.id).filter(id => !PAGE_KEYS.includes(id));
   const keys = [...PAGE_KEYS.slice(0, -1), ...extra, PAGE_KEYS.at(-1)];
   return keys.filter(key => issue[key] != null);

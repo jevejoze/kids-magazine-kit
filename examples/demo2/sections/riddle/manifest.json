@@ -1,0 +1,10 @@
+{
+  "id": "riddle",
+  "title": "脑筋急转弯",
+  "consumes": [],
+  "params": {},
+  "rules": [],
+  "image_policy": "free-only",
+  "narration": { "lines": 8 },
+  "state": null
+}

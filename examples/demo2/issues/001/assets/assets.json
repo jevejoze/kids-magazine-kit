@@ -1,0 +1,5 @@
+{
+  "_meta": { "stage": "assets", "by": "示例" },
+  "cover": "cover.jpg",
+  "news": ["news-1.jpg", "news-2.jpg", "news-3.jpg"]
+}

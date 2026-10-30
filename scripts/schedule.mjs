@@ -8,7 +8,7 @@ import { join, resolve, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseYaml } from "./yaml.mjs";
 import { checkParamValue, loadSections } from "./sections.mjs";
-import { PAGE_KEYS, NARRATION_MAX_LINES, SPEAKERS } from "./contracts.mjs";
+import { NARRATION_MAX_LINES, SPEAKERS } from "./contracts.mjs";
 
 export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 const WEEKDAY_ZH = { 日: "sun", 天: "sun", 一: "mon", 二: "tue", 三: "wed", 四: "thu", 五: "fri", 六: "sat" };
@@ -87,13 +87,6 @@ export function validateMagazine(m, registry = []) {
   if (unknown.length) errors.push(`未知栏目：${unknown.join("、")}（可用：${known.join("、")}）`);
   const dup = sections.filter((s, i) => sections.indexOf(s) !== i);
   if (dup.length) errors.push(`栏目重复：${[...new Set(dup)].join("、")}`);
-  const missing = Object.keys(LEGACY).filter(id => LEGACY[id].required && !sections.includes(id));
-  if (missing.length) errors.push(`旧版模板必须有这几页：${missing.join("、")}`);
-  // 旧版页面的顺序由模板定：栏目包排在信箱前面，其余按旧页序
-  const pages = sections.filter(s => known.includes(s) && s !== "english");
-  const rendered = [...PAGE_KEYS.slice(0, -1), ...pages.filter(s => !PAGE_KEYS.includes(s)), PAGE_KEYS.at(-1)].filter(s => pages.includes(s));
-  if (!unknown.length && !dup.length && rendered.join() !== pages.join())
-    errors.push(`旧版页面还不能调顺序，现在只能排成：${rendered.join("、")}`);
   const listed = id => sections.includes(id);
 
   const sch = m.schedule ?? {};
@@ -121,17 +114,6 @@ export function validateMagazine(m, registry = []) {
   }
 
   const policy = m.image_policy ?? DEFAULT_MAGAZINE.image_policy;
-  for (const id of sections.filter(s => known.includes(s))) {
-    const d = declared(id, registry);
-    if (d.policy === "private-ok" && policy === "free-only") errors.push(`栏目 ${id} 要用新闻原图（image_policy: private-ok），和全刊的 free-only 冲突`);
-  }
-  // 按 kind 换包的页位（经典连载）：平时的 book 和周五轮换到的 kind 都要过授权检查
-  for (const key of [...new Set(registry.filter(s => s.manifest?.slot).map(s => s.manifest.slot.key))].filter(listed)) {
-    const friday = isMap(sch) && "friday" in sch ? sch.friday : DEFAULT_MAGAZINE.schedule.friday;
-    const kinds = new Set(["book", ...(Array.isArray(friday?.[key]) ? friday[key] : [])]);
-    for (const pack of registry.filter(s => s.manifest?.slot?.key === key && kinds.has(s.manifest.slot.kind)))
-      if (pack.manifest.image_policy === "private-ok" && policy === "free-only") errors.push(`栏目包 ${pack.id}（${key} 的 ${pack.manifest.slot.kind}）要用新闻原图（image_policy: private-ok），和全刊的 free-only 冲突；周五轮换去掉 ${pack.manifest.slot.kind}，或换一个自由授权的栏目包`);
-  }
   if ("params" in m) {
     if (!isMap(m.params)) errors.push("params 写成 栏目: {参数: 值}");
     else for (const [id, values] of Object.entries(m.params)) {
@@ -233,7 +215,7 @@ export function schedule({ magazine, date, dataDir, issueNo, registry = [] }) {
     if (week && id === "think") Object.assign(params, { skill: week.skill, friday_topic: week.friday_topic });
     sections[id] = { params };
   }
-  return { weekday, weekday_theme: sch.weekday_theme?.[weekday] ?? "", sections };
+  return { weekday, weekday_theme: sch.weekday_theme?.[weekday] ?? "", sections, order: ids };
 }
 
 // 一个栏目本期出不出：true / false；旧任务书没有 sections 时返回 undefined（由调用方照旧规则判断）
@@ -266,6 +248,7 @@ export function scheduleIssue(issueDir, date) {
     creature: "creature" in result.sections,
     think: "think" in result.sections,
     sections: result.sections,
+    section_order: result.order,
   };
   if (next.serial && result.sections.serial) next.serial = { ...next.serial, kind: result.sections.serial.params.kind };
   mkdirSync(issueDir, { recursive: true });

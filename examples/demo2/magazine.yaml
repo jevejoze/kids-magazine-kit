@@ -1,0 +1,29 @@
+# 第二本杂志：故意和 examples/demo 不一样的配置，用来验收"引擎零改动就能出一本不同的杂志"
+masthead:
+  zh: 小满早知道
+  en: XIAOMAN KNOWS!
+  by: 🐶🦉 迷你编辑部 出品
+call: 小满
+send_note: 拍照发给妈妈
+english_level: L2
+image_policy: free-only
+cast: mini
+
+# 只选 5 个栏目，没有经典连载、也就没有周五轮换；自带一个引擎没有的自定义栏目 riddle
+sections:
+  - cover
+  - comic
+  - news
+  - check
+  - riddle
+  - mailbox
+
+schedule:
+  weekday_theme:
+    mon: 自然科学
+    tue: 历史人物
+    wed: 世界各地
+    thu: 数学趣题
+    fri: 艺术手工
+    sat: 亲子小实验
+    sun: 周刊回顾

@@ -1,0 +1,36 @@
+{
+  "_meta": { "stage": "news", "by": "示例" },
+  "week": "示例周",
+  "ask_zh": "你觉得这件事怎么样？",
+  "ask_en": "What do you think?",
+  "credits": "示例占位图 · CC0",
+  "items": [
+    {
+      "flag": "🐝", "place": "示例蜂场",
+      "title": "科学家给蜜蜂编号追踪飞行路线",
+      "text": "研究者给几百只蜜蜂贴上小标签，记录它们一天飞多远。",
+      "word": { "en": "track", "zh": "追踪" },
+      "sources": ["https://example.org/a", "https://example.org/b"],
+      "photo_shows": "示例占位图：蓝色色块代表蜂场", "photo_pos": "center",
+      "talk": { "background": "科学家想知道蜜蜂一天能飞多远", "scale": "差不多是绕操场跑二十圈", "follow_up": "你觉得蜜蜂为什么要飞这么远？" }
+    },
+    {
+      "flag": "🌻", "place": "示例农场",
+      "title": "向日葵的螺旋暗藏数学规律",
+      "text": "向日葵籽排成的螺旋数目是一组特别的数字。",
+      "word": { "en": "spiral", "zh": "螺旋" },
+      "sources": ["https://example.org/c", "https://example.org/d"],
+      "photo_shows": "示例占位图：橙色色块代表农场", "photo_pos": "center",
+      "talk": { "background": "螺旋数目总是某一组特别的数字", "scale": "就像楼梯一圈接一圈往上绕", "follow_up": "你还见过哪些螺旋形状？" }
+    },
+    {
+      "flag": "🧪", "place": "示例实验室",
+      "title": "小朋友设计的实验登上科学展",
+      "text": "一个小学生用厨房材料做的实验拿了奖。",
+      "word": { "en": "experiment", "zh": "实验" },
+      "sources": ["https://example.org/e", "https://example.org/f"],
+      "photo_shows": "示例占位图：绿色色块代表实验室", "photo_pos": "center",
+      "talk": { "background": "小朋友在家就能做科学实验", "scale": "材料都是厨房里现成的", "follow_up": "你想做什么实验？" }
+    }
+  ]
+}
