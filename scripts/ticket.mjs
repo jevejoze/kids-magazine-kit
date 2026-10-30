@@ -16,8 +16,49 @@ const { stages } = JSON.parse(readFileSync(join(ENGINE, "pipeline", "stages.json
 export const SLOTS = ["asker", "expert", "english", "trickster", "narrator"];
 const ALWAYS = ["red-lines"];
 const BRIEF_FIELDS = ["issue", "date", "weekday_theme", "english_level", "topic_hint", "child_question", "focus", "avoid", "last_feedback"];
-// 讲读稿不是栏目，按能力领任务单
-const CAPABILITIES = { narration: { stage: "50-narration", rules: ["narration", "no-visible-pedagogy"] } };
+// 讲读稿、审稿不是栏目，按能力领任务单；review 的 rules 在 ticket() 里按本期实际出的栏目动态并出来，这里留空
+const CAPABILITIES = {
+  narration: { stage: "50-narration", rules: ["narration", "no-visible-pedagogy"] },
+  review: { stage: "31-review", rules: [] },
+};
+
+// 审稿要看的规则并集：本期实际出的每个栏目（含讲读）各自声明的规则，去重
+function reviewRuleIds(registry, brief) {
+  const ids = new Set();
+  for (const key of [...Object.keys(brief.sections ?? {}), "narration"]) {
+    try { for (const r of spec(key, registry, brief).rules ?? []) ids.add(r); } catch { /* 本期不出的栏目跳过 */ }
+  }
+  return [...ids];
+}
+
+// 跨栏目撞题：每个栏目的主题字段（标题、说法……）两两比对，连续 4 个字相同就报一条，留给审稿人判断是不是真的撞了
+const TOPIC_FIELD = {
+  cover: v => [v.question?.zh], comic: v => [v.title_zh], creature: v => [v.name_zh], story: v => [v.title_zh],
+  challenge: v => [v.title], check: v => [v.claim], serial: v => [v.title_zh], think: v => [v.title],
+  news: v => (v.items ?? []).map(i => i.title),
+};
+const plain = s => String(s ?? "").replace(/<[^>]+>/g, "").replace(/[\s\p{P}\p{S}]/gu, "");
+const shares = (a, b, k) => { for (let i = 0; i + k <= a.length; i++) if (b.includes(a.slice(i, i + k))) return true; return false; };
+
+function crossSectionTopics(issue, registry, brief) {
+  const topics = [];
+  for (const key of Object.keys(brief.sections ?? {})) {
+    const field = TOPIC_FIELD[key];
+    if (!field) continue;
+    try {
+      const sp = spec(key, registry, brief), file = outputsOf(sp).find(f => f.endsWith(".json"));
+      const f = join(issue, file.slice(6));
+      if (!existsSync(f)) continue;
+      for (const t of field(readJson(f))) if (t) topics.push({ key, topic: t });
+    } catch { /* 这一栏目还没写，跳过 */ }
+  }
+  const warnings = [];
+  for (let i = 0; i < topics.length; i++) for (let j = i + 1; j < topics.length; j++) {
+    if (topics[i].key !== topics[j].key && shares(plain(topics[i].topic), plain(topics[j].topic), 4))
+      warnings.push(`${topics[i].key}「${topics[i].topic}」和 ${topics[j].key}「${topics[j].topic}」可能撞题，请确认`);
+  }
+  return warnings;
+}
 
 const isMap = v => v && typeof v === "object" && !Array.isArray(v);
 const stable = v => Array.isArray(v) ? v.map(stable)
@@ -140,7 +181,7 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
     params = { ...defaults, ...(brief.sections?.[sp.section]?.params ?? {}) };
   }
 
-  const ruleIds = [...new Set([...ALWAYS, ...sp.rules])];
+  const ruleIds = [...new Set([...ALWAYS, ...(sp.id === "review" ? reviewRuleIds(registry, brief) : sp.rules)])];
   const rules = ruleIds.map(id => {
     const file = join(engine, "core", "rules", `${id}.md`);
     if (!existsSync(file)) throw new Error(`栏目 ${sp.id} 声明的规则不存在：${id}（core/rules/${id}.md）`);
@@ -174,6 +215,7 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
     consumes,
     output: outputsOf(sp),
     ...(sp.id === "narration" ? { skeleton: narrationSkeleton(issue, registry, brief) } : {}),
+    ...(sp.id === "review" ? { topic_warnings: crossSectionTopics(issue, registry, brief) } : {}),
   };
   const fingerprint = createHash("sha256").update(JSON.stringify(stable(content))).digest("hex");
   return { content, fingerprint, markdown: markdown(content, fingerprint) };
@@ -189,6 +231,7 @@ function markdown(c, fingerprint) {
   ];
   if (c.state.length) out.push("## 要读、要更新的状态", "", ...c.state.map(f => `- ${f}`), "");
   if (Object.keys(c.consumes).length) out.push("## 上游值", "", ...Object.entries(c.consumes).map(([k, v]) => `- ${k}：${JSON.stringify(v)}`), "");
+  if (c.topic_warnings) out.push("## 跨栏目撞题检查", "", c.topic_warnings.length ? c.topic_warnings.map(w => `- ${w}`).join("\n") : "没发现明显撞题", "");
   if (c.skeleton) {
     out.push("## 本期骨架", "", "按渲染出来的页序排，卡号不固定、每期按实际出的栏目重新编号；每页的句数上限已按本期页数缩放", "");
     for (const p of c.skeleton) {

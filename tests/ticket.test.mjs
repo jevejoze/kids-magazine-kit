@@ -63,6 +63,24 @@ test("the narration ticket's skeleton is built from this issue's actual page ord
   assert.equal(ticket(issue, "narration").content.skeleton[0].max_lines, 7, "任务书写的句数上限直接用，不缩放");
 });
 
+test("the review ticket unions every active section's rules and flags cross-section topic overlaps", t => {
+  const { issue } = copyDemo(t);
+  edit(join(issue, "00-brief.json"), b => { b.sections = Object.fromEntries(["cover", "comic", "news", "check", "serial"].map(k => [k, { params: {} }])); });
+  const review = ticket(issue, "review");
+  assert.deepEqual(review.content.rules.map(r => r.id).sort(), ["english-level", "images", "narration", "no-visible-pedagogy", "red-lines"]);
+  assert.deepEqual(review.content.topic_warnings, [], "示例数据本来不撞题");
+  assert.match(review.markdown, /没发现明显撞题/);
+
+  edit(join(issue, "19-check.json"), k => { k.claim = "挪威夏天半夜十二点太阳还在天上"; });
+  const warned = ticket(issue, "review");
+  assert.match(warned.content.topic_warnings.join("\n"), /cover.*check.*可能撞题|check.*cover.*可能撞题/);
+  assert.match(warned.markdown, /可能撞题，请确认/);
+
+  // 只出信箱、单词屋这类没有「主题」字段的栏目时不报错
+  edit(join(issue, "00-brief.json"), b => { b.sections = { mailbox: { params: {} }, words: { params: {} } }; });
+  assert.deepEqual(ticket(issue, "review").content.topic_warnings, []);
+});
+
 test("fingerprint changes with the brief, params, a rule file, the cast and a consumed value", t => {
   const { root, issue } = copyDemo(t);
   const base = { story: fp(issue, "story"), comic: fp(issue, "comic"), cover: fp(issue, "cover") };

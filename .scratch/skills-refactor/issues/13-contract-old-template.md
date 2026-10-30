@@ -4,11 +4,25 @@
 
 **Blocked by:** 08, 09, 10, 11, 12
 
-**Status:** ready-for-agent
+**Status:** partial（见下方说明，未结项）
 
-- [ ] 旧模板只剩外壳，全局样式表只剩全局样式
+- [x] 旧模板只剩外壳，全局样式表只剩全局样式（10、11、12 完成后的既有结果：`assets/template.html` 114 行、`assets/style.css` 37 行，零个 `#id` 选择器，全部是通用规则；已核实，不用再改）
 - [ ] 步骤表由注册表和保留名生成，demo 的 status 输出正确
 - [ ] 期内文件用 skill id 命名，`pipeline.mjs status` 按新文件名显示进度
-- [ ] 审稿任务单包含规则并集和跨栏目撞题检查
-- [ ] 归档写各栏目 log.jsonl 和状态变更
-- [ ] 全部旧期像素一致，`node --test` 全绿
+- [x] 审稿任务单包含规则并集和跨栏目撞题检查（`ticket.mjs` 新增 `review` 能力：`reviewRuleIds` 按本期 `brief.sections`（含讲读）的每个栏目动态并出规则去重；`crossSectionTopics` 取各栏目的主题字段两两比对，连续 4 字相同就在任务单「跨栏目撞题检查」一节报一条给审稿人确认；`tests/ticket.test.mjs` 新增测试）
+- [x] 归档写各栏目 log.jsonl 和状态变更（已经是既有结果：`manifest.state` 非 null 的栏目——怪物档案、小剧场、经典连载四个 kind、周末思辨——在 06–12 各自的提交里都已经接上 `archive()` 的归档逻辑；`state` 是 null 的栏目本来就不需要日志）
+- [ ] 全部旧期像素一致，`node --test` 全绿（上面两条打勾的改动本身：140 个测试全绿，17 期回归像素一致；未完成的两条尚未触碰任何渲染或文件路径，不影响这个结论）
+
+## 未完成说明：步骤表生成 + 文件改名
+
+这两条清单项是同一个改动的两面：`pipeline/stages.json` 要从"手写 21 步"变成"每个栏目包的 manifest 生成一条，加上 `brief`/`review`/`narration`/`audio`/`video`/`archive` 等保留名"，而生成出来的步骤天然就该用栏目包自己的 id 命名输出文件（`14-puzzle.json` → `challenge.json`），两者拆不开。
+
+按 `docs/plan/skills-refactor.md` 的里程碑，这原本就是 M6（本工单）和 M7（工单 14）各自的独立阶段：M7 的迁移脚本把数据仓库的旧文件名转过去，M6/M7 一起跑全量回归。实际动手会牵扯到：
+
+- 这个引擎仓库里 23 个脚本和测试文件直接写着旧文件名（`"14-puzzle.json"` 这类字符串），包括 `examples/demo/` 的全部 fixture
+- 所有栏目包的 `SKILL.md`（"写 issue/14-puzzle.json"）、对应的 `pipeline/stages/*.md`、`pipeline/README.md`
+- 真实数据仓库（`/Users/jeffrey/workspace/other/kids-magazine`，只读）里 003–020 期的旧文件名要跑工单 14 的迁移脚本才能转，而迁移脚本本身又依赖这里先把引擎改完、定好新名字
+
+这个改动面比 08–12 任何一个栏目迁移都大，且必须和工单 14 的迁移脚本一起做才能验证"全部旧期像素一致"（否则没法在只读的真实数据上测试新文件名）。没有在本轮里动手，是不想在这已经很长的一次会话尾部，仓促做一个会动到真实出刊数据兼容性的大改动——这类改动应该单独开一轮，像 08–12 每一个那样逐步做、逐步回归。
+
+已经做的两条（跨栏目撞题检查、审稿规则并集）本身独立、不依赖改名，可以先用。
