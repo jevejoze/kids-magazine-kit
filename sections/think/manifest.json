@@ -1,0 +1,13 @@
+{
+  "id": "think",
+  "title": "周末思辨",
+  "consumes": [],
+  "params": {
+    "skill": { "type": "string", "default": "" },
+    "friday_topic": { "type": "string", "default": "" }
+  },
+  "rules": ["no-visible-pedagogy"],
+  "image_policy": "private-ok",
+  "narration": { "lines": 14 },
+  "state": { "file": "state/think/config.md", "log": "state/think/log.jsonl" }
+}

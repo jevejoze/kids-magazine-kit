@@ -180,21 +180,6 @@ export function createPipeline(issueArg) {
         } catch {}
       }
     },
-    "08-think.json": t => {
-      fields(t, "08", ["title", "story", "sides", "role", "deeper", "parent_guide", "source", "log_update"]);
-      need(len(t.title) <= 18, "08", `话题 ${len(t.title)} 字，超过 18`);
-      need(len(t.story) <= 120, "08", `故事 ${len(t.story)} 字，超过 120`);
-      need(t.sides?.length === 2, "08", "sides 要 2 个成员，各站一边");
-      t.sides?.forEach((x, i) => {
-        checkChar(x.who, "08", `第 ${i + 1} 个观点角色`);
-        need(len(x.say) <= 36, "08", `第 ${i + 1} 个观点 ${len(x.say)} 字，超过 36`);
-      });
-      need(len(t.role) <= 40, "08", `角色代入 ${len(t.role)} 字，超过 40`);
-      need(t.deeper?.length === 2, "08", "deeper 要 2 个追问");
-      t.deeper?.forEach((x, i) => need(len(x) <= 30, "08", `第 ${i + 1} 个追问 ${len(x)} 字，超过 30`));
-      need(!t.photo_url || t.photo_credit, "08", "有配图就写 photo_credit");
-      need(!META_SPOILER.test([t.title, t.story, ...(t.sides ?? []).map(s => s.say), t.role, ...(t.deeper ?? [])].join(" ")), "08", "周末思辨正文不得点破「思维本领/今天练」等课表字眼");
-    },
     "12-words.json": w => {
       fields(w, "12", ["intro", "grammar", "items", "task"]);
       need(w.items?.length === 3, "12", "单词要 3 个");
@@ -208,15 +193,6 @@ export function createPipeline(issueArg) {
         const old = vocab.find(v => v.word.toLowerCase() === x.word.toLowerCase());
         need(!old || old.issue === self, "12", `${x.word} 已经在第 ${old?.issue} 期学过`);
       });
-    },
-    "14-puzzle.json": p => {
-      const e = useEnglish() ? read("15-english.json") : {};
-      fields({ ...e, ...p }, "14", ["title", "body", "answer", "solution", "taunt_zh"]);
-      need(len(p.body) <= 120, "14", `题干 ${len(p.body)} 字，超过 120`);
-      need(len([p.body, ...(p.clues ?? []), p.question ?? ""].join("")) <= 240, "14", "题目情境、条件和问题合计超过 240 字");
-      if (p.taunt_zh) need(len(p.taunt_zh) <= 20, "14", `taunt_zh ${len(p.taunt_zh)} 字，超过 20`);
-      if (p.taunt_en) need(words(p.taunt_en) <= 10, "14", `taunt_en ${words(p.taunt_en)} 个单词，超过 10`);
-      checkProp(p.prop, "14");
     },
     "15-english.json": e => {
       fields(e, "15", ["english", "answers"]);
@@ -234,22 +210,6 @@ export function createPipeline(issueArg) {
       need(["book", "music", "film", "make"].includes(r.kind), "18", `kind 要写 book、music、film 或 make：${r.kind}`);
       if (r.crew?.who) checkChar(r.crew.who, "18", "crew.who");
       need(len(r.crew?.say) <= 20, "18", `crew.say ${len(r.crew?.say)} 字，超过 20`);
-    },
-    "19-check.json": k => {
-      fields(k, "19", ["where", "claim", "clues", "verdict", "explain", "sources"]);
-      need(len(k.claim) <= 30, "19", `说法 ${len(k.claim)} 字，超过 30`);
-      need(k.clues?.length === 3, "19", "线索要 3 条");
-      k.clues?.forEach((c, i) => need(len(c) <= 36, "19", `第 ${i + 1} 条线索 ${len(c)} 字，超过 36`));
-      if (k.choices) {
-        need(k.choices.length >= 2 && k.choices.length <= 3 && k.choices.every(c => len(c) <= 8), "19", "choices 要 2–3 个，每个 ≤ 8 字（含表情）");
-        need(k.choices.includes(k.answer), "19", `answer 要是 choices 里的一个：${k.answer}`);
-      } else need(["true", "false", "half"].includes(k.truth), "19", `truth 要写 true、false 或 half：${k.truth}`);
-      need(!k.skill || len(k.skill) <= 10, "19", `skill ${len(k.skill)} 字，超过 10`);
-      need(!k.tools || (k.tools.length === 3 && k.tools.every(t => t.length === 2)), "19", "tools 要 3 个 [标题, 小字]");
-      need(len(k.verdict) <= 40, "19", `倒印答案 ${len(k.verdict)} 字，超过 40`);
-      need((k.sources ?? []).length >= 2, "19", "要 2 个来源");
-      need(!k.photo_url || k.photo_credit, "19", "有配图就写 photo_credit");
-      need(!META_SPOILER.test([k.claim, ...(k.clues ?? []), k.verdict].join(" ")), "19", "真的假的正文与答案不得点破「思维本领/今天练」等课表字眼");
     },
     "50-narration.json": n => {
       need(reviewPassed() && n._meta?.content_hash === contentFingerprint(issue), "50", "讲读稿未绑定当前已审稿内容，请重写并记录 _meta.content_hash");
@@ -410,7 +370,14 @@ export function createPipeline(issueArg) {
     const st = stages.find(s => s.section === section), tag = st ? st.id.slice(0, 2) : pack.id;
     const out = st ? st.outputs.find(o => o.endsWith(".json")).slice(6) : `${pack.id}.json`;
     const collect = fn => { const n = problems.length; fn(); return problems.splice(n).map(m => m.replace(/^\[[^\]]*\] /, "")); };
-    const ctx = { issue, checkChar: (x, at) => collect(() => checkChar(x, tag, at)), stateful: existsSync(join(dataDir, "state", pack.id)) };
+    const ctx = {
+      issue,
+      checkChar: (x, at) => collect(() => checkChar(x, tag, at)),
+      checkProp: (p, at) => collect(() => checkProp(p, tag, at)),
+      stateful: existsSync(join(dataDir, "state", pack.id)),
+      get english() { return useEnglish() ? read("15-english.json") : {}; },
+      params: brief()?.sections?.[section]?.params ?? {},
+    };
     const { check: own } = require(file);
     const run = v => own(v, ctx).forEach(m => problems.push(`[${tag}] ${m}`));
     if (!slot) { checks[out] = run; continue; }
@@ -456,6 +423,10 @@ export function createPipeline(issueArg) {
     const nw = has("17-news.json") ? read("17-news.json") : null;
     const cr = useCreature() ? read("09-creature.json") : null, ck = has("19-check.json") ? read("19-check.json") : null;
     const th = useThink() ? read("08-think.json") : null;
+    // 课表参数（调度写进 00-brief.json 的 sections.check.params）给的 choices/tools：本期没写就按参数拆出来
+    const ckParams = b.sections?.check?.params ?? {};
+    const ckChoices = ck?.choices ?? (ckParams.choices ? ckParams.choices.split("/").map(s => s.trim()).filter(Boolean) : undefined);
+    const ckTools = ck?.tools ?? (ckParams.tools ? ckParams.tools.split("/").map(s => [s.trim(), ""]).filter(([t]) => t) : undefined);
     const asset = f => f ? `20-assets/${f}` : f;
     const strip = o => Object.fromEntries(Object.entries(o).filter(([k]) => !k.startsWith("_")));
     const issueJson = {
@@ -467,10 +438,10 @@ export function createPipeline(issueArg) {
       words: w ? strip(w) : undefined,
       story: { ep: s.ep, lang: s.lang || "zh", night: s.night, title_zh: s.title_zh, title_en: s.title_en, paragraphs: s.paragraphs, scene: s.scene, clue: s.clue, tbc: s.tbc },
       challenge: { taunt_zh: p.taunt_zh ?? e.taunt_zh, taunt_en: p.taunt_en ?? e.taunt_en, prop: p.prop ?? e.prop ?? "", puzzle: { title: p.title, body: p.body, clues: p.clues, question: p.question }, english: e.english },
-      check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict, choices: ck.choices, tools: ck.tools } : undefined,
+      check: ck ? { where: ck.where, claim: ck.claim, likes: ck.likes, comments: ck.comments, photo: asset(a.check), photo_pos: ck.photo_pos, credit: ck.photo_credit, clues: ck.clues, verdict: ck.verdict, choices: ckChoices, tools: ckTools } : undefined,
       think: th ? { title: th.title, title_en: th.title_en, story: th.story, photo: asset(a.think), photo_pos: th.photo_pos, credit: th.photo_credit, sides: th.sides, role: th.role, deeper: th.deeper } : undefined,
       mailbox: { ...strip(mb), answers: undefined },
-      _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { skill: ck.skill, truth: ck.truth ?? ck.answer, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
+      _answers: { puzzle: p.answer, puzzle_solution: p.solution, english: e.answers, story_secret: s.secret, check: ck ? { skill: ck.skill ?? (ckParams.skill || undefined), truth: ck.truth ?? ck.answer, verdict: ck.verdict, explain: ck.explain, sources: ck.sources } : undefined, creature_sources: cr?.sources, think_guide: th?.parent_guide, think_source: th?.source },
     };
     if (nw) {
       issueJson.news = {
@@ -619,9 +590,15 @@ export function createPipeline(issueArg) {
         updated.push(st.log);
       } else if (cr.log_update) appendSection("creature-log.md", `No.${cr.no}`, `- No.${cr.no}（第 ${padNum} 期）：${cr.log_update}`);
     }
+    // 周末思辨：有 state/think/ 就追加 log.jsonl；旧数据目录照旧追加 think-log.md
     if (useThink()) {
-      const th = read("08-think.json");
-      if (th.log_update) appendSection("think-log.md", `第 ${padNum} 期`, `- 第 ${padNum} 期（${b.date}）：${th.log_update}`);
+      const th = read("08-think.json"), st = registry.find(x => x.id === "think")?.manifest.state;
+      if (st && existsSync(join(dataDir, "state", "think"))) {
+        const logPath = join(dataDir, st.log), cur = existsSync(logPath) ? readFileSync(logPath, "utf8") : "";
+        if (!cur.split("\n").filter(Boolean).some(l => JSON.parse(l).issue === num))
+          atomicWrite(logPath, cur.replace(/\s*$/, cur.trim() ? "\n" : "") + JSON.stringify({ issue: num, date: b.date, title: th.title, summary: th.log_update ?? "" }) + "\n");
+        updated.push(st.log);
+      } else if (th.log_update) appendSection("think-log.md", `第 ${padNum} 期`, `- 第 ${padNum} 期（${b.date}）：${th.log_update}`);
     }
 
     // 成品/NNN/：文件名照 pipeline/README.md「目录」；讲读版只在第 70 步有效时复制

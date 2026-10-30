@@ -21,11 +21,17 @@ function render(data) {
   const template = issueHtml({ data });
   ids = cardIds(template);
   vm.runInContext(template.match(/<script>([\s\S]*?)<\/script>/)[1], context);
-  return id => root.outerHTML.match(new RegExp(`<section class="[^"]*" id="${id}">[\\s\\S]*?<\\/section>`))[0];
+  return id => {
+    // 旧版页面的 id 直接在 <section> 上；栏目包的 id 在外层 <div class="section">，里面才是 <section class="card">
+    const legacy = root.outerHTML.match(new RegExp(`<section class="[^"]*" id="${id}">[\\s\\S]*?<\\/section>`));
+    if (legacy) return legacy[0];
+    const at = root.outerHTML.indexOf(`id="${id}">`);
+    return root.outerHTML.slice(at).match(/<section[\s\S]*?<\/section>/)[0];
+  };
 }
 
 test("tablet challenge separates conditions and question, and reveals this issue's answers on the page", () => {
-  const data = issue(), card = render(data)("c5");
+  const data = issue(), card = render(data)("challenge");
   assert.match(card, /class="clues"><li>/);
   assert.ok(card.replace(/<[^>]+>/g, "").includes(data.challenge.puzzle.question));
   assert.ok(card.includes(data._answers.puzzle));
@@ -40,7 +46,7 @@ test("legacy body-only puzzles render without writing areas or English answers w
   delete data.challenge.english;
   data.challenge.puzzle.slots = ["___"];
   assert.deepEqual(validateIssue(data), []);
-  const card = render(data)("c5");
+  const card = render(data)("challenge");
   assert.ok(card.replace(/<[^>]+>/g, "").includes(data.challenge.puzzle.body));
   assert.doesNotMatch(card, /class="clues"|class="english-key"|___/);
 });
@@ -69,7 +75,7 @@ test("standard challenge samples omit optional English and each has one solution
   for (const sample of Object.values(samples)) {
     const data = issue(); data.challenge = { taunt_zh: sample.taunt_zh, taunt_en: "Three clues. Can you solve it?", prop: sample.prop, puzzle: sample.puzzle }; data._answers.puzzle = sample.answer;
     assert.deepEqual(validateIssue(data), []);
-    const card = render(data)("c5");
+    const card = render(data)("challenge");
     assert.doesNotMatch(card, /class="route"|english-key|with-english|Three clues/);
     assert.ok(card.indexOf('class="clues"') < card.indexOf('class="question"'));
   }
@@ -110,7 +116,7 @@ test("short and full-budget Chinese challenges fit both character modes with sma
     for (const mode of ["svg", "png"]) {
       let html = issueHtml({ data, characterPack: mode === "png" ? loadCharacterPack("storybook-v1") : null });
       html = html.replace("</body>", `<script>window.READY.then(()=>{
-        const c=document.querySelector('#c5'),r=c.getBoundingClientRect(),p=c.querySelector('.puz').getBoundingClientRect(),a=c.querySelector('.answer-key').getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
+        const c=document.querySelector('#challenge > .card'),r=c.getBoundingClientRect(),p=c.querySelector('.puz').getBoundingClientRect(),a=c.querySelector('.answer-key').getBoundingClientRect(),f=c.querySelector('.foot').getBoundingClientRect();
         const result={compact:c.classList.contains('challenge-compact'),footer:f.bottom<=r.bottom-56+1,answer:p.bottom+15<=a.top&&a.bottom<=f.top,
           answerSmall:parseFloat(getComputedStyle(c.querySelector('.puzzle-key')).fontSize)<=20&&parseFloat(getComputedStyle(c.querySelector('.puzzle-key')).fontSize)<parseFloat(getComputedStyle(c.querySelector('.clues li')).fontSize)&&Number(getComputedStyle(c.querySelector('.puzzle-key')).fontWeight)<=400,
           text:[...c.querySelectorAll('.taunt-text,.puz h3,.body,.clues li>span,.question,.answer-content')].every(e=>e.scrollWidth<=e.clientWidth+1),
@@ -119,7 +125,7 @@ test("short and full-budget Chinese challenges fit both character modes with sma
         const e=document.createElement('pre');e.id='layout-result';e.textContent=JSON.stringify(result);document.body.append(e);
       });</script></body>`);
       const file = join(dir, name + "-" + mode + ".html"); writeFileSync(file, html);
-      const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", `--user-data-dir=${join(dir, name + "-" + mode + "-profile")}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#c5"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 45000 });
+      const dom = execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", `--user-data-dir=${join(dir, name + "-" + mode + "-profile")}`, "--window-size=1080,1440", "--virtual-time-budget=5000", "--dump-dom", pathToFileURL(file).href + "#challenge"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 30 * 1024 * 1024, timeout: 45000 });
       const result = dom.match(/<pre id="layout-result">(\{[^<]+\})<\/pre>/);
       assert.ok(result, `${name}/${mode}: browser did not finish layout measurement`);
       const metrics = JSON.parse(result[1]);

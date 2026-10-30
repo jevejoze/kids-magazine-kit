@@ -1,0 +1,10 @@
+{
+  "id": "challenge",
+  "title": "挑战",
+  "consumes": [],
+  "params": {},
+  "rules": [],
+  "image_policy": "free-only",
+  "narration": { "lines": 12 },
+  "state": null
+}

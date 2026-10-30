@@ -11,13 +11,13 @@ const chrome = process.env.CHROME || ["/Applications/Google Chrome.app/Contents/
 test("custom bubble tails do not stretch or inherit an extra border in Chrome", { skip: !chrome }, t => {
   const dir = mkdtempSync(join(tmpdir(), "kids-bubbles-"));
   t.after(() => rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }));
-  const css = ["../assets/style.css", "../sections/story/page.css"].map(f => readFileSync(new URL(f, import.meta.url), "utf8")).join("\n");
+  const css = ["../assets/style.css", "../sections/story/page.css", "../sections/challenge/page.css", "../sections/think/page.css"].map(f => readFileSync(new URL(f, import.meta.url), "utf8")).join("\n");
   const bubble = id => `<div class="bub" data-test="${id}">第一行对话<br>第二行对话</div>`;
   const html = `<!doctype html><meta charset="utf-8"><style>${css}</style>
     <div id="story">${["owl", "raccoon", "general"].map(role => `<div class="act ${role}-act">${bubble(role)}</div>`).join("")}
       ${["mouse", "dog"].map(role => `<div class="duo-row ${role}-row">${bubble(role)}</div>`).join("")}</div>
-    <div id="c5"><div class="taunt">${bubble("challenge")}</div></div>
-    <div id="cthink">${[0, 1].map(i => `<div class="side s${i}">${bubble("think" + i)}</div>`).join("")}</div>
+    <div id="challenge"><div class="card"><div class="taunt">${bubble("challenge")}</div></div></div>
+    <div id="think"><div class="card">${[0, 1].map(i => `<div class="side s${i}">${bubble("think" + i)}</div>`).join("")}</div></div>
     ${bubble("default")}
     <script>document.body.dataset.tails=JSON.stringify([...document.querySelectorAll('[data-test]')].map(el=>{
       const s=getComputedStyle(el,'::after');return {id:el.dataset.test,height:s.height,left:s.borderLeftWidth,

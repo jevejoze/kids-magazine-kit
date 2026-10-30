@@ -1,0 +1,51 @@
+/* 周末思辨：故事 → 两个成员各站一边 → 换你来 → 追问 → 我的想法。页面 id 是 #think，卡片在里面的 .card */
+#think .card .side .bub:after{inset:auto;margin:0;border:0;width:0;height:0}
+#think .card{background:#EEF3FF}
+#think .card .h1{font-size:62px}
+#think .card .h1 .en{font-size:32px}
+#think .card .story{margin-top:16px;padding:16px 26px;font-size:28px;line-height:1.45;flex:none;display:flex;gap:20px;align-items:center}
+#think .card .story .pic{flex:0 0 280px;height:180px;border-radius:20px;border:4px solid var(--ink);background-size:cover}
+#think .card .sides{display:flex;gap:14px;margin-top:14px;position:relative;align-items:stretch}
+#think .card .side{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  gap:10px;background:#FFF;border:4px solid var(--ink);border-radius:26px;box-shadow:0 7px 0 var(--ink);
+  padding:14px 12px 10px;position:relative;
+}
+#think .card .side.s0{background:#FFFDF5}
+#think .card .side.s1{background:#FAF8F5}
+#think .card .side .char-stage{
+  height:120px;display:flex;align-items:flex-end;justify-content:center;
+  filter:drop-shadow(0 5px 0 rgba(74,59,50,.16));flex-shrink:0;
+}
+#think .card .side .char-stage svg{max-height:120px;width:auto;display:block}
+#think .card .side .bub{
+  font-size:26px;line-height:1.35;margin:0;padding:10px 14px;width:100%;text-align:center;
+  border-radius:18px;border:3px solid var(--ink);position:relative;box-shadow:0 3px 0 rgba(74,59,50,.08);
+}
+#think .card .side.s0 .bub{background:#FFF8E1}
+#think .card .side.s0 .bub:after{
+  content:"";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--ink);
+}
+#think .card .side.s1 .bub{background:#F5EFEB}
+#think .card .side.s1 .bub:after{
+  content:"";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--ink);
+}
+#think .card .vs-emblem{
+  background:#FF5E5E;color:#FFF;border:4px solid var(--ink);border-radius:50%;
+  width:62px;height:62px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:800;box-shadow:0 5px 0 var(--ink);transform:rotate(-5deg);
+  align-self:center;flex-shrink:0;margin:0 -10px;z-index:2;
+}
+#think .card .role{margin-top:14px;padding:12px 24px;font-size:28px;line-height:1.4;background:var(--butter);flex:none}
+#think .card .role b,#think .card .deeper b{display:block;font-weight:400;font-size:25px;color:var(--tomato)}
+#think .card .role b{color:var(--ink)}
+#think .card .deeper{margin-top:14px;padding:10px 24px;font-size:27px;line-height:1.38;flex:none}
+#think .card .deeper p:before{content:"· "}
+#think .card .mine{margin-top:14px;padding:10px 24px 12px;flex:1;display:flex;flex-direction:column;min-height:0}
+#think .card .mine h3{font-size:28px;font-weight:400}
+#think .card .mine .lines{flex:1;display:flex;flex-direction:column;justify-content:space-around}
+#think .card .mine .after{margin-top:auto;display:flex;align-items:center;gap:12px;font-size:24px}
+#think .card .mine .after span{border:3px solid var(--ink);border-radius:999px;padding:2px 14px;background:#fff}
+#think .card .credit2{font-size:15px;color:var(--soft);margin-top:6px;line-height:1.3}

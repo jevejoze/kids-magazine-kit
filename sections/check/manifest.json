@@ -1,0 +1,14 @@
+{
+  "id": "check",
+  "title": "真的假的",
+  "consumes": [],
+  "params": {
+    "skill": { "type": "string", "default": "" },
+    "choices": { "type": "string", "default": "" },
+    "tools": { "type": "string", "default": "" }
+  },
+  "rules": ["no-visible-pedagogy"],
+  "image_policy": "private-ok",
+  "narration": { "lines": 12 },
+  "state": null
+}

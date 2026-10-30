@@ -58,50 +58,17 @@ if (legacy("words") && W) cards.push(`<section class="card" id="c3">${topBar("�
   <div class="box task"><div class="fun">✍️ 轮到你：${W.task}</div>${lines(W.lines || 2)}</div>
   ${foot("主持：波波鼠 Boba Mouse")}</section>`);
 
-// 挑战卡：默认一道中文谜题；仅在明确启用时兼容旧英文三关。
-const P = D.challenge;
-const answerText = value => escapeText(Array.isArray(value) ? value.join("；") : value ?? "");
-if (legacy("challenge") && P) cards.push(`<section class="card${P.english?.length ? " with-english" : ""}" id="c5">${topBar("🧩 捣蛋浣熊的挑战")}
-  <div class="taunt">${ch("raccoon:smirk:136:" + (P.prop || ""))}<div class="bub"><span class="taunt-text">${wrapChineseWords(P.taunt_zh)}</span>${P.english?.length && P.taunt_en ? `<span class="en">${escapeText(P.taunt_en)}</span>` : ""}</div></div>
-  <div class="puz"><div class="puzzle-label">浣熊出题</div><h3 class="fun">${wrapChineseWords(P.puzzle.title)}</h3><div class="body">${wrapChineseWords(P.puzzle.body)}</div>
-    ${P.puzzle.clues?.length ? `<div class="clue-label">${P.puzzle.clues.length} 条线索 · 每条都要满足</div><ol class="clues">${P.puzzle.clues.map(clue => `<li><span>${wrapChineseWords(clue)}</span></li>`).join("")}</ol>` : ""}
-    ${P.puzzle.question ? `<div class="question"><b>你来判断</b><span>${wrapChineseWords(P.puzzle.question)}</span></div>` : ""}</div>
-  ${P.english?.length ? `<div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
-    <div class="q"><div class="cn fun">${e.cn}</div><div class="en">${e.en}</div></div></div>`).join("")}</div>` : ""}
-  <div class="answer-key"><div class="answer-content"><b>参考答案 · 想好再看</b><p class="puzzle-key">${answerText(D._answers?.puzzle)}</p>
-    ${P.english?.length ? `<p class="english-key">英文：${(D._answers?.english || []).map((answer, i) => `${i + 1}. ${answerText(answer)}`).join("　")}</p>` : ""}</div></div>
-  ${foot("想好了？转动平板，核对本页答案")}</section>`);
+// 挑战：sections/challenge
+legacy("challenge");
 
-// 真的假的（每天一页）：一条网上流传的说法，快脑袋先投票，慢脑袋按线索查，答案倒着印；有思维课表时选项和查证工具跟着本周换
-const CK = D.check;
-const CK_CHOICES = CK?.choices ?? ["✅ 真的", "❌ 假的", "🤔 说不清"];
-const CK_TOOLS = CK?.tools ?? [["👤 谁说的？", "他怎么知道的"], ["🧪 有证据吗？", "实验、照片、数字"], ["📚 别处怎么说？", "再找一个来源"]];
-if (legacy("check") && CK) cards.push(`<section class="card" id="ccheck">${topBar("🕵️ 真的假的 · True or False?")}
-  <div class="box post${CK.photo ? " has-pic" : ""}"><div class="txt"><div class="ph fun">📱 ${CK.where}</div><div class="claim fun">${CK.claim}</div><div class="likes en">👍 ${CK.likes || "10万+"}　💬 ${CK.comments || "2,333"}</div></div>
-    ${CK.photo ? `<div class="pic" style="background-image:url('${CK.photo}');background-position:${CK.photo_pos || "center"}"></div>` : ""}</div>
-  <div class="vote fun">你的快脑袋说：${CK_CHOICES.map(c => `<span>${c}</span>`).join("")}</div>
-  <div class="tools fun">${CK_TOOLS.map(([t, s]) => `<span>${t}<small>${s}</small></span>`).join("")}</div>
-  <div class="box clues fun"><h3>🦉 慢脑袋查一查</h3>${CK.clues.map((c, i) => `<p><b>${i + 1}</b>${c}</p>`).join("")}</div>
-  <div class="box mine fun"><h3>🕵️ 我的结论：${CK.choices ? CK_CHOICES.map(c => c.replace(/^\S+\s/, "")).join(" / ") : "真 / 假"}，因为……</h3>${lines(2)}</div>
-  <div class="upside fun"><span>👀 倒过来看答案：</span>${CK.verdict}</div>
-  ${CK.credit ? `<div class="credit2 en">${CK.credit}</div>` : ""}
-  ${foot(`看完再倒过来对答案${NEXT("真的假的")}`)}</section>`);
+// 真的假的：sections/check
+legacy("check");
 
 // 经典连载：sections/serial-{book,music,film,make}，按本期 kind 选一个包
 legacy("serial");
 
-// 周末思辨（周五）：一个两边都有道理的话题，孩子先写下想法，周六和家人聊
-const TK = D.think;
-if (legacy("think") && TK) cards.push(`<section class="card" id="cthink">${topBar("🗣️ 周末思辨 · Big Talk", "周六聊一聊")}
-  <div class="h1 fun">${TK.title}${TK.title_en ? `<span class="en">${TK.title_en}</span>` : ""}</div>
-  <div class="box story fun${TK.photo ? " has-pic" : ""}">${TK.photo ? `<div class="pic" style="background-image:url('${TK.photo}');background-position:${TK.photo_pos || "center"}"></div>` : ""}<p>${TK.story}</p></div>
-  <div class="sides">${TK.sides.map((x, i) => `<div class="side s${i}"><div class="bub fun">${x.say}</div><div class="char-stage">${ch(x.who)}</div></div>`).join(`<div class="vs-emblem en">VS</div>`)}</div>
-  <div class="box role fun"><b>🎭 换你来</b>${TK.role}</div>
-  <div class="box deeper fun"><b>🤔 再想深一点</b>${TK.deeper.map(q => `<p>${q}</p>`).join("")}</div>
-  <div class="box mine fun"><h3>✏️ 我的想法：______，因为……</h3>${lines(2)}
-    <div class="after">周六聊完，我的想法：<span>没变</span><span>变了一点</span><span>完全变了</span></div></div>
-  ${TK.credit ? `<div class="credit2 en">${TK.credit}</div>` : ""}
-  ${foot(`周六和家人聊一聊，听听别人怎么想${NEXT("周末思辨")}`)}</section>`);
+// 周末思辨：sections/think
+legacy("think");
 
 // 信箱（最后一页）：几句关于本期的问题，孩子口头答、家长拍照或转述都行
 const M = D.mailbox;
@@ -146,7 +113,7 @@ function fitCards() {
   }
 }
 function fitChallengeLayout() {
-  const card = document.querySelector("#c5"), foot = card?.querySelector(".foot");
+  const card = document.querySelector("#challenge > .card"), foot = card?.querySelector(".foot");
   if (!foot || !card.getBoundingClientRect().height) return;
   card.classList.remove("challenge-compact", "challenge-roomy");
   const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);

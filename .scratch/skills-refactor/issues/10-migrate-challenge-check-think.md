@@ -4,10 +4,10 @@
 
 **Blocked by:** 07
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] 三个栏目包齐全
-- [ ] 课表参数（focus、choices、tools、friday_topic）经 params 传到 check 和 page.js
-- [ ] 两个栏目的任务单里带 no-visible-pedagogy 规则
-- [ ] 现有挑战测试改到新路径后照样通过
-- [ ] 相关旧期像素一致
+- [x] 三个栏目包齐全
+- [x] 课表参数（choices、tools、friday_topic；工单写的 focus 沿用代码里现成的参数名 skill）经 params 传到 check 和 page.js
+- [x] 两个栏目的任务单里带 no-visible-pedagogy 规则
+- [x] 现有挑战测试改到新路径后照样通过
+- [x] 相关旧期像素一致

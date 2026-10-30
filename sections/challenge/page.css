@@ -1,0 +1,71 @@
+/* 挑战 · 页面 id 是 #challenge，卡片在里面的 .card */
+#challenge .card .taunt .bub:after{inset:auto;margin:0;border:0;width:0;height:0}
+#challenge .card{background:#F1ECFA}
+#challenge .card .dots{opacity:.3}
+#challenge .card>.top,#challenge .card>.taunt,#challenge .card>.puz,#challenge .card>.route,#challenge .card>.answer-key,#challenge .card>.foot{flex-shrink:0}
+#challenge .card .taunt{display:flex;align-items:center;gap:22px;margin-top:18px;position:relative;padding:0 8px}
+#challenge .card .taunt .ch{flex-shrink:0;filter:drop-shadow(0 4px 0 rgba(74,59,50,.1))}
+#challenge .card .taunt .bub{font-size:28px;font-weight:600;line-height:1.4;width:auto;flex:1;min-width:0;margin:0;background:#FFFDF7;border:3px solid var(--ink);border-radius:20px;box-shadow:0 4px 0 #D7CCEB;padding:12px 20px;position:relative}
+#challenge .card .taunt-text{display:block}
+#challenge .card .taunt .bub .en{font-size:24px;color:var(--soft);margin-top:4px;display:block}
+#challenge .card .taunt .bub:before{content:"";position:absolute;left:-12px;top:30px;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:12px solid var(--ink)}
+#challenge .card .taunt .bub:after{content:"";position:absolute;left:-7px;top:31px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:9px solid #FFFDF7}
+#challenge .card .puz{padding:24px 28px;margin-top:16px;position:relative;background:#FFFDF9;border:3px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 #CBBDE0}
+#challenge .card:not(.with-english) .puz{margin-bottom:16px}
+#challenge .card .puzzle-label{font-size:21px;font-weight:600;color:#75608D;letter-spacing:2px;margin-bottom:8px}
+#challenge .card .puz h3{font-size:48px;line-height:1.25;margin-bottom:14px;font-weight:400}
+#challenge .card .puz .body{font-size:32px;line-height:1.5}
+#challenge .card .clue-label{font-size:21px;color:#75608D;font-weight:600;margin-top:22px;margin-bottom:10px}
+#challenge .card .clues{list-style:none;counter-reset:clue;display:flex;flex-direction:column;gap:10px}
+#challenge .card .clues li{counter-increment:clue;display:flex;align-items:flex-start;gap:14px;padding:10px 14px;background:#F4F0FA;border-radius:12px;font-size:32px;line-height:1.45}
+#challenge .card .clues li>span{min-width:0;flex:1}
+#challenge .card .clues li:before{content:counter(clue);flex:0 0 32px;height:32px;margin-top:6px;border-radius:50%;background:#E5DBF4;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600}
+#challenge .card .question{margin-top:18px;padding-top:18px;border-top:2px solid #DFD5EC;font-size:32px;line-height:1.4;font-weight:600}
+#challenge .card .question b{display:block;font-size:21px;color:#75608D;margin-bottom:6px}
+#challenge .card .answer-key{position:relative;align-self:flex-end;max-width:100%;margin:auto 0 16px;padding:10px 14px;border:1px dashed #D2C7DD;border-radius:10px;background:transparent}
+#challenge .card .foot{margin-top:0;font-size:24px}
+#challenge .card .answer-content{transform:rotate(180deg);font-size:20px;line-height:1.4;color:#81758D}
+#challenge .card .answer-content>b{display:block;font-size:15px;font-weight:400;color:#93879E;margin-bottom:4px}
+#challenge .card .answer-content .puzzle-key{font-weight:400}
+#challenge .card .answer-content .english-key{font-size:18px;line-height:1.4;margin-top:6px}
+#challenge .card.with-english .puz{padding:16px 24px;margin-top:16px}
+#challenge .card.with-english .puz h3{font-size:34px;margin-bottom:8px}
+#challenge .card.with-english .puz .body,#challenge .card.with-english .clues li{font-size:26px;line-height:1.4}
+#challenge .card.with-english .clues{gap:8px;margin-top:10px}
+#challenge .card.with-english .clues li:before{flex-basis:30px;height:30px;margin-top:3px;font-size:21px}
+#challenge .card.with-english .question{font-size:28px;margin-top:12px;padding:10px 0 0}
+#challenge .card.with-english .question b{display:none}
+#challenge .card.with-english .taunt .bub{font-size:27px}
+#challenge .card.with-english .taunt .bub .en{font-size:22px}
+#challenge .card.with-english .answer-key{padding:12px 20px;margin-top:18px}
+#challenge .card .route{position:relative;margin-top:6px}
+#challenge .card .route:before{content:"";position:absolute;left:58px;top:20px;bottom:20px;border-left:6px dotted var(--lav)}
+#challenge .card .lv{display:flex;gap:20px;align-items:flex-start;margin-top:14px;padding:12px 24px;flex:none}
+#challenge .card .lv .st{flex:0 0 120px;text-align:center;font-size:26px;background:var(--lav);border:4px solid var(--ink);border-radius:20px;padding:6px 0;line-height:1.2}
+#challenge .card .lv .st b{display:block;font-size:22px;font-weight:400}
+#challenge .card .lv.l1 .st{background:#B9D9FF}#challenge .card .lv.l2 .st{background:#FFD45C}
+#challenge .card .lv .q{flex:1}
+#challenge .card .lv .cn{font-size:23px;color:var(--soft)}
+#challenge .card .lv .en{font-size:26px;line-height:1.3}
+#challenge .card.with-english .clue-label,#challenge .card.with-english .puzzle-label{display:none}
+#challenge .card.with-english .clues li{padding:0;background:none}
+#challenge .card.with-english .question{border-top:0}
+/* Short questions spread out instead of leaving the lower page empty. */
+#challenge .card.challenge-roomy .puz{padding:32px 34px;margin-top:24px}
+#challenge .card.challenge-roomy .puz h3{font-size:52px;margin-bottom:20px}
+#challenge .card.challenge-roomy .puz .body{font-size:34px;line-height:1.6}
+#challenge .card.challenge-roomy .clue-label{margin-top:30px;margin-bottom:14px}
+#challenge .card.challenge-roomy .clues{gap:16px}
+#challenge .card.challenge-roomy .clues li{padding:16px 18px;font-size:34px;line-height:1.5}
+#challenge .card.challenge-roomy .question{margin-top:28px;padding-top:26px;font-size:34px}
+/* Long questions keep readable type; compact spacing only when the page needs it. */
+#challenge .card.challenge-compact .taunt{margin-top:12px}
+#challenge .card.challenge-compact .taunt .ch{width:120px;height:120px}
+#challenge .card.challenge-compact .puz{padding:20px 26px;margin-top:14px}
+#challenge .card.challenge-compact .puzzle-label{display:none}
+#challenge .card.challenge-compact .puz h3{font-size:42px;margin-bottom:12px}
+#challenge .card.challenge-compact .puz .body{font-size:30px;line-height:1.4}
+#challenge .card.challenge-compact .clue-label{margin-top:16px;margin-bottom:8px}
+#challenge .card.challenge-compact .clues{gap:8px}
+#challenge .card.challenge-compact .clues li{font-size:30px;line-height:1.4;padding:6px 12px}
+#challenge .card.challenge-compact .question{margin-top:14px;padding-top:12px;font-size:30px}

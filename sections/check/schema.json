@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "真的假的 19-check.json",
+  "type": "object",
+  "required": ["where", "claim", "clues", "verdict", "explain", "sources"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "where": { "type": "string", "minLength": 1 },
+    "claim": { "type": "string", "minLength": 1, "maxLength": 30 },
+    "likes": { "type": "string" },
+    "comments": { "type": "string" },
+    "photo_url": { "type": "string" },
+    "photo_pos": { "type": "string" },
+    "photo_credit": { "type": "string" },
+    "clues": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "maxLength": 36 } },
+    "choices": { "type": "array", "minItems": 2, "maxItems": 3, "items": { "type": "string", "maxLength": 8 } },
+    "answer": { "type": "string" },
+    "truth": { "type": "string", "enum": ["true", "false", "half"] },
+    "skill": { "type": "string", "maxLength": 10 },
+    "tools": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } } },
+    "verdict": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "explain": { "type": "string", "minLength": 1 },
+    "sources": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+  }
+}

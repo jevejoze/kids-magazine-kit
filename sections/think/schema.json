@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "周末思辨 08-think.json",
+  "type": "object",
+  "required": ["title", "story", "sides", "role", "deeper", "parent_guide", "source", "log_update"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "title": { "type": "string", "minLength": 1, "maxLength": 18 },
+    "title_en": { "type": "string" },
+    "story": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "photo_url": { "type": "string" },
+    "photo_pos": { "type": "string" },
+    "photo_credit": { "type": "string" },
+    "sides": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "object", "required": ["who", "say"], "properties": { "who": { "type": "string" }, "say": { "type": "string", "maxLength": 36 } } } },
+    "role": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "deeper": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string", "maxLength": 30 } },
+    "parent_guide": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "log_update": { "type": "string" }
+  }
+}

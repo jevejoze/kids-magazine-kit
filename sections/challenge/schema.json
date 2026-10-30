@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "挑战 14-puzzle.json",
+  "type": "object",
+  "required": ["title", "body", "answer", "solution", "taunt_zh", "question"],
+  "properties": {
+    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
+    "taunt_zh": { "type": "string", "minLength": 1, "maxLength": 20 },
+    "taunt_en": { "type": "string" },
+    "prop": { "type": "string" },
+    "title": { "type": "string", "minLength": 1 },
+    "body": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "clues": { "type": "array", "items": { "type": "string" } },
+    "question": { "type": "string", "minLength": 1 },
+    "answer": { "type": "string", "minLength": 1 },
+    "solution": { "type": "string", "minLength": 1 }
+  }
+}

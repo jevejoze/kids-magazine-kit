@@ -136,7 +136,8 @@ const once = method => new Promise((ok, fail) => {
       const r = c.getBoundingClientRect(), foot = c.querySelector('.foot'), prev = foot?.previousElementSibling;
       const clip = foot ? Math.round(foot.getBoundingClientRect().bottom - (r.bottom - 8)) : 0;
       const overlap = foot && prev ? Math.round(prev.getBoundingClientRect().bottom - foot.getBoundingClientRect().top) : 0;
-      const textSelector = (c.closest(".section")?.id ?? c.id) === "comic" ? ".bubble-text,.takeaway,.fact,.h1" : c.id === "c5" ? ".taunt-text,.puz h3,.puz .body,.clues li>span,.question,.answer-content" : null;
+      const sectionId = c.closest(".section")?.id ?? c.id;
+      const textSelector = sectionId === "comic" ? ".bubble-text,.takeaway,.fact,.h1" : sectionId === "challenge" ? ".taunt-text,.puz h3,.puz .body,.clues li>span,.question,.answer-content" : null;
       const spill = Boolean(textSelector) && [...c.querySelectorAll(textSelector)].some(el => el.scrollWidth > el.clientWidth + 1);
       return { id: c.closest('.section')?.id ?? c.id, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, clip, overlap, spill };
     }))`,

@@ -23,9 +23,6 @@ svg.ch{display:block}
 /* 通用：气泡 */
 .bub{background:#FFF8EE;border:4px solid var(--ink);border-radius:28px;padding:16px 20px;font-size:30px;line-height:1.38;position:relative;margin-bottom:10px;width:100%}
 .bub:after{content:"";position:absolute;bottom:-20px;left:50%;margin-left:-14px;border:14px solid transparent;border-top-color:var(--ink)}
-/* Custom tails must clear the default downward tail before setting their own sides. */
-#c5 .taunt .bub:after,
-#cthink .side .bub:after{inset:auto;margin:0;border:0;width:0;height:0}
 .bub.en{font-size:34px;background:#E9F6FF}
 
 /* 通用：写字格 */
@@ -48,76 +45,6 @@ svg.ch{display:block}
 #c3 .w .ex b{color:var(--tomato);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:6px}
 #c3 .task{margin-top:22px;font-size:30px;padding:18px 30px 14px;background:#FFFDF2;flex:none}
 
-/* card 5 挑战：情境 → 线索 → 判断，答案倒印 */
-#c5{background:#F1ECFA}
-#c5 .dots{opacity:.3}
-#c5>.top,#c5>.taunt,#c5>.puz,#c5>.route,#c5>.answer-key,#c5>.foot{flex-shrink:0}
-#c5 .taunt{display:flex;align-items:center;gap:22px;margin-top:18px;position:relative;padding:0 8px}
-#c5 .taunt .ch{flex-shrink:0;filter:drop-shadow(0 4px 0 rgba(74,59,50,.1))}
-#c5 .taunt .bub{font-size:28px;font-weight:600;line-height:1.4;width:auto;flex:1;min-width:0;margin:0;background:#FFFDF7;border:3px solid var(--ink);border-radius:20px;box-shadow:0 4px 0 #D7CCEB;padding:12px 20px;position:relative}
-#c5 .taunt-text{display:block}
-#c5 .taunt .bub .en{font-size:24px;color:var(--soft);margin-top:4px;display:block}
-#c5 .taunt .bub:before{content:"";position:absolute;left:-12px;top:30px;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:12px solid var(--ink)}
-#c5 .taunt .bub:after{content:"";position:absolute;left:-7px;top:31px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:9px solid #FFFDF7}
-#c5 .puz{padding:24px 28px;margin-top:16px;position:relative;background:#FFFDF9;border:3px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 #CBBDE0}
-#c5:not(.with-english) .puz{margin-bottom:16px}
-#c5 .puzzle-label{font-size:21px;font-weight:600;color:#75608D;letter-spacing:2px;margin-bottom:8px}
-#c5 .puz h3{font-size:48px;line-height:1.25;margin-bottom:14px;font-weight:400}
-#c5 .puz .body{font-size:32px;line-height:1.5}
-#c5 .clue-label{font-size:21px;color:#75608D;font-weight:600;margin-top:22px;margin-bottom:10px}
-#c5 .clues{list-style:none;counter-reset:clue;display:flex;flex-direction:column;gap:10px}
-#c5 .clues li{counter-increment:clue;display:flex;align-items:flex-start;gap:14px;padding:10px 14px;background:#F4F0FA;border-radius:12px;font-size:32px;line-height:1.45}
-#c5 .clues li>span{min-width:0;flex:1}
-#c5 .clues li:before{content:counter(clue);flex:0 0 32px;height:32px;margin-top:6px;border-radius:50%;background:#E5DBF4;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600}
-#c5 .question{margin-top:18px;padding-top:18px;border-top:2px solid #DFD5EC;font-size:32px;line-height:1.4;font-weight:600}
-#c5 .question b{display:block;font-size:21px;color:#75608D;margin-bottom:6px}
-#c5 .answer-key{position:relative;align-self:flex-end;max-width:100%;margin:auto 0 16px;padding:10px 14px;border:1px dashed #D2C7DD;border-radius:10px;background:transparent}
-#c5 .foot{margin-top:0;font-size:24px}
-#c5 .answer-content{transform:rotate(180deg);font-size:20px;line-height:1.4;color:#81758D}
-#c5 .answer-content>b{display:block;font-size:15px;font-weight:400;color:#93879E;margin-bottom:4px}
-#c5 .answer-content .puzzle-key{font-weight:400}
-#c5 .answer-content .english-key{font-size:18px;line-height:1.4;margin-top:6px}
-#c5.with-english .puz{padding:16px 24px;margin-top:16px}
-#c5.with-english .puz h3{font-size:34px;margin-bottom:8px}
-#c5.with-english .puz .body,#c5.with-english .clues li{font-size:26px;line-height:1.4}
-#c5.with-english .clues{gap:8px;margin-top:10px}
-#c5.with-english .clues li:before{flex-basis:30px;height:30px;margin-top:3px;font-size:21px}
-#c5.with-english .question{font-size:28px;margin-top:12px;padding:10px 0 0}
-#c5.with-english .question b{display:none}
-#c5.with-english .taunt .bub{font-size:27px}
-#c5.with-english .taunt .bub .en{font-size:22px}
-#c5.with-english .answer-key{padding:12px 20px;margin-top:18px}
-#c5 .route{position:relative;margin-top:6px}
-#c5 .route:before{content:"";position:absolute;left:58px;top:20px;bottom:20px;border-left:6px dotted var(--lav)}
-#c5 .lv{display:flex;gap:20px;align-items:flex-start;margin-top:14px;padding:12px 24px;flex:none}
-#c5 .lv .st{flex:0 0 120px;text-align:center;font-size:26px;background:var(--lav);border:4px solid var(--ink);border-radius:20px;padding:6px 0;line-height:1.2}
-#c5 .lv .st b{display:block;font-size:22px;font-weight:400}
-#c5 .lv.l1 .st{background:#B9D9FF}#c5 .lv.l2 .st{background:#FFD45C}
-#c5 .lv .q{flex:1}
-#c5 .lv .cn{font-size:23px;color:var(--soft)}
-#c5 .lv .en{font-size:26px;line-height:1.3}
-#c5.with-english .clue-label,#c5.with-english .puzzle-label{display:none}
-#c5.with-english .clues li{padding:0;background:none}
-#c5.with-english .question{border-top:0}
-/* Short questions spread out instead of leaving the lower page empty. */
-#c5.challenge-roomy .puz{padding:32px 34px;margin-top:24px}
-#c5.challenge-roomy .puz h3{font-size:52px;margin-bottom:20px}
-#c5.challenge-roomy .puz .body{font-size:34px;line-height:1.6}
-#c5.challenge-roomy .clue-label{margin-top:30px;margin-bottom:14px}
-#c5.challenge-roomy .clues{gap:16px}
-#c5.challenge-roomy .clues li{padding:16px 18px;font-size:34px;line-height:1.5}
-#c5.challenge-roomy .question{margin-top:28px;padding-top:26px;font-size:34px}
-/* Long questions keep readable type; compact spacing only when the page needs it. */
-#c5.challenge-compact .taunt{margin-top:12px}
-#c5.challenge-compact .taunt .ch{width:120px;height:120px}
-#c5.challenge-compact .puz{padding:20px 26px;margin-top:14px}
-#c5.challenge-compact .puzzle-label{display:none}
-#c5.challenge-compact .puz h3{font-size:42px;margin-bottom:12px}
-#c5.challenge-compact .puz .body{font-size:30px;line-height:1.4}
-#c5.challenge-compact .clue-label{margin-top:16px;margin-bottom:8px}
-#c5.challenge-compact .clues{gap:8px}
-#c5.challenge-compact .clues li{font-size:30px;line-height:1.4;padding:6px 12px}
-#c5.challenge-compact .question{margin-top:14px;padding-top:12px;font-size:30px}
 /* card 6 信箱 */
 #c6{background:#FFEFD9}
 #c6 .letter{padding:24px 34px;margin-top:20px;font-size:30px;line-height:1.6;background:#FFFDF7;flex:none}
@@ -137,77 +64,3 @@ svg.ch{display:block}
 /* 今日一问：本周思考工具 */
 .toolpill{display:inline-block;font-size:26px;background:var(--butter);color:var(--ink);border:4px solid var(--ink);border-radius:999px;padding:4px 18px;box-shadow:0 4px 0 var(--ink)}
 
-/* 真的假的 */
-#ccheck{background:#FFF4E0}
-#ccheck .post{margin-top:22px;padding:18px 28px;border-radius:28px;background:#fff;flex:none}
-#ccheck .post.has-pic{display:flex;gap:24px;align-items:stretch}
-#ccheck .post .txt{flex:1;min-width:0}
-#ccheck .post .pic{flex:0 0 300px;border-radius:20px;border:4px solid var(--ink);background-size:cover;min-height:220px}
-#ccheck .post .ph{font-size:24px;color:var(--soft)}
-#ccheck .post .claim{font-size:50px;line-height:1.3;margin-top:6px}
-#ccheck .post .likes{font-size:22px;color:var(--soft);margin-top:6px}
-#ccheck .vote{display:flex;align-items:center;gap:16px;margin-top:18px;font-size:28px;position:relative}
-#ccheck .vote span{border:4px solid var(--ink);border-radius:999px;padding:4px 20px;background:#fff}
-#ccheck .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px;position:relative}
-#ccheck .tools span{border:4px solid var(--ink);border-radius:22px;background:var(--butter);padding:10px 14px;font-size:28px;text-align:center;box-shadow:0 5px 0 var(--ink)}
-#ccheck .tools small{display:block;font-size:20px;color:var(--soft)}
-#ccheck .clues{margin-top:18px;padding:18px 30px 20px;font-size:30px;line-height:1.4;background:#F1FBF6;flex:none;display:flex;flex-direction:column}
-#ccheck .clues h3{font-size:32px;font-weight:400;margin-bottom:4px}
-#ccheck .clues p{display:flex;gap:12px;margin-top:6px;font-size:31px}
-#ccheck .clues p b{flex:0 0 36px;height:36px;border-radius:50%;background:var(--mint);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:400;font-size:22px;margin-top:2px}
-#ccheck .mine{margin-top:18px;padding:14px 28px 18px;flex:1;display:flex;flex-direction:column;min-height:0}
-#ccheck .mine h3{font-size:30px;font-weight:400}
-#ccheck .mine .lines{flex:1;display:flex;flex-direction:column;justify-content:space-around}
-#ccheck .upside{margin:18px 0 6px;transform:rotate(180deg);font-size:24px;color:var(--soft);line-height:1.4;position:relative;text-align:center}
-#ccheck .credit2{margin-top:6px}
-
-/* 周末思辨：故事 → 两个成员各站一边 → 换你来 → 追问 → 我的想法 */
-#cthink{background:#EEF3FF}
-#cthink .h1{font-size:62px}
-#cthink .h1 .en{font-size:32px}
-#cthink .story{margin-top:16px;padding:16px 26px;font-size:28px;line-height:1.45;flex:none;display:flex;gap:20px;align-items:center}
-#cthink .story .pic{flex:0 0 280px;height:180px;border-radius:20px;border:4px solid var(--ink);background-size:cover}
-#cthink .sides{display:flex;gap:14px;margin-top:14px;position:relative;align-items:stretch}
-#cthink .side{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
-  gap:10px;background:#FFF;border:4px solid var(--ink);border-radius:26px;box-shadow:0 7px 0 var(--ink);
-  padding:14px 12px 10px;position:relative;
-}
-#cthink .side.s0{background:#FFFDF5}
-#cthink .side.s1{background:#FAF8F5}
-#cthink .side .char-stage{
-  height:120px;display:flex;align-items:flex-end;justify-content:center;
-  filter:drop-shadow(0 5px 0 rgba(74,59,50,.16));flex-shrink:0;
-}
-#cthink .side .char-stage svg{max-height:120px;width:auto;display:block}
-#cthink .side .bub{
-  font-size:26px;line-height:1.35;margin:0;padding:10px 14px;width:100%;text-align:center;
-  border-radius:18px;border:3px solid var(--ink);position:relative;box-shadow:0 3px 0 rgba(74,59,50,.08);
-}
-#cthink .side.s0 .bub{background:#FFF8E1}
-#cthink .side.s0 .bub:after{
-  content:"";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
-  border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--ink);
-}
-#cthink .side.s1 .bub{background:#F5EFEB}
-#cthink .side.s1 .bub:after{
-  content:"";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
-  border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--ink);
-}
-#cthink .vs-emblem{
-  background:#FF5E5E;color:#FFF;border:4px solid var(--ink);border-radius:50%;
-  width:62px;height:62px;display:flex;align-items:center;justify-content:center;
-  font-size:26px;font-weight:800;box-shadow:0 5px 0 var(--ink);transform:rotate(-5deg);
-  align-self:center;flex-shrink:0;margin:0 -10px;z-index:2;
-}
-#cthink .role{margin-top:14px;padding:12px 24px;font-size:28px;line-height:1.4;background:var(--butter);flex:none}
-#cthink .role b,#cthink .deeper b{display:block;font-weight:400;font-size:25px;color:var(--tomato)}
-#cthink .role b{color:var(--ink)}
-#cthink .deeper{margin-top:14px;padding:10px 24px;font-size:27px;line-height:1.38;flex:none}
-#cthink .deeper p:before{content:"· "}
-#cthink .mine{margin-top:14px;padding:10px 24px 12px;flex:1;display:flex;flex-direction:column;min-height:0}
-#cthink .mine h3{font-size:28px;font-weight:400}
-#cthink .mine .lines{flex:1;display:flex;flex-direction:column;justify-content:space-around}
-#cthink .mine .after{margin-top:auto;display:flex;align-items:center;gap:12px;font-size:24px}
-#cthink .mine .after span{border:3px solid var(--ink);border-radius:999px;padding:2px 14px;background:#fff}
-#cthink .credit2{font-size:15px;color:var(--soft);margin-top:6px;line-height:1.3}
