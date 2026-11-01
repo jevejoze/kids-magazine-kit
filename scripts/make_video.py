@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""第 70 步：把 40-cards 的图片和 60-audio 的语音合成讲读视频。
+"""把 cards 的图片和 audio 的语音合成讲读视频。
 
 用法: python3 make_video.py <issue 目录>
-读:   50-narration.json、60-audio/c{card}_{序号}.wav、40-cards/card-N.png、
+读:   narration.json、audio/c{card}_{序号}.wav、cards/card-N.png、
       数据目录 sfx/<名字>.wav|mp3（可选音效；sfx/page 是翻页声，sfx/bgm 是垫乐，都可选）
-写:   70-final/讲读版.mp4，并把 40-cards 里的 PDF 复制进 70-final/
+写:   final/讲读版.mp4，并把 cards 里的 PDF 复制进 final/
 需要 ffmpeg / ffprobe；hold 提示文字需要带 drawtext 的 ffmpeg 和中文字体，字体用环境变量 FONT 指定，默认自动找。
 
 做法：先把整期的声音拼成一条音轨，记下每页从几秒开始；画面按这些时间点一次编码，
@@ -151,8 +151,18 @@ def main(issue):
     scripts = os.path.dirname(os.path.abspath(__file__))
     node = os.environ.get("NODE", "node")
     build_inputs = subprocess.check_output([node, os.path.join(scripts, "pipeline.mjs"), "video-inputs", issue], text=True).strip()
-    nar = json.load(open(os.path.join(issue, "50-narration.json")))["narration"]
-    audio_dir, cards_dir = os.path.join(issue, "60-audio"), os.path.join(issue, "40-cards")
+    nar_path = os.path.join(issue, "narration.json")
+    if not os.path.exists(nar_path):
+        nar_path = os.path.join(issue, "50-narration.json")
+    nar = json.load(open(nar_path))["narration"]
+
+    audio_dir = os.path.join(issue, "audio")
+    if not os.path.exists(audio_dir):
+        audio_dir = os.path.join(issue, "60-audio")
+
+    cards_dir = os.path.join(issue, "cards")
+    if not os.path.exists(cards_dir):
+        cards_dir = os.path.join(issue, "40-cards")
     final = tempfile.mkdtemp(prefix=".kids-video-", dir=issue)
     tmp = tempfile.mkdtemp(prefix="narrate-")
 
@@ -250,8 +260,9 @@ def main(issue):
         note = ""
         if holds and not drawn:
             note = "（hold 提示没有画上：" + ("没找到中文字体，设置 FONT 环境变量" if not font else "这个 ffmpeg 不带 drawtext") + "）"
-        subprocess.run([node, os.path.join(scripts, "build-state.mjs"), "finish-video", issue, "70-video", build_inputs, final], check=True)
-        out = os.path.join(issue, "70-final", "讲读版.mp4")
+        subprocess.run([node, os.path.join(scripts, "build-state.mjs"), "finish-video", issue, "video", build_inputs, final], check=True)
+        final_dir = os.path.join(issue, "final") if os.path.exists(os.path.join(issue, "final")) else os.path.join(issue, "70-final")
+        out = os.path.join(final_dir, "讲读版.mp4")
         print(f"{out}  {total / 60:.1f} 分钟；翻页时间点 " + " ".join(f"{s:.1f}s" for s in starts[1:]) + note)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
