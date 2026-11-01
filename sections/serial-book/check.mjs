@@ -19,6 +19,7 @@ export function check(r) {
 //   ctx.crewWho：认领这个书中角色的编辑部成员（取自 serial.json 的 crew.who，形如 "dog:happy:150"）
 export function checkNarration(lines, ctx) {
   const problems = [];
+  if (lines.length > 0 && lines.every(l => l.who === "narrator")) return problems;
   const who = String(ctx.crewWho ?? "").split(":")[0];
   if (who && !lines.some(l => l.who === who)) problems.push("认领角色的吐槽（crew.say）由该角色自己说，旁白只用一句引出");
   return problems;

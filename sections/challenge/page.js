@@ -3,11 +3,12 @@ const lines = n => `<div class="lines">${"<i></i>".repeat(n)}</div>`;
 const answerText = (value, escapeText) => escapeText(Array.isArray(value) ? value.join("；") : value ?? "");
 
 export function render(P, kit) {
-  const { topBar, ch, foot, wrapChineseWords, escapeText, issue } = kit;
+  const { topBar, ch, foot, wrapChineseWords, escapeText, issue, slots = {} } = kit;
+  const trickster = slots.trickster || "raccoon";
   const answers = issue._answers ?? {};
-  return { class: P.english?.length ? "with-english" : "", html: `${topBar("🧩 捣蛋浣熊的挑战")}
-  <div class="taunt">${ch("raccoon:smirk:136:" + (P.prop || ""))}<div class="bub"><span class="taunt-text">${wrapChineseWords(P.taunt_zh)}</span>${P.english?.length && P.taunt_en ? `<span class="en">${escapeText(P.taunt_en)}</span>` : ""}</div></div>
-  <div class="puz"><div class="puzzle-label">浣熊出题</div><h3 class="fun">${wrapChineseWords(P.puzzle.title)}</h3><div class="body">${wrapChineseWords(P.puzzle.body)}</div>
+  return { class: P.english?.length ? "with-english" : "", html: `${topBar("🧩 捣蛋鬼的挑战")}
+  <div class="taunt">${ch(`${trickster}:smirk:136:` + (P.prop || ""))}<div class="bub"><span class="taunt-text">${wrapChineseWords(P.taunt_zh)}</span>${P.english?.length && P.taunt_en ? `<span class="en">${escapeText(P.taunt_en)}</span>` : ""}</div></div>
+  <div class="puz"><div class="puzzle-label">挑战出题</div><h3 class="fun">${wrapChineseWords(P.puzzle.title)}</h3><div class="body">${wrapChineseWords(P.puzzle.body)}</div>
     ${P.puzzle.clues?.length ? `<div class="clue-label">${P.puzzle.clues.length} 条线索 · 每条都要满足</div><ol class="clues">${P.puzzle.clues.map(clue => `<li><span>${wrapChineseWords(clue)}</span></li>`).join("")}</ol>` : ""}
     ${P.puzzle.question ? `<div class="question"><b>你来判断</b><span>${wrapChineseWords(P.puzzle.question)}</span></div>` : ""}</div>
   ${P.english?.length ? `<div class="route">${P.english.map((e, i) => `<div class="box lv l${i}"><div class="st fun">第${i + 1}关<b>${"⭐".repeat(e.stars)}</b></div>
