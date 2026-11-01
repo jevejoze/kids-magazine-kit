@@ -5,10 +5,12 @@ import { join } from "node:path";
 
 const REQUIRED = ["title_zh", "title_en", "panels", "fact"];
 const nonempty = f => existsSync(f) && statSync(f).isFile() && statSync(f).size > 0;
+const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
 
 export function check(c, ctx = {}) {
   const problems = [];
   for (const k of REQUIRED) if (c[k] === undefined || c[k] === null || c[k] === "") problems.push(`缺少字段 ${k}`);
+  if (c.takeaway && len(c.takeaway) > 28) problems.push(`takeaway ${len(c.takeaway)} 字，超过 28 字`);
   if (c.panels?.length !== 4) problems.push("漫画要 4 格");
   c.panels?.forEach((p, i) => {
     if (p.bubbles.length > 2) problems.push(`第 ${i + 1} 格气泡 ${p.bubbles.length} 个，最多 2 个`);
