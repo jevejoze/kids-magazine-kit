@@ -16,6 +16,7 @@
           "place": { "type": "string" },
           "title": { "type": "string" },
           "text": { "type": "string" },
+          "category": { "type": "string", "description": "选题分类：动物超常行为 / 吉尼斯搞怪纪录 / 小学生或极客民间发明" },
           "word": { "type": "object", "required": ["en", "zh"], "properties": { "en": { "type": "string" }, "zh": { "type": "string" } } },
           "photo_url": { "type": "string" },
           "photo_credit": { "type": "string" },
