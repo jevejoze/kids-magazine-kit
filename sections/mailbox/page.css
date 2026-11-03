@@ -1,13 +1,51 @@
 /* 信箱 · 页面 id 是 #mailbox，卡片在里面的 .card */
-#mailbox .card{background:#FFEFD9}
-#mailbox .card .letter{padding:24px 34px;margin-top:20px;font-size:30px;line-height:1.6;background:#FFFDF7;flex:none}
-#mailbox .card .checkin{margin-top:22px;padding:18px 30px 16px;background:#F3FBFF;flex:none}
-#mailbox .card .checkin h3{font-size:34px;font-weight:400;color:#2F6FB5}
-#mailbox .card .checkin .row{margin-top:10px;font-size:28px}
-#mailbox .card .checkin .row b{font-weight:400}
-#mailbox .card .pick{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
-#mailbox .card .pick span{border:3px solid var(--ink);border-radius:999px;padding:2px 16px;font-size:25px;background:#fff}
-/* 有经典连载时"最喜欢哪一页"有 7 个选项，自适应换行并保持紧凑 */
-#mailbox .card .pick.many{gap:8px 8px;flex-wrap:wrap}
-#mailbox .card .pick.many span{padding:3px 12px;font-size:22px;white-space:nowrap}
-#mailbox .card .checkin .lines i{height:44px}
+#mailbox .card{background:#F7EFE2}
+
+/* 阁楼便签纸公共手账风格 */
+#mailbox .note-paper{position:relative;background:#FFFDF7;border:4px solid var(--ink);border-radius:28px;box-shadow:0 8px 0 var(--ink)}
+
+/* 胶带手账涂鸦效果 */
+#mailbox .tape{position:absolute;z-index:2;height:24px;background:rgba(255,225,120,0.85);border:2px dashed rgba(180,140,50,0.5);box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+#mailbox .tape-top{top:-12px;left:50%;width:130px;transform:translateX(-50%) rotate(-1deg)}
+#mailbox .tape-left{top:-12px;left:40px;width:110px;transform:rotate(-3deg);background:rgba(255,185,195,0.85);border-color:rgba(200,90,110,0.5)}
+#mailbox .tape-right{top:-12px;right:40px;width:120px;transform:rotate(2.5deg);background:rgba(180,225,255,0.85);border-color:rgba(70,140,200,0.5)}
+
+/* 死党悄悄话便签 */
+#mailbox .letter{margin-top:16px;padding:16px 28px 18px;background:#FFFDF5;flex:none}
+#mailbox .note-tag{font-size:24px;color:var(--soft);margin-bottom:4px}
+#mailbox .letter-text{font-size:27px;line-height:1.45;color:var(--ink)}
+
+/* 栏目1：翻车公开处刑台 */
+#mailbox .blunder-board{margin-top:18px;padding:18px 24px 16px;background:#FFF9F5;flex:none;transform:rotate(-0.4deg)}
+#mailbox .board-head{display:flex;justify-content:space-between;align-items:center}
+#mailbox .board-title{font-size:32px;color:#D84315;letter-spacing:1px}
+#mailbox .stamp{border:3px solid #E64539;color:#E64539;border-radius:10px;padding:2px 14px;font-size:20px;font-weight:bold;transform:rotate(-4deg);background:#FFEFEF}
+#mailbox .blunder-body{display:flex;gap:20px;margin-top:10px;align-items:center}
+#mailbox .culprit-col{flex:0 0 130px;display:flex;flex-direction:column;align-items:center}
+#mailbox .avatar-wrap{width:130px;height:130px;display:flex;align-items:center;justify-content:center}
+#mailbox .avatar-wrap svg{max-width:130px;max-height:130px}
+#mailbox .culprit-badge{margin-top:4px;font-size:20px;background:#FFD45C;border:2px solid var(--ink);border-radius:999px;padding:2px 10px;white-space:nowrap}
+#mailbox .blunder-text{flex:1;min-width:0}
+#mailbox .case-title{font-size:26px;color:var(--ink);font-weight:bold}
+#mailbox .case-desc{margin-top:6px;font-size:25px;line-height:1.42;color:var(--ink)}
+#mailbox .verdict{margin-top:8px;font-size:21px;color:#B71C1C;background:#FFF0ED;border-radius:12px;padding:4px 12px;border:1px dashed #E57373}
+
+/* 栏目2：秘密树洞 / 蠢问题挑战 */
+#mailbox .treehole-board{margin-top:18px;padding:18px 24px 18px;background:#F6FBFF;flex:none;transform:rotate(0.4deg)}
+#mailbox .treehole-head{display:flex;justify-content:space-between;align-items:center}
+#mailbox .treehole-title{font-size:32px;color:#1565C0}
+#mailbox .anti-tag{font-size:20px;background:#8EC5FF;border:2px solid var(--ink);border-radius:999px;padding:2px 14px;color:var(--ink)}
+#mailbox .treehole-prompt{margin-top:8px;font-size:27px;color:var(--ink)}
+#mailbox .treehole-hint{margin-top:4px;font-size:23px;color:#455A64;line-height:1.4}
+#mailbox .treehole-hint b{color:#0D47A1;font-weight:normal}
+
+/* 手账涂鸦手绘区 */
+#mailbox .doodle-zone{margin-top:10px;background:#FFFDF9;border:3px dashed #90A4AE;border-radius:20px;padding:12px 18px;position:relative}
+#mailbox .doodle-header{display:flex;justify-content:space-between;font-size:21px;color:var(--soft)}
+#mailbox .doodle-target{font-size:18px;color:#78909C}
+#mailbox .doodle-canvas{position:relative;min-height:92px;margin-top:6px;display:flex;align-items:center}
+#mailbox .doodle-grid{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-around;pointer-events:none}
+#mailbox .doodle-grid i{display:block;height:28px;border-bottom:2px dashed rgba(74,59,50,0.18)}
+#mailbox .doodle-tip{position:relative;z-index:1;font-size:23px;color:#9E9E9E;padding-right:120px}
+#mailbox .target-avatar{position:absolute;right:0;bottom:0;z-index:2;width:110px;height:100px;display:flex;align-items:flex-end;justify-content:center}
+#mailbox .target-avatar svg{max-width:110px;max-height:100px}

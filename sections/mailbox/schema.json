@@ -2,12 +2,31 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "信箱 mailbox.json",
   "type": "object",
-  "required": ["hello"],
+  "required": ["hello", "blunder", "treehole"],
   "properties": {
     "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
     "hello": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "blunder": {
+      "type": "object",
+      "required": ["who", "title", "desc"],
+      "properties": {
+        "who": { "type": "string" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "desc": { "type": "string", "minLength": 1, "maxLength": 100 }
+      }
+    },
+    "treehole": {
+      "type": "object",
+      "required": ["target", "question"],
+      "properties": {
+        "target": { "type": "string" },
+        "type": { "type": "string", "enum": ["silly_question", "secret"] },
+        "question": { "type": "string", "minLength": 1, "maxLength": 30 },
+        "hint": { "type": "string", "maxLength": 60 }
+      }
+    },
     "letter": { "type": "string" },
-    "ask_zh": { "type": "string", "maxLength": 30 },
+    "ask_zh": { "type": "string", "maxLength": 40 },
     "send_note": { "type": "string" },
     "answers": { "type": "string" }
   }
