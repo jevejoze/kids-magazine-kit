@@ -1,6 +1,6 @@
 // 真的假的的按页校验：check(check, ctx) → 问题列表（不带步骤前缀）
 const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
-const META_SPOILER = /思维本领|思维方法|今天学|今天练|本周练/;
+const META_SPOILER = /思维本领|思维方法|思维工具|本领训练|今天学|今天练|本周练/;
 
 export function check(k, ctx) {
   const problems = [], need = (ok, msg) => { if (!ok) problems.push(msg); };
@@ -18,6 +18,20 @@ export function check(k, ctx) {
   need(len(k.verdict) <= 40, `倒印答案 ${len(k.verdict)} 字，超过 40`);
   need((k.sources ?? []).length >= 2, "要 2 个来源");
   need(!k.photo_url || k.photo_credit, "有配图就写 photo_credit");
-  need(!META_SPOILER.test([k.claim, ...(k.clues ?? []), k.verdict].join(" ")), "真的假的正文与答案不得点破「思维本领/今天练」等课表字眼");
+  need(!META_SPOILER.test([k.claim, ...(k.clues ?? []), k.verdict].join(" ")), "真的假的正文与答案不得点破「思维本领/思维工具/本领训练」等说教字眼");
+  return problems;
+}
+
+// 这一页的讲读校验：checkNarration(lines, ctx) → 问题列表
+//   规矩 7：不说答案在哪一期公布（答案倒印在本页底部，不说"明天 / 信箱公布答案"）
+//   规矩：讲读台词不得出现思维说教用语
+export function checkNarration(lines) {
+  const problems = [];
+  if (lines.some(l => /答案.*(明天|下一期|信箱)|(明天|信箱).*答案/.test(l.text))) {
+    problems.push(`答案倒印在页脚，不说"明天 / 信箱公布答案"`);
+  }
+  if (lines.some(l => META_SPOILER.test(l.text))) {
+    problems.push(`讲读台词不得出现「思维本领/思维工具/本领训练」等说教字眼`);
+  }
   return problems;
 }

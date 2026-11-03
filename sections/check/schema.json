@@ -1,25 +1,69 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "真的假的 check.json",
+  "title": "真的假的（谣言粉碎机） check.json",
   "type": "object",
   "required": ["where", "claim", "clues", "verdict", "explain", "sources"],
   "properties": {
-    "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
-    "where": { "type": "string", "minLength": 1 },
-    "claim": { "type": "string", "minLength": 1, "maxLength": 30 },
-    "likes": { "type": "string" },
-    "comments": { "type": "string" },
+    "_meta": {
+      "type": "object",
+      "properties": {
+        "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "where": {
+      "type": "string",
+      "minLength": 1,
+      "description": "谣言出处泛称（如长辈朋友圈、家族群、同学闲聊、某短视频）"
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30,
+      "description": "流传的谣言说法或生活怪谈原话（≤ 30 字）"
+    },
+    "likes": { "type": "string", "description": "互动点赞数泛写" },
+    "comments": { "type": "string", "description": "互动评论数泛写" },
     "photo_url": { "type": "string" },
     "photo_pos": { "type": "string" },
     "photo_credit": { "type": "string" },
-    "clues": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "maxLength": 36 } },
-    "choices": { "type": "array", "minItems": 2, "maxItems": 3, "items": { "type": "string", "maxLength": 8 } },
+    "clues": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "3条角色化、生活化的破谣线索（每条 ≤ 36 字）",
+      "items": { "type": "string", "maxLength": 36 }
+    },
+    "choices": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 3,
+      "items": { "type": "string", "maxLength": 8 }
+    },
     "answer": { "type": "string" },
     "truth": { "type": "string", "enum": ["true", "false", "half"] },
     "skill": { "type": "string", "maxLength": 10 },
-    "tools": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } } },
-    "verdict": { "type": "string", "minLength": 1, "maxLength": 40 },
-    "explain": { "type": "string", "minLength": 1 },
-    "sources": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+    "tools": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } }
+    },
+    "verdict": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "description": "倒印在页脚的破谣结论，给出一句有力的理由（≤ 40 字）"
+    },
+    "explain": {
+      "type": "string",
+      "minLength": 1,
+      "description": "供讲读稿与角色互动的两三句科学解释"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "description": "至少2个独立可靠的科学/常识来源",
+      "items": { "type": "string" }
+    }
   }
 }
