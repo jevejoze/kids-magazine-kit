@@ -2,7 +2,7 @@
 const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
 const words = s => String(s ?? "").replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
 
-export function check(p, ctx) {
+export function check(p, ctx = {}) {
   const problems = [], need = (ok, msg) => { if (!ok) problems.push(msg); };
   const fields = (obj, keys) => keys.forEach(k => need(obj[k] !== undefined && obj[k] !== null && obj[k] !== "", `缺少字段 ${k}`));
   const e = ctx.english ?? {};
@@ -11,6 +11,12 @@ export function check(p, ctx) {
   need(len([p.body, ...(p.clues ?? []), p.question ?? ""].join("")) <= 240, "题目情境、条件和问题合计超过 240 字");
   if (p.taunt_zh) need(len(p.taunt_zh) <= 20, `taunt_zh ${len(p.taunt_zh)} 字，超过 20`);
   if (p.taunt_en) need(words(p.taunt_en) <= 10, `taunt_en ${words(p.taunt_en)} 个单词，超过 10`);
+  if (p.cards && Array.isArray(p.cards)) {
+    p.cards.forEach((card, i) => {
+      if (typeof card !== "object" || card === null) problems.push(`cards[${i}] 必须是对象`);
+      else if (!card.text && !card.symbol) problems.push(`cards[${i}] 缺少 text 或 symbol 视觉解谜内容`);
+    });
+  }
   problems.push(...(ctx.checkProp?.(p.prop) ?? []));
   return problems;
 }

@@ -52,3 +52,26 @@ test("rendered issue has the story page from the pack", () => {
   assert.match(html, /SECTIONS\["story"\]/);
   assert.match(html, /"story"/);
 });
+
+test("story checkNarration checks character dialogue and audio cues", async () => {
+  const { checkNarration } = await import("../sections/story/check.mjs");
+  const goodLines = [
+    { who: "narrator", text: "故事开始", sfx: "footsteps" },
+    { who: "raccoon", text: "我没拿！" },
+    { who: "dog", text: "手上有绿光！", pause: 3 }
+  ];
+  assert.deepEqual(checkNarration(goodLines), []);
+
+  const onlyNarrator = [
+    { who: "narrator", text: "全由旁白念", sfx: "footsteps" },
+    { who: "narrator", text: "破案了" }
+  ];
+  assert.match(checkNarration(onlyNarrator).join("\n"), /角色对质争辩/);
+
+  const noAudio = [
+    { who: "narrator", text: "开始" },
+    { who: "raccoon", text: "我没拿" },
+    { who: "dog", text: "你拿了" }
+  ];
+  assert.match(checkNarration(noAudio).join("\n"), /留白停顿/);
+});

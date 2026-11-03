@@ -8,8 +8,27 @@
     "taunt_zh": { "type": "string", "minLength": 1, "maxLength": 20 },
     "taunt_en": { "type": "string" },
     "prop": { "type": "string" },
+    "kind": { "type": "string", "description": "视觉解谜题型：sketch（草图寻宝）| cipher（密码破译）| mirror（反转镜像字）| spot_diff（视觉找茬）| logic（逻辑线索）" },
     "title": { "type": "string", "minLength": 1 },
     "body": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "cards": {
+      "type": "array",
+      "description": "视觉解谜卡片（摩斯码、镜像反转、符号卡片）",
+      "items": {
+        "type": "object",
+        "properties": {
+          "badge": { "type": "string" },
+          "symbol": { "type": "string" },
+          "text": { "type": "string" },
+          "mirror": { "type": "boolean" },
+          "cipher": { "type": "boolean" },
+          "hint": { "type": "string" }
+        }
+      }
+    },
+    "sketch": { "type": "string", "description": "现场秘密草图或地图 SVG/HTML" },
+    "drawers": { "type": "array", "description": "抽屉/宝箱网格数据" },
+    "visual": { "type": "object", "description": "自定义视觉图示配置" },
     "clues": { "type": "array", "items": { "type": "string" } },
     "question": { "type": "string", "minLength": 1 },
     "answer": { "type": "string", "minLength": 1 },
