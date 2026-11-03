@@ -20,6 +20,11 @@
 #challenge .card .clues li{counter-increment:clue;display:flex;align-items:flex-start;gap:14px;padding:10px 14px;background:#F4F0FA;border-radius:12px;font-size:32px;line-height:1.45}
 #challenge .card .clues li>span{min-width:0;flex:1}
 #challenge .card .clues li:before{content:counter(clue);flex:0 0 32px;height:32px;margin-top:6px;border-radius:50%;background:#E5DBF4;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600}
+#challenge .card .clue-tag{display:inline-block;font-size:20px;font-weight:700;padding:2px 8px;border-radius:8px;margin-right:8px;vertical-align:middle}
+#challenge .card .clue-tag-mirror{background:#DCE9FE;color:#1E4B8C}
+#challenge .card .clue-tag-cipher{background:#FEF0D2;color:#855A12}
+#challenge .card .clue-tag-default{background:#EADDF8;color:#593E7A}
+#challenge .card .clue-has-mirror{font-weight:600}
 #challenge .card .question{margin-top:18px;padding-top:18px;border-top:2px solid #DFD5EC;font-size:32px;line-height:1.4;font-weight:600}
 #challenge .card .question b{display:block;font-size:21px;color:#75608D;margin-bottom:6px}
 #challenge .card .answer-key{position:relative;align-self:flex-end;max-width:100%;margin:auto 0 16px;padding:10px 14px;border:1px dashed #D2C7DD;border-radius:10px;background:transparent}
@@ -50,6 +55,28 @@
 #challenge .card.with-english .clue-label,#challenge .card.with-english .puzzle-label{display:none}
 #challenge .card.with-english .clues li{padding:0;background:none}
 #challenge .card.with-english .question{border-top:0}
+/* 图文解谜卡片：草图、密码符、反转镜像字与抽屉网格 */
+#challenge .card .visual-sketch{margin:14px 0;padding:12px;background:#FAF7FE;border:2.5px dashed #A594C6;border-radius:18px;text-align:center}
+#challenge .card .visual-cards{display:flex;gap:14px;margin:16px 0;justify-content:space-between}
+#challenge .card .visual-card{flex:1;min-width:0;background:#F8F5FD;border:3px solid var(--ink);border-radius:18px;padding:12px 14px;box-shadow:0 4px 0 #D7CCEB;text-align:center;position:relative}
+#challenge .card .visual-card.is-mirror{background:#F0F7FF;border-color:#3C5A99}
+#challenge .card .visual-card.is-cipher{background:#FFFDF0;border-color:#8C6D23}
+#challenge .card .card-badge{display:inline-block;font-size:18px;font-weight:600;background:#DFD5EC;color:#503E6B;padding:2px 10px;border-radius:10px;margin-bottom:6px}
+#challenge .card .card-symbol{font-family:monospace,monospace;font-size:32px;font-weight:700;color:#5B487A;letter-spacing:4px;margin:6px 0}
+#challenge .card .card-text{font-size:26px;line-height:1.35;color:var(--ink)}
+#challenge .card .card-hint{font-size:20px;color:var(--soft);margin-top:6px}
+#challenge .card .mirror-text{display:inline-block;transform:scaleX(-1);font-family:monospace,monospace;letter-spacing:2px}
+#challenge .card .drawer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:12px;margin:16px 0}
+#challenge .card .drawer-box{background:#FFFDF7;border:3px solid var(--ink);border-radius:14px;padding:10px 8px;text-align:center;box-shadow:0 4px 0 #D7CCEB;position:relative}
+#challenge .card .drawer-handle{display:block;width:28px;height:6px;background:#B8A9D1;border-radius:3px;margin:0 auto 6px;border:1.5px solid var(--ink)}
+#challenge .card .drawer-num{font-size:26px;font-weight:700;color:var(--ink)}
+#challenge .card .drawer-label{display:block;font-size:18px;color:var(--soft);margin-top:2px}
+#challenge .card .drawer-icon{display:block;font-size:24px;margin-top:4px}
+#challenge .card.has-visual .puz{padding:20px 24px}
+#challenge .card.has-visual .puz h3{font-size:40px;margin-bottom:10px}
+#challenge .card.has-visual .puz .body{font-size:28px;line-height:1.4}
+#challenge .card.has-visual .clues li{font-size:28px;line-height:1.4;padding:8px 12px}
+#challenge .card.has-visual .question{margin-top:14px;padding-top:12px;font-size:28px}
 /* Short questions spread out instead of leaving the lower page empty. */
 #challenge .card.challenge-roomy .puz{padding:32px 34px;margin-top:24px}
 #challenge .card.challenge-roomy .puz h3{font-size:52px;margin-bottom:20px}

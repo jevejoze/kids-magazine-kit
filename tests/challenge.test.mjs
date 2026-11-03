@@ -99,6 +99,41 @@ test("standard challenge samples omit optional English and each has one solution
   assert.deepEqual(boats, [[16, 20]]); assert.equal(`甲船${boats[0][0]}人，乙船${boats[0][1]}人。`, samples.math.answer);
 });
 
+test("visual puzzle renders cards, sketch, drawers, and tagged clues", () => {
+  const data = issue();
+  data.challenge = {
+    taunt_zh: "哼，你肯定解不开！",
+    prop: "magnifier",
+    puzzle: {
+      kind: "sketch",
+      title: "阁楼寻宝秘密草图",
+      body: "捣蛋浣熊画了一张藏宝草图。",
+      sketch: "<svg viewBox=\"0 0 100 100\"><circle cx=\"50\" cy=\"50\" r=\"40\"/></svg>",
+      cards: [
+        { badge: "摩斯", symbol: "· · -", text: "双数抽屉", hint: "看符号" },
+        { badge: "镜像", mirror: true, text: "右边是空的", hint: "反转看" }
+      ],
+      drawers: [1, 2, 3, 4],
+      clues: [
+        "[摩斯] 第一组密码「··-」提示双数抽屉。",
+        "[镜像] 镜像提示排除右边。"
+      ],
+      question: "真钥匙在第几个抽屉？"
+    }
+  };
+  data._answers.puzzle = "第 2 个抽屉";
+  const card = render(data)("challenge");
+  assert.match(card, /class="visual-sketch"/);
+  assert.match(card, /class="visual-cards"/);
+  assert.match(card, /class="card-badge">摩斯<\/span>/);
+  assert.match(card, /class="card-symbol fun">· · -<\/div>/);
+  assert.match(card, /class="card-text mirror-text">/);
+  assert.match(card, /class="drawer-grid"/);
+  assert.match(card, /class="drawer-num">4<\/span>/);
+  assert.match(card, /class="clue-tag clue-tag-cipher">摩斯<\/span>/);
+  assert.match(card, /class="clue-tag clue-tag-mirror">镜像<\/span>/);
+});
+
 const chrome = process.env.CHROME || ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome", "/usr/bin/chromium"].find(existsSync);
 test("short and full-budget Chinese challenges fit both character modes with small inverted answers", { skip: !chrome }, t => {
   const dir = mkdtempSync(join(tmpdir(), "kids-challenge-budget-"));
