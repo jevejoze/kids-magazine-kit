@@ -38,6 +38,14 @@ test("cover pack checks the page and reports under step 10", t => {
   assert.match(createPipeline(issue).check().join("\n"), /photo\.license 必须是非空 string/, "缺协议先由结构校验拦下");
   edit(file, c => { c.photo.license = "CC BY 4.0"; c.crew = ["cat:happy:150"]; });
   assert.match(errors(issue, "cover").join("\n"), /\[cover\] .*封面第 1 个角色/);
+  edit(file, c => { c.crew = ["dog:happy:150"]; c.question.zh = "极昼形成机制是什么？"; });
+  assert.match(errors(issue, "cover").join("\n"), /\[cover\] 问题必须反常识、反直觉/);
+});
+
+test("cover narration rejects broadcaster tone", async () => {
+  const { checkNarration } = await import("../sections/cover/check.mjs");
+  assert.match(checkNarration([{ text: "欢迎收听今天的节目" }]).join("\n"), /封面讲读废除报幕腔/);
+  assert.deepEqual(checkNarration([{ text: "快看这张照片！敢不敢跟我打赌？" }]), []);
 });
 
 test("comic pack checks the page and its diagram under step 11", t => {

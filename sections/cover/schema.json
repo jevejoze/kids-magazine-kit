@@ -5,18 +5,33 @@
   "required": ["question", "answer", "photo", "stamp", "crew", "crew_say", "credit"],
   "properties": {
     "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
-    "question": { "type": "object", "required": ["zh"], "properties": { "zh": { "type": "string", "minLength": 1 }, "en": { "type": "string" } } },
-    "answer": { "type": "string", "minLength": 1 },
+    "question": {
+      "type": "object",
+      "required": ["zh"],
+      "properties": {
+        "zh": { "type": "string", "minLength": 1, "description": "脑洞挑衅主问题，反常识反直觉，<= 24 字" },
+        "en": { "type": "string" }
+      }
+    },
+    "answer": { "type": "string", "minLength": 1, "description": "答案要点（供今日一问解释使用）" },
     "photo": {
-      "type": "object", "required": ["url", "license"],
-      "properties": { "url": { "type": "string" }, "page": { "type": "string" }, "author": { "type": "string" }, "license": { "type": "string", "minLength": 1 }, "verified": { "type": "string" } }
+      "type": "object",
+      "required": ["url", "license"],
+      "properties": {
+        "url": { "type": "string" },
+        "page": { "type": "string" },
+        "author": { "type": "string" },
+        "license": { "type": "string", "minLength": 1 },
+        "verified": { "type": "string" }
+      },
+      "description": "奇观特写照片（微观/深海/极限视角高反差真实奇观，严禁普通风景照）"
     },
     "photo_pos": { "type": "string" },
-    "stamp": { "type": "string", "minLength": 1 },
+    "stamp": { "type": "string", "minLength": 1, "description": "奇观真实证据或拍摄信息，<= 14 字" },
     "asked_by": { "type": "string" },
     "strip": { "type": "string" },
     "crew": { "type": "array", "maxItems": 2, "items": { "type": "string", "pattern": "^[a-z]+:[a-z]+:[0-9]+(:[a-z+]+)?$" } },
-    "crew_say": { "type": "string", "minLength": 1 },
+    "crew_say": { "type": "string", "minLength": 1, "description": "封面角色金句或吐槽，<= 12 字" },
     "credit": { "type": "string", "minLength": 1 },
     "theme_icon": { "type": "string" },
     "sources": { "type": "array", "items": { "type": "string" } }
