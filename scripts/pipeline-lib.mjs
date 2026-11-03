@@ -48,7 +48,10 @@ const NUM = "[零〇一二两三四五六七八九十百千万亿点几]";
 const NUM_UNIT = new RegExp(`${NUM}{2,}(?:多)?(?:克|千克|公斤|吨|毫米|厘米|公里|千米|米|光年|毫升|升|度|倍|岁|年|天|小时|分钟|秒|万|亿|个|只|种|次|颗|条)|百分之${NUM}+`, "g");
 const YEAR_DATE = new RegExp(`[零〇一二三四五六七八九]{4}年|${NUM}{1,2}月${NUM}{1,3}[日号]`);
 export function createPipeline(issueArg) {
-  const issue = resolve(issueArg);
+  let issue = resolve(issueArg);
+  if (!existsSync(issue) && existsSync(resolve(here, "..", "examples", "demo", issueArg))) {
+    issue = resolve(here, "..", "examples", "demo", issueArg);
+  }
   const dataDir = resolve(issue, "..", "..");
   const registry = loadSections({ engine: resolve(here, ".."), data: dataDir }).sections;
   // 数据仓库自带的自定义栏目（引擎的 stages.json 不认识）：按它自己的 manifest 现算一条步骤，status/done 才找得到它；
