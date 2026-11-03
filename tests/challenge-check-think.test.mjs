@@ -49,7 +49,7 @@ test("challenge ticket carries no extra rules", t => {
   assert.deepEqual(a.content.params, { narration_lines: 12 });
 });
 
-test("check pack's own check.mjs reports under [check]", t => {
+test("check pack's own check.mjs reports under [check]", async t => {
   const { issue } = copyDemo(t);
   const errors = () => createPipeline(issue).check().filter(e => e.startsWith("[check]"));
   assert.deepEqual(errors(), []);
@@ -57,6 +57,13 @@ test("check pack's own check.mjs reports under [check]", t => {
   assert.ok(errors().some(e => e.includes("说法")), errors().join("\n"));
   edit(join(issue, "check.json"), k => { k.claim = "说法"; k.choices = ["真", "假"]; k.answer = "不在里面"; });
   assert.match(errors().join("\n"), /answer 要是 choices 里的一个/);
+  edit(join(issue, "check.json"), k => { k.choices = ["真", "假"]; k.answer = "真"; k.verdict = "这是思维工具训练结果"; });
+  assert.ok(errors().some(e => e.includes("不得点破")), errors().join("\n"));
+
+  const { checkNarration } = await import("../sections/check/check.mjs");
+  assert.deepEqual(checkNarration([{ who: "narrator", text: "把页面倒过来看答案吧！" }]), []);
+  assert.ok(checkNarration([{ who: "narrator", text: "明天公布答案" }]).some(e => e.includes("明天 / 信箱公布答案")));
+  assert.ok(checkNarration([{ who: "narrator", text: "今天练习思维工具" }]).some(e => e.includes("不得出现")));
 });
 
 test("challenge pack's own check.mjs reports under [challenge]", t => {
