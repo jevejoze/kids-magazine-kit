@@ -1,5 +1,5 @@
 // 今日一问的按页校验：check(comic, ctx) → 问题列表（不带步骤前缀）
-//   ctx.checkChar(spec, at) → 角色写法的问题列表；ctx.issue：本期目录，图解 SVG 相对它找
+//   ctx.checkChar(spec, at) → 角色写法的问​​题列表；ctx.issue：本期目录，图解 SVG 相对它找
 import { existsSync, statSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -11,9 +11,17 @@ export function check(c, ctx = {}) {
   const problems = [];
   for (const k of REQUIRED) if (c[k] === undefined || c[k] === null || c[k] === "") problems.push(`缺少字段 ${k}`);
   if (c.takeaway && len(c.takeaway) > 28) problems.push(`takeaway ${len(c.takeaway)} 字，超过 28 字`);
+  if (c.fact && len(c.fact) > 45) problems.push(`fact ${len(c.fact)} 字，超过 45 字`);
+  if (c.fact_title && len(c.fact_title) > 8) problems.push(`fact_title ${len(c.fact_title)} 字，超过 8 字`);
+  if (c.diagram_title && len(c.diagram_title) > 28) problems.push(`diagram_title ${len(c.diagram_title)} 字，超过 28 字`);
   if (c.panels?.length !== 4) problems.push("漫画要 4 格");
   c.panels?.forEach((p, i) => {
-    if (p.bubbles.length > 2) problems.push(`第 ${i + 1} 格气泡 ${p.bubbles.length} 个，最多 2 个`);
+    if (p.title && len(p.title) > 12) problems.push(`第 ${i + 1} 格标题 ${len(p.title)} 字，超过 12 字`);
+    if ((p.bubbles ?? []).length > 2) problems.push(`第 ${i + 1} 格气泡 ${p.bubbles.length} 个，最多 2 个`);
+    const max = ((p.bubbles ?? []).length > 1 || (p.chars ?? []).length > 1) ? 20 : 26;
+    (p.bubbles ?? []).forEach((b, j) => {
+      if (len(b.text) > max) problems.push(`第 ${i + 1} 格第 ${j + 1} 个气泡 ${len(b.text)} 字，超过 ${max} 字`);
+    });
     (p.chars ?? []).forEach(x => problems.push(...(ctx.checkChar?.(x, `第 ${i + 1} 格角色`) ?? [])));
   });
   const diagPath = c.diagram ? join(ctx.issue ?? ".", c.diagram) : "";
@@ -24,6 +32,7 @@ export function check(c, ctx = {}) {
     if (/<image\b[^>]*\b(?:href|xlink:href)=["']https?:/i.test(svg)) problems.push("图解 SVG 不可引用外部网络图片");
     const small = [...svg.matchAll(/font-size=["']?(\d+(?:\.\d+)?)/g)].map(m => Number(m[1])).find(sz => sz < 20);
     if (small) problems.push(`图解 SVG 含过小字号 ${small}px（要求中文标注 ≥ 24 号字）`);
+    if (/坐标轴|x轴|y轴|受力分析/i.test(svg)) problems.push("图解 SVG 禁止包含枯燥抽象物理坐标轴或受力分析，改为生动直观的拟人剖面/流程透视");
   }
   return problems;
 }
