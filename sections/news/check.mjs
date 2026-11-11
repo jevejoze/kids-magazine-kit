@@ -6,9 +6,14 @@ const missing = (obj, keys) => keys.filter(k => obj[k] === undefined || obj[k] =
 // 选题红线：严禁宏大叙事、宏观经济、枯燥国际时政、政治选举
 const FORBIDDEN_THEMES = /大选|选举|议会|总统|首脑|政治|政党|外交谈判|武装冲突|战争|内阁|公投|投票/;
 
-export function check(n) {
+export function check(n, ctx = {}) {
   const problems = [...missing(n, REQUIRED)], need = (ok, msg) => { if (!ok) problems.push(msg); };
-  need(n.items?.length >= 2 && n.items?.length <= 3, "新闻要 2 或 3 条（大图版为 2 条）");
+  const isPoster = n.layout === "poster" || ctx?.params?.layout === "poster";
+  if (isPoster) {
+    need(n.items?.length >= 1 && n.items?.length <= 3, "新闻要 1–3 条（海报版最多 3 条）");
+  } else {
+    need(n.items?.length >= 2 && n.items?.length <= 3, "新闻要 2 或 3 条（大图版为 2 条）");
+  }
   n.items?.forEach((x, i) => {
     need(len(x.text) <= 50, `第 ${i + 1} 条 ${len(x.text)} 字，超过 50`);
     need((x.sources ?? []).length >= 2, `第 ${i + 1} 条要 2 个来源`);

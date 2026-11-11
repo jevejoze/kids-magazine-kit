@@ -79,19 +79,28 @@ const FIT = [
   ["comic", ".diagram svg", "--comic-diagram-height", 280, 200],
   ["creature", ".card-photo", "--creature-photo-height", 380, 300],
   ["news", ".lead .pic", "--news-lead-height", 340, 240],
+  ["news", ".sub .pic", "--news-sub-height", 260, 200],
+  ["news", ".poster .pic", "--news-poster-height", 680, 480],
+  ["news", ".poster-ask .pic", "--news-ask-pic-height", 520, 380],
 ];
 function fitCards() {
   for (const [id, sel, prop, max, min] of FIT) {
-    const card = document.querySelector(`#${id}.card, #${id} > .card`), el = card?.querySelector(sel), foot = card?.querySelector(".foot");
-    if (!el || !foot || !card.getBoundingClientRect().height) continue;
-    card.style.setProperty(prop, `${max}px`);
-    const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);
-    const excess = Math.max(0, Math.ceil(foot.getBoundingClientRect().bottom - limit));
-    card.style.setProperty(prop, `${Math.max(min, max - excess)}px`);
+    const list = document.querySelectorAll(`#${id}.card, #${id} > .card`);
+    list.forEach(card => {
+      const el = typeof card?.querySelector === "function" ? card.querySelector(sel) : null;
+      const foot = typeof card?.querySelector === "function" ? card.querySelector(".foot") : null;
+      if (!el || !foot || typeof card.getBoundingClientRect !== "function" || !card.getBoundingClientRect().height) return;
+      card.style.setProperty(prop, `${max}px`);
+      const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);
+      const excess = Math.max(0, Math.ceil(foot.getBoundingClientRect().bottom - limit));
+      card.style.setProperty(prop, `${Math.max(min, max - excess)}px`);
+    });
   }
 }
 function fitChallengeLayout() {
-  const card = document.querySelector("#challenge > .card"), foot = card?.querySelector(".foot");
+  const card = document.querySelector("#challenge > .card");
+  if (!card || typeof card.querySelector !== "function" || typeof card.getBoundingClientRect !== "function") return;
+  const foot = card.querySelector(".foot");
   if (!foot || !card.getBoundingClientRect().height) return;
   card.classList.remove("challenge-compact", "challenge-roomy");
   const limit = card.getBoundingClientRect().bottom - parseFloat(getComputedStyle(card).paddingBottom);

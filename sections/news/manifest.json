@@ -2,7 +2,9 @@
   "id": "news",
   "title": "环球小报",
   "consumes": [],
-  "params": {},
+  "params": {
+    "layout": { "type": "string", "default": "classic", "enum": ["classic", "poster"] }
+  },
   "rules": ["images", "english-level"],
   "image_policy": "private-ok",
   "narration": { "lines": 24 },
