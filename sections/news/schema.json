@@ -7,7 +7,7 @@
     "_meta": { "type": "object", "properties": { "ticket": { "type": "string", "pattern": "^[a-f0-9]{64}$" } } },
     "week": { "type": "string", "minLength": 1 },
     "items": {
-      "type": "array", "minItems": 3, "maxItems": 3,
+      "type": "array", "minItems": 2, "maxItems": 3,
       "items": {
         "type": "object",
         "required": ["flag", "place", "title", "text", "word", "photo_url", "photo_credit", "photo_shows", "talk", "sources"],

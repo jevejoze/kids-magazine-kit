@@ -59,10 +59,14 @@ test("[creature] and [news] checks come from the packs", t => {
   const { issue } = copyDemo(t);
   const errors = tag => createPipeline(issue).check().filter(e => e.startsWith(tag));
   assert.deepEqual(errors("[news]"), []);
-  edit(join(issue, "news.json"), n => { n.items[1].text = "字".repeat(51); delete n.items[2].photo_shows; n.items.pop(); });
+  // 2 items is valid (大图版)
+  edit(join(issue, "news.json"), n => { n.items.pop(); });
+  assert.deepEqual(errors("[news]"), []);
+  // 1 item triggers error, text > 50 triggers length error
+  edit(join(issue, "news.json"), n => { n.items[0].text = "字".repeat(51); n.items.pop(); });
   const news = errors("[news]").join("\n");
-  assert.match(news, /新闻要 3 条/);
-  assert.match(news, /第 2 条 51 字，超过 50/);
+  assert.match(news, /新闻要 2 或 3 条/);
+  assert.match(news, /第 1 条 51 字，超过 50/);
 
   monday(issue);
   assert.deepEqual(errors("[creature]"), []);
