@@ -129,7 +129,7 @@ export function createPipeline(issueArg) {
   // 没写 _meta.ticket 的旧输出照旧有效
   const staleTicket = (name, value) => {
     const want = value?._meta?.ticket, skill = want && ticketSkillOf(name);
-    if (!skill) return null;
+    if (!skill || inIssue(skill) === false) return null;
     try { return ticket(issue, skill).fingerprint === want ? null : "任务单变了，输出已过期，请按新任务单重做"; }
     catch (e) { return `领不到任务单（${e.message.split("\n")[0]}），输出已过期`; }
   };
@@ -334,7 +334,7 @@ export function createPipeline(issueArg) {
       need(total >= lo - 300 && total <= hi + 400, "narration", `讲读稿共 ${total} 字，建议 ${lo}–${hi}`);
     },
     "assets/assets.json": a => {
-      need(a.news?.length === 3, "assets", "assets.json 的 news 要有 3 张图片");
+      need(a.news?.length >= 2 && a.news?.length <= 3, "assets", "assets.json 的 news 要有 2 或 3 张图片");
       if (has("serial.json")) {
         const r = read("serial.json");
         if (r.craft === "origami") {
@@ -382,6 +382,8 @@ export function createPipeline(issueArg) {
       if (!has(file) || (contentOnly && file === "narration.json")) continue;
       if (file === "think.json" && !useThink()) continue;
       if (file === "creature.json" && !useCreature()) continue;
+      const st = stages.find(s => s.outputs.includes(`issue/${file}`));
+      if (st && skipped(st)) continue;
       try {
         const value = read(file);
         const structural = validateStructure(file, value, structuralOmit(file, value));
