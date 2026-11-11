@@ -11,28 +11,13 @@ export function render(NW, kit) {
   const isPoster = NW.layout === "poster";
 
   if (isPoster) {
-    if (n <= 1) {
-      const item = items[0] || {};
-      return `${topBar("🌏 环球小报 · World News", NW.week)}
-      ${storyBox(item, "poster-ask")}
-      <div class="box ask2 fun">💬 ${NW.ask_zh}<br><span class="en">${NW.ask_en}</span></div>
-      <div class="credit2 en">${NW.credits}</div>
-      ${foot(NW.foot || `新闻来源已交叉核实${next("环球小报")}`)}`;
-    }
-
     return items.map((item, idx) => {
       const isLast = idx === n - 1;
       const right = n > 1 ? `${idx + 1} / ${n}` : NW.week;
-      if (!isLast) {
-        return `${topBar("🌏 环球小报 · World News", right)}
-        ${storyBox(item, "poster")}
-        ${foot(NW.foot || "新闻来源已交叉核实 · 往后翻：环球小报 →")}`;
-      }
+      const footText = NW.foot || (isLast ? `新闻来源已交叉核实${next("环球小报")}` : "新闻来源已交叉核实 · 往后翻：环球小报 →");
       return `${topBar("🌏 环球小报 · World News", right)}
-      ${storyBox(item, "poster-ask")}
-      <div class="box ask2 fun">💬 ${NW.ask_zh}<br><span class="en">${NW.ask_en}</span></div>
-      <div class="credit2 en">${NW.credits}</div>
-      ${foot(NW.foot || `新闻来源已交叉核实${next("环球小报")}`)}`;
+      ${storyBox(item, "poster")}
+      ${foot(footText)}`;
     });
   }
 
