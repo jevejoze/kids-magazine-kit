@@ -8,7 +8,7 @@ const FORBIDDEN_THEMES = /大选|选举|议会|总统|首脑|政治|政党|外�
 
 export function check(n) {
   const problems = [...missing(n, REQUIRED)], need = (ok, msg) => { if (!ok) problems.push(msg); };
-  need(n.items?.length === 3, "新闻要 3 条");
+  need(n.items?.length >= 2 && n.items?.length <= 3, "新闻要 2 或 3 条（大图版为 2 条）");
   n.items?.forEach((x, i) => {
     need(len(x.text) <= 50, `第 ${i + 1} 条 ${len(x.text)} 字，超过 50`);
     need((x.sources ?? []).length >= 2, `第 ${i + 1} 条要 2 个来源`);
