@@ -215,7 +215,10 @@ export function createPipeline(issueArg) {
       // 渲染过就按 cards/pages.json 对页：它记着每张图是哪个栏目（注册的新栏目也在里面）
       const pagesFile = join(issue, "cards", "pages.json");
       const rendered = existsSync(pagesFile) ? JSON.parse(readFileSync(pagesFile, "utf8")).map(p => p.section) : null;
-      if (rendered) need(JSON.stringify(rendered.filter(k => PAGE_KEYS.includes(k))) === JSON.stringify(pageOrder()), "render", "cards/pages.json 的页序和本期栏目对不上，请重新渲染");
+      if (rendered) {
+        const dedupled = rendered.filter(k => PAGE_KEYS.includes(k)).filter((k, i, all) => i === 0 || k !== all[i - 1]);
+        need(JSON.stringify(dedupled) === JSON.stringify(pageOrder()), "render", "cards/pages.json 的页序和本期栏目对不上，请重新渲染");
+      }
       const order = rendered ?? pageOrder(), cards = order.length;
       if (hasStages) need(pages.length === cards && pages.every((p, i) => p.card === i + 1), "narration", `${cards} 页都要按顺序讲读，不可重复或遗漏`);
       // 每页最多几句：按栏目包自己声明的上限（manifest.narration.lines），本期页数比平时多就按比例收紧，
@@ -334,7 +337,7 @@ export function createPipeline(issueArg) {
       need(total >= lo - 300 && total <= hi + 400, "narration", `讲读稿共 ${total} 字，建议 ${lo}–${hi}`);
     },
     "assets/assets.json": a => {
-      need(a.news?.length >= 2 && a.news?.length <= 3, "assets", "assets.json 的 news 要有 2 或 3 张图片");
+      need(a.news?.length >= 1 && a.news?.length <= 3, "assets", "assets.json 的 news 要有 1–3 张图片");
       if (has("serial.json")) {
         const r = read("serial.json");
         if (r.craft === "origami") {
@@ -440,9 +443,12 @@ export function createPipeline(issueArg) {
       ...(b.section_order ? { _order: b.section_order } : {}),
     };
     if (nw) {
+      const nwParams = b.sections?.news?.params ?? {};
+      const layout = nw.layout || nwParams.layout || "classic";
       issueJson.news = {
         week: nw.week, ask_zh: nw.ask_zh, ask_en: nw.ask_en, credits: nw.credits, foot: nw.foot,
         items: nw.items.map((x, i) => ({ flag: x.flag, place: x.place, title: x.title, text: x.text, word: x.word, photo: asset(a.news?.[i]), photo_pos: x.photo_pos })),
+        ...(layout !== "classic" ? { layout } : {}),
       };
       issueJson._answers.news_sources = nw.items.flatMap(x => x.sources ?? []);
     }

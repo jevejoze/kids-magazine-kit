@@ -62,7 +62,7 @@ test("[creature] and [news] checks come from the packs", t => {
   // 2 items is valid (大图版)
   edit(join(issue, "news.json"), n => { n.items.pop(); });
   assert.deepEqual(errors("[news]"), []);
-  // 1 item triggers error, text > 50 triggers length error
+  // 1 item triggers error in classic layout, text > 50 triggers length error
   edit(join(issue, "news.json"), n => { n.items[0].text = "字".repeat(51); n.items.pop(); });
   const news = errors("[news]").join("\n");
   assert.match(news, /新闻要 2 或 3 条/);

@@ -4,10 +4,15 @@
 #news .pic{background-size:cover;border-bottom:5px solid var(--ink);position:relative}
 #news .lead .pic{height:clamp(240px,var(--news-lead-height,340px),420px)}
 #news .sub .pic{height:clamp(200px,var(--news-sub-height,260px),320px)}
+#news .poster .pic{height:clamp(480px,var(--news-poster-height,680px),720px)}
+#news .poster-ask .pic{height:clamp(380px,var(--news-ask-pic-height,520px),560px)}
 #news .loc{font-size:24px;color:var(--soft)}
 #news .txt{padding:12px 28px 16px}
+#news .poster .txt, #news .poster-ask .txt{padding:16px 30px 20px}
 #news h3{font-size:40px;line-height:1.2;color:#2F6FB5}
+#news .poster h3, #news .poster-ask h3{font-size:42px}
 #news p{font-size:29px;line-height:1.5;margin-top:6px}
+#news .poster p, #news .poster-ask p{margin-top:8px}
 #news .sub h3{font-size:36px;line-height:1.2;color:#2F6FB5}
 #news .sub p{font-size:27px;line-height:1.5;margin-top:4px}
 #news .kw{display:inline-block;margin-left:8px;background:#FFF4C9;border-radius:14px;padding:2px 14px;font-size:27px}
