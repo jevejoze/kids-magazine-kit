@@ -5,7 +5,8 @@
 #serial-book .meta{font-size:26px;color:var(--soft);margin-top:6px;position:relative}
 #serial-book .pic{float:left;width:380px;height:536px;margin:6px 30px 12px 0;overflow:hidden;background:#FFFDF7}
 #serial-book .pic .img{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat}
-#serial-book .pic .credit3{position:absolute;right:16px;bottom:10px;font-size:15px;color:#fff;text-shadow:0 1px 3px #000}
+#serial-book .pic .credit3{position:absolute;left:16px;right:16px;bottom:10px;text-align:right;font-size:15px;line-height:1.35;color:#fff;text-shadow:0 1px 3px #000}
+#serial-book .pic .credit3 span{display:block}
 #serial-book .text{margin-top:22px;font-size:31px;line-height:1.62;position:relative;display:flow-root}
 #serial-book .text p+p{margin-top:8px}
 #serial-book .text em{font-style:normal;background:#FFE58F;padding:0 6px;border-radius:8px}

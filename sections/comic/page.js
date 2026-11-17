@@ -24,5 +24,5 @@ export function render(C, kit) {
     ${C.takeaway ? `<div class="takeaway"><b>所以</b><span>${escapeText(C.takeaway)}</span></div>` : ""}</div>` : ""}
   <div class="grid lower">${comicPanels(C.panels.slice(2), 2, kit)}</div>
   <div class="fact"><b>${C.fact_title || "💡 再发现"}</b><span>${C.fact}</span></div>
-  ${foot(C.host || "主持：团子狗 × 咕咕博士")}`;
+  ${foot("")}`;
 }

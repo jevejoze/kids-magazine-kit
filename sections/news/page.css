@@ -20,6 +20,7 @@
 #news .pair h3{font-size:32px}
 #news .pair p{font-size:25px;line-height:1.45}
 #news .pair .kw{font-size:24px}
+#news .poster+.ask2{margin-top:0;margin-bottom:16px}
 #news .ask2{flex:none;margin-top:18px;padding:12px 30px;background:var(--tomato);color:#fff;font-size:29px;line-height:1.4}
 #news .ask2 .en{font-size:24px;opacity:.9}
 #news .credit2{font-size:15px;color:var(--soft);margin-top:10px;position:relative;line-height:1.3}

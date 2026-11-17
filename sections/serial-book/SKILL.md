@@ -35,8 +35,9 @@
   ],
   "quote": {"en": "The poetry of motion! The real way to travel! The only way to travel!", "zh": "这才是速度的诗篇！这才是真正的旅行方式！", "who": "蛤蟆"},
   "crew": {"who": "dog:panic:130", "say": "刹车！快踩刹车啊！要撞上啦！"},
+  "recap": "蛤蟆一见汽车就着了魔，把大篷车丢在了路边。",
   "guess": "跑车腾空飞出悬崖，蛤蟆能侥幸逃生吗？",
-  "tbc": "下一回：大闹法庭与二十年重刑",
+  "tbc": "下一回：一声巨响之后",
   "summary": "蛤蟆偷车在公路上疯狂飙车，在急转弯处避让马车冲下悬崖，悬念停留在汽车腾空飞出的刹那。"
 }
 ```
@@ -60,6 +61,7 @@
   ],
   "quote": {"en": "There is nothing — absolutely nothing — half so much worth doing as simply messing about in boats.", "zh": "世界上没有任何事，比自由自在闲逛更值得去做了。", "who": "河鼠"},
   "crew": {"who": "owl:smirk:130", "say": "我选飞！站在树梢看你们隐身互踩脚！"},
+  "recap": "蛤蟆的跑车飞出了悬崖护栏。",
   "guess": "如果是你，你选隐身术还是会飞？快找爸妈辩论一场！",
   "tbc": "下一回：河鼠与鼹鼠勇闯凶险野树林",
   "summary": "周五死党脑洞大辩论：隐身术 vs 会飞，列举双方硬核扎心理由，激发孩子周末表达欲。"
@@ -89,7 +91,9 @@
 ### 4. 金句、发问与配图
 - `quote`：摘一句原著英文原文（照抄，核对标点），≤ 25 个词，挑符合当前场景情绪高潮的句子；`zh` 是地道的中文翻译。
 - `guess`：平时是悬念截断发问（“……他能逃出生天吗？”），周五是辩论站队发问（“……你选哪一边？各列3条理由！”），必须以问号结尾。
-- `tbc`：预告下一回，只给核心悬念。
+- `recap`：一句话上回前情，≤ 30 字，印在标题下面（页面自动加「上回：」，这里不用写）。照 `log.jsonl` 里上一回的 `summary` 写，只说上一回停在哪，不提本回。第 2 回起必写。有了 `recap`，章节和作者（`chapter`、`author`）挪到插画署名那一行
+- `tbc`：预告下一回，只给核心悬念。**不能回答本回的 `guess`**：`guess` 问「他会掉头陪他回老家吗？」，`tbc` 就不能写「雪夜里找回鼹鼠的老家」；写一个画面或一个声音（「树桩边的那一声」），不写结果。
+- 页脚留空；只在需要补一句说明时写 `foot`。
 - 插画：优先用 Wikimedia Commons 上的公版原版插画（如 Paul Bransom 1913 版彩图、1908 年初版卷首画），画面必须紧扣当期的高能场面。只用自由授权的图（`image_policy: free-only`）。
 
 ## 图片
@@ -102,4 +106,4 @@ assets 这一步把 `photo_url` 下载成 `assets/serial-book/serial.jpg`（`nod
 
 ## 自检
 
-`node scripts/pipeline.mjs check <issue>` 没有 `[serial]` 报错；字数；`quote` 和原著逐字一致；本回情节和分集计划对得上；插画对得上高能情节；没有照抄中文译本。
+`node scripts/pipeline.mjs check <issue>` 没有 `[serial]` 报错；字数；`quote` 和原著逐字一致；`recap` 和上一回的摘要对得上；`tbc` 没有回答 `guess`；本回情节和分集计划对得上；插画对得上高能情节；没有照抄中文译本。

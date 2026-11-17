@@ -1,6 +1,6 @@
-// 秘密信箱（最后一页）：读者秘密树洞 + 脑洞吐槽
-// 栏目 1：编辑部翻车公开处刑台（丢人事迹爆料与死党吐槽）
-// 栏目 2：秘密树洞 / 向角色提一个答不上来的反套路蠢问题
+// 秘密信箱（最后一页）：一句问候 + 今日翻车 + 树洞
+// 今日翻车：一位编辑部成员搞砸了一件小事，最后由一位死党说一句，落在和好上
+// 树洞：请孩子问一个能难倒某位成员的怪问题，整页只有这一处要动手
 
 export function render(M, kit) {
   const { topBar, foot, ch } = kit;
@@ -9,12 +9,13 @@ export function render(M, kit) {
     who: "raccoon",
     title: "土豆发电大断电",
     desc: "捣蛋浣熊说要用发芽土豆给阁楼供电，火花一闪全楼跳闸，咕咕博士的咖啡直接煮成了胡椒袜子味！",
+    makeup: "咕咕博士：下回先画电路图，我陪你。",
   };
 
   const treehole = M.treehole || {
     target: "owl",
-    question: M.ask_zh || "向博士提一个他绝对答不上来的蠢问题！",
-    hint: "比如：长颈鹿打嗝需要多长时间？在便签画出你的反套路脑洞！",
+    question: M.ask_zh || "问一个博士答不上来的怪问题！",
+    hint: "长颈鹿打嗝需要多长时间？",
   };
 
   const whoSpec = blunder.who || "raccoon";
@@ -37,52 +38,42 @@ export function render(M, kit) {
   const culpritAvatar = ch ? ch(`${whoId}:${whoMood}:130`) : "";
   const targetAvatar = ch ? ch(`${targetId}:${targetMood}:110`) : "";
 
+  const hint = treehole.hint ? String(treehole.hint).replace(/^比如[：:，,]?\s*/, "") : "";
+
   return `${topBar("💌 秘密信箱 · Secret Mailbox", "秘密阁楼")}
   <div class="box note-paper letter fun">
     <div class="tape tape-top"></div>
     <div class="note-tag fun">🤫 阁楼死党悄悄话</div>
-    <div class="letter-text fun">${M.hello || M.letter || "小满早上好！欢迎来到本期秘密阁楼！"}</div>
+    <div class="letter-text fun">${M.hello || M.letter || "早上好！"}</div>
   </div>
 
   <div class="box note-paper blunder-board fun">
     <div class="tape tape-left"></div>
     <div class="board-head">
-      <div class="board-title fun">🚨 本周翻车公开处刑台</div>
-      <span class="stamp fun">处刑通报</span>
+      <div class="board-title fun">🙈 今日翻车</div>
+      <span class="stamp fun">又翻车啦</span>
     </div>
     <div class="blunder-body">
       <div class="culprit-col">
         <div class="avatar-wrap">${culpritAvatar}</div>
-        <div class="culprit-badge fun">责任人：${culpritName}</div>
+        <div class="culprit-badge fun">翻车的是：${culpritName}</div>
       </div>
       <div class="blunder-text">
-        <div class="case-title fun">💥 案件：${blunder.title}</div>
+        <div class="case-title fun">💥 ${blunder.title}</div>
         <div class="case-desc fun">${blunder.desc}</div>
-        <div class="verdict fun">丢人指数：⭐⭐⭐⭐⭐ · 死党一致判定：绝不原谅（下次还敢）</div>
+        ${blunder.makeup ? `<div class="makeup fun">${blunder.makeup}</div>` : ""}
       </div>
     </div>
   </div>
 
   <div class="box note-paper treehole-board fun">
     <div class="tape tape-right"></div>
-    <div class="treehole-head">
-      <div class="treehole-title fun">🕳️ 秘密树洞 · 向${targetName}提问</div>
-      <span class="anti-tag fun">反套路挑战</span>
-    </div>
+    <div class="treehole-title fun">🕳️ 树洞 · 难倒${targetName}</div>
     <div class="treehole-prompt fun">❓ ${treehole.question}</div>
-    ${treehole.hint ? `<div class="treehole-hint fun">💡 <b>反套路脑洞示范：</b>${treehole.hint}</div>` : ""}
+    ${hint ? `<div class="treehole-hint fun">比如：${hint}</div>` : ""}
     <div class="doodle-zone">
-      <div class="doodle-header fun">
-        <span>✏️ 涂鸦草稿区 / 便签写画留言：</span>
-        <span class="doodle-target en">Target: ${targetId}</span>
-      </div>
-      <div class="doodle-canvas">
-        <div class="doodle-grid">
-          <i></i><i></i><i></i>
-        </div>
-        <div class="doodle-tip fun">在这里写下或画出你的反套路问题，绝对难倒他！</div>
-        <div class="target-avatar">${targetAvatar}</div>
-      </div>
+      <div class="doodle-tip fun">写一句、画一笔都行</div>
+      <div class="target-avatar">${targetAvatar}</div>
     </div>
   </div>
 

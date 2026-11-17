@@ -10,9 +10,9 @@ export function check(n, ctx = {}) {
   const problems = [...missing(n, REQUIRED)], need = (ok, msg) => { if (!ok) problems.push(msg); };
   const isPoster = n.layout === "poster" || ctx?.params?.layout === "poster";
   if (isPoster) {
-    need(n.items?.length >= 1 && n.items?.length <= 3, "新闻要 1–3 条（海报版最多 3 条）");
+    need(n.items?.length === 2, "大图版新闻要 2 条，一条一页");
   } else {
-    need(n.items?.length >= 2 && n.items?.length <= 3, "新闻要 2 或 3 条（大图版为 2 条）");
+    need(n.items?.length >= 2 && n.items?.length <= 3, "经典版新闻要 2 或 3 条");
   }
   n.items?.forEach((x, i) => {
     need(len(x.text) <= 50, `第 ${i + 1} 条 ${len(x.text)} 字，超过 50`);

@@ -8,11 +8,12 @@
     "hello": { "type": "string", "minLength": 1, "maxLength": 60 },
     "blunder": {
       "type": "object",
-      "required": ["who", "title", "desc"],
+      "required": ["who", "title", "desc", "makeup"],
       "properties": {
         "who": { "type": "string" },
         "title": { "type": "string", "minLength": 1, "maxLength": 16 },
-        "desc": { "type": "string", "minLength": 1, "maxLength": 100 }
+        "desc": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "makeup": { "type": "string", "minLength": 1, "maxLength": 20 }
       }
     },
     "treehole": {

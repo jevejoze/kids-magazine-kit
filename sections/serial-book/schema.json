@@ -66,6 +66,13 @@
     "tbc": {
       "type": "string"
     },
+    "recap": {
+      "type": "string",
+      "maxLength": 30
+    },
+    "foot": {
+      "type": "string"
+    },
     "summary": {
       "type": "string"
     },

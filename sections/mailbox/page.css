@@ -15,7 +15,7 @@
 #mailbox .note-tag{font-size:24px;color:var(--soft);margin-bottom:4px}
 #mailbox .letter-text{font-size:27px;line-height:1.45;color:var(--ink)}
 
-/* 栏目1：翻车公开处刑台 */
+/* 栏目 1：今日翻车 */
 #mailbox .blunder-board{margin-top:18px;padding:18px 24px 16px;background:#FFF9F5;flex:none;transform:rotate(-0.4deg)}
 #mailbox .board-head{display:flex;justify-content:space-between;align-items:center}
 #mailbox .board-title{font-size:32px;color:#D84315;letter-spacing:1px}
@@ -28,24 +28,17 @@
 #mailbox .blunder-text{flex:1;min-width:0}
 #mailbox .case-title{font-size:26px;color:var(--ink);font-weight:bold}
 #mailbox .case-desc{margin-top:6px;font-size:25px;line-height:1.42;color:var(--ink)}
-#mailbox .verdict{margin-top:8px;font-size:21px;color:#B71C1C;background:#FFF0ED;border-radius:12px;padding:4px 12px;border:1px dashed #E57373}
 
-/* 栏目2：秘密树洞 / 蠢问题挑战 */
-#mailbox .treehole-board{margin-top:18px;padding:18px 24px 18px;background:#F6FBFF;flex:none;transform:rotate(0.4deg)}
-#mailbox .treehole-head{display:flex;justify-content:space-between;align-items:center}
+#mailbox .makeup{margin-top:8px;font-size:23px;line-height:1.4;color:var(--ink);background:#FFF6D6;border-radius:12px;padding:4px 12px}
+
+/* 栏目 2：树洞 */
+#mailbox .treehole-board{margin-top:18px;margin-bottom:18px;padding:18px 24px 18px;background:#F6FBFF;flex:1;min-height:0;display:flex;flex-direction:column;transform:rotate(0.4deg)}
 #mailbox .treehole-title{font-size:32px;color:#1565C0}
-#mailbox .anti-tag{font-size:20px;background:#8EC5FF;border:2px solid var(--ink);border-radius:999px;padding:2px 14px;color:var(--ink)}
 #mailbox .treehole-prompt{margin-top:8px;font-size:27px;color:var(--ink)}
 #mailbox .treehole-hint{margin-top:4px;font-size:23px;color:#455A64;line-height:1.4}
-#mailbox .treehole-hint b{color:#0D47A1;font-weight:normal}
 
-/* 手账涂鸦手绘区 */
-#mailbox .doodle-zone{margin-top:10px;background:#FFFDF9;border:3px dashed #90A4AE;border-radius:20px;padding:12px 18px;position:relative}
-#mailbox .doodle-header{display:flex;justify-content:space-between;font-size:21px;color:var(--soft)}
-#mailbox .doodle-target{font-size:18px;color:#78909C}
-#mailbox .doodle-canvas{position:relative;min-height:92px;margin-top:6px;display:flex;align-items:center}
-#mailbox .doodle-grid{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-around;pointer-events:none}
-#mailbox .doodle-grid i{display:block;height:28px;border-bottom:2px dashed rgba(74,59,50,0.18)}
-#mailbox .doodle-tip{position:relative;z-index:1;font-size:23px;color:#9E9E9E;padding-right:120px}
+/* 留给孩子写画的空白 */
+#mailbox .doodle-zone{flex:1;min-height:120px;margin-top:12px;background:#FFFDF9;border:3px dashed #90A4AE;border-radius:20px;padding:12px 18px;position:relative}
+#mailbox .doodle-tip{font-size:23px;color:#9E9E9E}
 #mailbox .target-avatar{position:absolute;right:0;bottom:0;z-index:2;width:110px;height:100px;display:flex;align-items:flex-end;justify-content:center}
 #mailbox .target-avatar svg{max-width:110px;max-height:100px}

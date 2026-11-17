@@ -9,14 +9,16 @@ export function check(m) {
   // 翻车榜校验
   need(m.blunder && typeof m.blunder === "object", "缺少翻车榜字段 blunder");
   if (m.blunder) {
-    need(m.blunder.who, "翻车榜缺少责任人 blunder.who");
+    need(m.blunder.who, "翻车榜缺少翻车的角色 blunder.who");
     need(m.blunder.title, "翻车榜缺少标题 blunder.title");
     need(len(m.blunder.title) <= 16, `翻车榜标题 ${len(m.blunder.title)} 字，超过 16`);
     need(m.blunder.desc, "翻车榜缺少过程描述 blunder.desc");
     need(len(m.blunder.desc) <= 100, `翻车榜过程描述 ${len(m.blunder.desc)} 字，超过 100`);
+    need(m.blunder.makeup, "翻车榜缺少和好的那一句 blunder.makeup");
+    need(len(m.blunder.makeup) <= 20, `翻车榜和好的那一句 ${len(m.blunder.makeup)} 字，超过 20`);
   }
 
-  // 秘密树洞 / 蠢问题挑战校验
+  // 树洞校验
   need(m.treehole && typeof m.treehole === "object", "缺少树洞字段 treehole");
   if (m.treehole) {
     need(m.treehole.target, "树洞缺少对象角色 treehole.target");
@@ -50,9 +52,9 @@ export function checkNarration(lines, ctx) {
     [...t.matchAll(/(?:说给|讲给|发给|告诉|拿给)(爸爸|妈妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|家人)/g)].forEach(m => {
       if (sendTo.length && !sendTo.includes(m[1])) problems.push(`说"${m[0]}"，send_note 写的是"${ctx.sendNote}"`);
     });
-    if (/你猜/.test(t)) problems.push(`信箱不再出猜谜题，只念树洞互动与反套路提问：${t}`);
+    if (/你猜/.test(t)) problems.push(`信箱不再出猜谜题，只念今日翻车和树洞：${t}`);
     if (/上期答案|上期.*谜题.*答案/.test(t)) problems.push(`信箱不再公布上期答案：${t}`);
-    if (OBSOLETE_SURVEY.test(t)) problems.push(`信箱已重构为树洞与翻车台，严禁出现作业评价式机械提问：${t}`);
+    if (OBSOLETE_SURVEY.test(t)) problems.push(`信箱不出作业评价式的问卷提问：${t}`);
   });
   return problems;
 }

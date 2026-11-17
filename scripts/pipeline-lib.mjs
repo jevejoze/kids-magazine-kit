@@ -447,7 +447,7 @@ export function createPipeline(issueArg) {
       const layout = nw.layout || nwParams.layout || "classic";
       issueJson.news = {
         week: nw.week, ask_zh: nw.ask_zh, ask_en: nw.ask_en, credits: nw.credits, foot: nw.foot,
-        items: nw.items.map((x, i) => ({ flag: x.flag, place: x.place, title: x.title, text: x.text, word: x.word, photo: asset(a.news?.[i]), photo_pos: x.photo_pos })),
+        items: nw.items.map((x, i) => ({ flag: x.flag, place: x.place, title: x.title, text: x.text, word: x.word, photo: asset(a.news?.[i]), photo_pos: x.photo_pos, credit: x.photo_credit })),
         ...(layout !== "classic" ? { layout } : {}),
       };
       issueJson._answers.news_sources = nw.items.flatMap(x => x.sources ?? []);

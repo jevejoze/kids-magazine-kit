@@ -1,7 +1,7 @@
 // 经典连载 · 书的按页校验：check(serial, ctx) → 问题列表（不带步骤前缀）
 //   kind、crew 这些各 kind 共用的检查在 pipeline-lib 里，这里只管书
 const REQUIRED = ["ep", "book_zh", "book_en", "chapter", "title_zh", "paragraphs", "quote", "crew", "guess", "tbc", "photo_url", "photo_credit"];
-const MAX_CHARS = 280, MAX_QUOTE_WORDS = 25, MAX_CREW_SAY = 20;
+const MAX_CHARS = 280, MAX_QUOTE_WORDS = 25, MAX_CREW_SAY = 20, MAX_RECAP = 30;
 const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
 const words = s => String(s ?? "").replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
 
@@ -24,6 +24,9 @@ export function check(r, ctx = {}) {
     if (r.crew.say && len(r.crew.say) > MAX_CREW_SAY) problems.push(`认领角色吐槽 ${len(r.crew.say)} 字，超过 ${MAX_CREW_SAY}`);
     if (r.crew.who && ctx.checkChar) problems.push(...(ctx.checkChar(r.crew.who, "crew.who") ?? []));
   }
+
+  if (r.ep > 1 && !r.recap) problems.push("第 2 回起要写一句上回前情 recap");
+  if (r.recap && len(r.recap) > MAX_RECAP) problems.push(`上回前情 ${len(r.recap)} 字，超过 ${MAX_RECAP}`);
 
   if (r.guess && !/[？?]$/.test(r.guess.trim())) {
     problems.push("悬念/辩论发问（guess）须以问号结尾");
