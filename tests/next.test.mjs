@@ -108,6 +108,13 @@ test("producer 开工推锁并区分 ready、draft、missing，重复触发不�
     assert.equal(git(remote, "show", "--pretty=format:", "--name-only", "main"), "issues/004/.lock");
     assert.equal(readFileSync(join(root, "待续写.md"), "utf8"), "本地已有暂存稿");
 
+    // 同一个执行再次触发（上次中断、任务书还没写）：照常接着开工，不重领锁、不被自己挡住
+    const commits = git(remote, "rev-list", "--count", "main");
+    const self = run(root, "2026-10-15", "producer", { KIDS_MAG_AGENT: "首位执行" });
+    action(self, "produce role=producer date=2026-10-15 issue=issues/004");
+    assert.doesNotMatch(self.stdout, /接手/);
+    assert.equal(git(remote, "rev-list", "--count", "main"), commits);
+
     const again = run(root, "2026-10-15", "producer", { KIDS_MAG_AGENT: "第二位执行" });
     action(again, "blocked role=producer date=2026-10-15 issue=issues/004");
     assert.match(again.stdout, /首位执行 正在制作/);

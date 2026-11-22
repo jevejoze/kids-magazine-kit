@@ -184,12 +184,14 @@ function produceToday(data, date, name, retry = true) {
   if (latest >= 999) throw new Error("下一期期号超过三位数字");
   const issue = `issues/${String(latest + 1).padStart(3, "0")}`, fields = { ...base, issue };
   const lock = readLock(data, issue);
-  if (lock && !lock.expired) return blocked(fields, lock);
+  // 自己领的锁、任务书还没写（上次触发中断了）：照常接着开工，不再重领
+  const own = lock && lock.by === name && lock.host === hostname();
+  if (lock && !lock.expired && !own) return blocked(fields, lock);
   const card = planDay(readPlan(data, isoWeek(date)), date);
-  const changed = takeLock(lock, fields);
+  const changed = own ? null : takeLock(lock, fields);
   if (changed) return changed;
   return { ...fields, action: "produce", instructions: [
-    ...(lock ? [`已接手 ${lock.by} 的过期开工锁。`] : []),
+    ...(lock && !own ? [`已接手 ${lock.by} 的过期开工锁。`] : []),
     "1. 阅读 \`.engine/roles/producer.md\`。",
     `2. 运行 \`node .engine/scripts/pipeline.mjs schedule ${issue} ${date}\`，按任务书出刊。`,
     `3. 归档后推送回执，运行 \`node .engine/scripts/notify.mjs issue ${issue}\` 生成通知。`,
