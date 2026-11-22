@@ -12,6 +12,13 @@ export const DEDUPE = {
   news_url: true, news_event: true, news_entity_days: 21, claim: true, question: true,
   same_section_entity_days: 30, cross_section_entity_days: 14, mechanism_days: 45, title_fuzzy_days: 30,
 };
+// 泛称实体：大类不回避（孩子喜欢动物就该多出动物），只按具体物种、具体对象、具体事件去重。
+// 这些词仍记在总账里，但不参加实体窗口；数据仓库可在 magazine.yaml 的 dedupe.generic 里追加。
+export const GENERIC_ENTITIES = [
+  "动物", "植物", "狗", "猫", "鸟", "鱼", "虫子", "昆虫", "恐龙", "化石", "海洋", "深海", "大海", "太空", "宇宙",
+  "地球", "月球", "月亮", "太阳", "星星", "天气", "科学家", "博物馆", "机器人", "人工智能", "古埃及", "古代",
+  "中国", "美国", "日本", "英国", "世界纪录", "吉尼斯世界纪录", "宠物", "小学生", "儿童",
+];
 const DAY = 86400e3;
 export const stripTags = s => String(s ?? "").replace(/<[^>]+>/g, "");
 const plain = s => stripTags(s).replace(/[\s\p{P}\p{S}]/gu, "").toLowerCase();
@@ -77,10 +84,12 @@ export function readTopics(dataDir) {
 export function topicContext(dataDir, magazine) {
   if (!magazine) magazine = loadMagazine(dataDir, loadSections({ engine: ENGINE, data: dataDir }).sections);
   const names = aliases(dataDir);
+  const canonical = s => { const key = plain(s); return names.get(key) ?? key; };
   return {
     rows: readTopics(dataDir),
     rules: { ...DEDUPE, ...magazine.dedupe },
-    canonical: s => { const key = plain(s); return names.get(key) ?? key; },
+    canonical,
+    generic: new Set([...GENERIC_ENTITIES, ...(magazine.dedupe?.generic ?? [])].map(canonical)),
   };
 }
 
@@ -118,10 +127,10 @@ function gap(a, b) {
 const within = (rule, days) => rule === true || (typeof rule === "number" && days <= rule);
 const similar = (a, b, n) => shares(plain(a), plain(b), n);
 
-export function compareTopics(topic, previous, { rules, canonical }, allowRepeat = topic.allow_repeat) {
+export function compareTopics(topic, previous, { rules, canonical, generic = new Set() }, allowRepeat = topic.allow_repeat) {
   const days = gap(topic, previous), { section } = topic;
   const sameSection = section === previous.section;
-  const entities = topic.entities.map(canonical).filter(Boolean);
+  const entities = topic.entities.map(canonical).filter(e => e && !generic.has(e));
   const shared = previous.entities.find(entity => entities.includes(canonical(entity)));
   const messages = [];
   const add = (key, match, reason, warning = false) => {

@@ -203,6 +203,7 @@ node .engine/scripts/pipeline.mjs plan-check plan/2026-W49.json
 | `title_fuzzy_days` | 30 | 历史条目没有实体时，标题相似（连续 6 字）| 警告 |
 
 - 卡写了 `allow_repeat` → 错误降为警告，警告里带上理由。
+- **泛称实体**（狗、猫、化石、恐龙、月球、古埃及、吉尼斯世界纪录……，引擎默认清单见 `scripts/topics.mjs` 的 `GENERIC_ENTITIES`，数据仓库可用 `magazine.yaml` 的 `dedupe.generic: [...]` 追加）不参加实体窗口：大类不回避，只拦具体物种、对象、事件。卡的实体全是泛称时 plan-check 警告。依据：用 001–024 期真实总账回放，未排除泛称时「化石」「狗」「猫」「古埃及」造成 21 条误拦，排除后剩下的全是真重复。
 - 日期按出刊日（plan 的那一天 / brief 的日期）计算。
 
 ### 4.3 拦截点

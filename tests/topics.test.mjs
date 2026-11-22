@@ -142,3 +142,25 @@ test("archive 追加实际栏目及备用卡元数据，重跑不重复，并在
   assert.equal(p.done("archive"), true);
   assert.equal(run(data, "pipeline.mjs", "plan-check", "plan/2026-W42.json").status, 0);
 });
+
+test("泛称实体不参加实体窗口，magazine.yaml 的 dedupe.generic 可追加", t => {
+  const { data } = fixture(t);
+  const ctx = topicContext(data);
+  const old = row({ title: "6岁男孩发现海洋动物化石", entities: ["化石", "鱼龙"], url: "https://example.org/a" });
+  const fresh = row({ id: "n-trike", date: "2026-10-10", title: "五只三角龙进博物馆", entities: ["化石", "三角龙"], url: "https://example.org/b" });
+  assert.deepEqual(compareTopics(fresh, old, ctx), []);
+  const same = row({ id: "n-ichthy", date: "2026-10-10", title: "鱼龙新标本", entities: ["鱼龙"], url: "https://example.org/c" });
+  assert.match(compareTopics(same, old, ctx)[0].text, /新闻实体重复：鱼龙/);
+  const custom = topicContext(data, { dedupe: { generic: ["鱼龙"] } });
+  assert.deepEqual(compareTopics(same, old, custom), []);
+});
+
+test("自选新闻自带的 entities 和 event 归档时进总账", t => {
+  const brief = { issue: 9, date: "2026.10.14 周三", plan: { status: "missing", fallback: [] } };
+  const news = { items: [{ title: "自选新闻", sources: ["https://example.org/x", "https://example.org/y"], entities: ["虎鲸"], event: "虎鲸戴鲑鱼帽" }] };
+  return import("../scripts/plan.mjs").then(({ outputTopics }) => {
+    const { rows, errors } = outputTopics(brief, { news });
+    assert.deepEqual(errors, []);
+    assert.deepEqual([rows[0].entities, rows[0].event, rows[0].url], [["虎鲸"], "虎鲸戴鲑鱼帽", "https://example.org/x"]);
+  });
+});

@@ -138,7 +138,10 @@ export function validateMagazine(m, registry = []) {
   if ("dedupe" in m) {
     if (!isMap(m.dedupe)) errors.push("dedupe 要是 map");
     else for (const [key, value] of Object.entries(m.dedupe)) {
-      if (!Object.hasOwn(DEDUPE, key)) errors.push(`dedupe.${key} 是未知的去重规则`);
+      if (key === "generic") {
+        if (!Array.isArray(value) || !value.every(v => typeof v === "string" && v.trim()))
+          errors.push("dedupe.generic 要是泛称实体的字符串列表");
+      } else if (!Object.hasOwn(DEDUPE, key)) errors.push(`dedupe.${key} 是未知的去重规则`);
       else if (!(Number.isInteger(value) && value >= 0) && !(typeof DEDUPE[key] === "boolean" && typeof value === "boolean"))
         errors.push(`dedupe.${key} 要是非负天数${typeof DEDUPE[key] === "boolean" ? "、true（永久）或 false（关闭）" : ""}`);
     }

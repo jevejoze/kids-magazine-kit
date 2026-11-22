@@ -102,7 +102,7 @@ sh .engine/scripts/run.sh
 - `answer`：一句话答案，留给今日一问讲。
 - `why_reader`：为什么适合这个孩子，必须引用档案依据（`profile.md` 兴趣权重、`curation-log.md` 随手记、`child-questions.md`、`feedback.jsonl`）。
 - `avoid`：不要讲成什么样（如避免枯燥分类）。
-- `entities`：核心实体列表，≥ 1 个，规范中文名，如 `["抹香鲸"]`。
+- `entities`：核心实体列表，≥ 1 个，规范中文名，如 `["抹香鲸"]`。要写**具体**的物种、对象或事件（抹香鲸、旅行者1号、狮子座流星雨），不要只写大类（狗、猫、化石、月球）：大类是泛称，不参加去重，全写泛称 plan-check 会警告。同一事物用同一个名字，别名登记在数据目录的 `state/topic-aliases.json`。
 - `sources`：参考来源 URL 列表，≥ 1。
 - `asked_by`：孩子提的问题写称呼；否则省略或留空。
 - `photo_hint`：封面照片拍摄方向（如"深海竖直悬浮睡觉的抹香鲸群"）。

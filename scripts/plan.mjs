@@ -226,6 +226,8 @@ export function checkPlan(file) {
     if (entries.some(other => other !== entry && other.topic.id === topic.id)
       || ctx.rows.some(row => row.id === topic.id && !archivedOrigin(entry, row, briefs)))
       errors.push(`id 重复：${topic.id}`);
+    if (topic.entities.length && topic.entities.every(e => ctx.generic.has(ctx.canonical(e))))
+      warnings.push(`[${topic.section}] ${topic.id} 的实体全是泛称（${topic.entities.join("、")}），去重只能靠标题，请补一个具体物种、对象或事件名`);
     if (entry.spare && !pending(entry)) continue;
     for (const row of ctx.rows) {
       if (archivedOrigin(entry, row, briefs) && (row.id === topic.id || (!row.id && !entry.spare))) continue;
