@@ -90,13 +90,14 @@ node .engine/scripts/pipeline.mjs plan-fallback issues/NNN news <卡 id> "原配
 - `cover` / `check`：脚本自动从该周 `spares` 中取第一张未被用过且通过去重的备用卡替换进 `brief.plan`，并在 `brief.plan.fallback` 记录。若无可用备用卡，自动降级为自选（`"to": "free"`），免除忠实度核对，去重照样拦截。
 - `news`：将该卡标为作废（`"to": "free"`），执行可自行找一条符合规则的新闻替代，该卡不再强制要求 url 匹配，新找的新闻依然经过总账去重拦截。
 - 每次 fallback 都会记录原因，并在出刊通知中告知家长。
+- **自选的稿件要自带主题字段**（降级成自选、或当天没有选题卡时）：新闻每条写 `entities`（1–3 个规范中文名）和 `event`（一句话事件），封面写 `entities` 和 `mechanism_key`，真的假的写 `entities`。check 用它们去重，归档时写进总账；不写只能靠标题相似兜底，以后容易撞题。
 
 ### 5. 后续制作、归档与通知
 
 1. 完成各步制作与素材下载。
 2. 合并整期：`node .engine/scripts/pipeline.mjs assemble issues/NNN`。
 3. 审稿：按 `pipeline/stages/review.md` 审核内容，记录指纹。
-4. 渲染：`node .engine/scripts/render.mjs issues/NNN/30-issue.json issues/NNN/cards --flat`。
+4. 渲染：`node .engine/scripts/render.mjs issues/NNN/issue.json issues/NNN/cards --flat`。
 5. 语音与视频：按流程运行语音与视频制作脚本。
 6. 归档（第 90 步）：
    - 运行：`node .engine/scripts/pipeline.mjs archive issues/NNN`。

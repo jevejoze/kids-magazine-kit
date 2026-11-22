@@ -44,7 +44,7 @@
       },
       "misconception": "半夜不落山就意味着太阳不动。",
       "answer": "地球倾斜，夏天北极附近连午夜也照得到太阳。",
-      "why_nini": "profile.md：喜欢大自然里让人觉得奇怪的现象。",
+      "why_reader": "profile.md：喜欢大自然里让人觉得奇怪的现象。",
       "entities": [
         "极昼"
       ],
@@ -63,7 +63,7 @@
         "https://aa.usno.navy.mil/faq/eqtime",
         "https://pmel.noaa.gov/arctic-zone/gallery_np_seasons.html"
       ],
-      "why_nini": "profile.md：用可以观察的证据判断说法。"
+      "why_reader": "profile.md：用可以观察的证据判断说法。"
     },
     "news": [
       {
@@ -76,7 +76,7 @@
         ],
         "title_hint": "11 岁女孩成为最年轻的“女子特级大师”",
         "angle": "看视频自学本领",
-        "why_nini": "profile.md：从动物行为和生活经验引出追问。"
+        "why_reader": "profile.md：从动物行为和生活经验引出追问。"
       },
       {
         "id": "n-2026-10-14-pelican",
@@ -88,7 +88,7 @@
         ],
         "title_hint": "鹈鹕敲门求救",
         "angle": "动物什么时候会向人求助",
-        "why_nini": "profile.md：从动物行为和生活经验引出追问。"
+        "why_reader": "profile.md：从动物行为和生活经验引出追问。"
       },
       {
         "id": "n-2026-10-14-dog-faces",
@@ -100,7 +100,7 @@
         ],
         "title_hint": "狗狗看得出你在害怕",
         "angle": "动物怎样读懂表情",
-        "why_nini": "profile.md：从动物行为和生活经验引出追问。"
+        "why_reader": "profile.md：从动物行为和生活经验引出追问。"
       }
     ],
     "week": "2026-W42",

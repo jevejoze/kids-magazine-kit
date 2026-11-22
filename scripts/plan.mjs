@@ -121,7 +121,7 @@ function validateCard(card, section, at, errors) {
   const length = (field, max) => need(field, isText(card[field]) && stripTags(card[field]).trim() && [...stripTags(card[field])].length <= max, `要有文字且去掉标签后不超过 ${max} 字`);
   need("id", isText(card.id) && ID.test(card.id) && card.id !== "free", "要用小写字母、数字和连字符，free 是降级保留值");
   need("entities", textList(card.entities, isText), "至少要有一个实体名");
-  text("why_nini");
+  text("why_reader");
   text("allow_repeat", true);
   if (section !== "news") need("sources", textList(card.sources, isUrl), "至少要有一个 HTTP(S) URL");
   if (section === "cover") {
@@ -300,10 +300,11 @@ export function outputTopics(brief, values, source = "archive") {
     if (!isText(title)) return;
     const topic = cardTopic(section, card ?? {}, date);
     const main = topic.url ?? sources[0] ?? null;
-    // 自选稿若自带主题字段，出稿时也参加去重。总账只留选题卡提供的结构化信息。
-    const entities = checking && !card && Array.isArray(actual.entities) ? actual.entities.filter(isText) : topic.entities;
-    const mechanism = checking && section === "cover" && isText(actual.mechanism_key) ? actual.mechanism_key : null;
-    const event = checking && section === "news" && isText(actual.event) ? actual.event : null;
+    // 自选稿（降级或没有选题卡）自带的主题字段 entities / mechanism_key / event 也参加去重，归档时一并进总账，
+    // 这样降级出的新闻同样受实体窗口保护。有选题卡时以卡为准。
+    const entities = !card && Array.isArray(actual.entities) ? actual.entities.filter(isText) : topic.entities;
+    const mechanism = !card && section === "cover" && isText(actual.mechanism_key) ? actual.mechanism_key : null;
+    const event = !card && section === "news" && isText(actual.event) ? actual.event : null;
     const urls = [...new Set(sources.filter(u => u !== main))];
     rows.push({
       issue: Number(brief.issue), date, section, id: card?.id ?? null, title: stripTags(title),

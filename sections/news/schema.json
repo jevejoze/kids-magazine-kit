@@ -23,7 +23,9 @@
           "photo_pos": { "type": "string" },
           "photo_shows": { "type": "string" },
           "talk": { "type": "object", "required": ["background", "scale", "follow_up"], "properties": { "background": { "type": "string" }, "scale": { "type": "string" }, "follow_up": { "type": "string" } } },
-          "sources": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+          "sources": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+          "entities": { "type": "array", "items": { "type": "string" }, "description": "自选时填：核心实体规范名，去重用（有选题卡时以卡为准）" },
+          "event": { "type": "string", "description": "自选时填：一句话事件描述，去重用" }
         }
       }
     },

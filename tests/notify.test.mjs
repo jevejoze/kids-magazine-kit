@@ -27,7 +27,7 @@ test("周排通知按日期输出星期、封面、真的假的和备用卡", t 
   assert.match(text, /^📅.*2026-W42/);
   assert.match(text, /2026-10-14 星期三｜挪威夏天半夜.*｜极昼时，太阳一直停在同一个位置/);
   assert.match(text, /备用卡\n封面｜肥皂泡.*｜在山谷里.*\n真的假的｜所有蜘蛛/);
-  assert.doesNotMatch(text, /<br>|why_nini|https:\/\//);
+  assert.doesNotMatch(text, /<br>|why_reader|https:\/\//);
 });
 
 test("定稿通知显示新闻建议标题、每次变更和原因", t => {

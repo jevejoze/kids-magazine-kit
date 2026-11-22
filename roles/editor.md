@@ -76,7 +76,7 @@ sh .engine/scripts/run.sh
    - 数量：按版面要求选够（海报版 poster 2 条，经典版 classic 3 条）。
    - 填写 `news` 数组，每条为一张 NewsCard。
 3. **核实与质量自查**：
-   - 逐张卡核实：来源 URL 真实且能打开、数字核对确凿、符合 `core/rules/topic-quality.md`、`why_nini` 引用依据真实有效。
+   - 逐张卡核实：来源 URL 真实且能打开、数字核对确凿、符合 `core/rules/topic-quality.md`、`why_reader` 引用依据真实有效。
 4. **标 ready 并校验**：
    - 将明天那一天的 `status` 改为 `"ready"`。
    - 运行校验：`node .engine/scripts/pipeline.mjs plan-check plan/<YYYY-Www>.json`。
@@ -100,7 +100,7 @@ sh .engine/scripts/run.sh
 - `number`：`{"value": "可核实数字", "source": "来源URL"}`，必须查证确凿。
 - `misconception`：要纠正的一个常见误解。
 - `answer`：一句话答案，留给今日一问讲。
-- `why_nini`：为什么适合这个孩子，必须引用档案依据（`profile.md` 兴趣权重、`curation-log.md` 随手记、`child-questions.md`、`feedback.jsonl`）。
+- `why_reader`：为什么适合这个孩子，必须引用档案依据（`profile.md` 兴趣权重、`curation-log.md` 随手记、`child-questions.md`、`feedback.jsonl`）。
 - `avoid`：不要讲成什么样（如避免枯燥分类）。
 - `entities`：核心实体列表，≥ 1 个，规范中文名，如 `["抹香鲸"]`。
 - `sources`：参考来源 URL 列表，≥ 1。
@@ -121,14 +121,14 @@ sh .engine/scripts/run.sh
   },
   "misconception": "以为鲸鱼像人一样躺着睡大觉或者睡觉时会溺水。",
   "answer": "它们头朝上竖直漂在水里，关掉半边大脑打个十几分钟的盹，还得浮出水面换气！",
-  "why_nini": "依据 child-questions.md 11-20 提问「鲸鱼怎么在水里睡觉」；符合 profile.md 海洋生物高权重。",
+  "why_reader": "依据 child-questions.md 11-20 提问「鲸鱼怎么在水里睡觉」；符合 profile.md 海洋生物高权重。",
   "avoid": "不要罗列所有鲸目分类，聚焦抹香鲸竖立睡觉的震撼奇观。",
   "entities": ["抹香鲸"],
   "sources": [
     "https://www.nature.com/articles/news080221-2",
     "https://www.nationalgeographic.com/animals/mammals/facts/sperm-whale"
   ],
-  "asked_by": "妮妮",
+  "asked_by": "小满",
   "photo_hint": "深海幽蓝背景下数头抹香鲸笔直竖立悬浮睡觉的震撼实拍"
 }
 ```
@@ -140,7 +140,7 @@ sh .engine/scripts/run.sh
 - `truth`：`真` / `假` / `说不清`（约三分之一为真）。
 - `entities`：核心实体列表，≥ 1 个。
 - `sources`：可靠核实来源 URL，≥ 1。
-- `why_nini`：选题依据，引用档案记录。
+- `why_reader`：选题依据，引用档案记录。
 - `notes`：破谣切入点或给执行的提示。
 - `allow_repeat`：有意重复理由（可选）。
 
@@ -155,7 +155,7 @@ sh .engine/scripts/run.sh
     "https://www.nhm.ac.uk/discover/octopuses-have-three-hearts.html",
     "https://ocean.si.edu/ocean-life/invertebrates/cephalopods"
   ],
-  "why_nini": "依据 profile.md 海洋生物高权重；反馈显示孩子极喜欢颠覆身体常识的奇趣事实。",
+  "why_reader": "依据 profile.md 海洋生物高权重；反馈显示孩子极喜欢颠覆身体常识的奇趣事实。",
   "notes": "两颗鳃心负责把血液泵入鳃部吸氧，一颗主心负责全身供血，游动时主心还会停跳。"
 }
 ```
@@ -170,7 +170,7 @@ sh .engine/scripts/run.sh
 - `title_hint`：建议标题，吸引孩子。
 - `angle`：讲给孩子的切入点（动物超常行为 / 搞怪纪录 / 民间发明）。
 - `photo`：照片直链或搜图方向；有视频写 `video`。
-- `why_nini`：选题依据，引用档案。
+- `why_reader`：选题依据，引用档案。
 - `followup_of`：同事件新进展写旧新闻 URL；否则省略。
 - `allow_repeat`：有意重复理由（可选）。
 
@@ -185,7 +185,7 @@ sh .engine/scripts/run.sh
   "title_hint": "乌鸦自制“投石取水器”喝水！",
   "angle": "动物超常智力与工具使用，颠覆孩子对鸟类认知的趣味抓手",
   "photo": "乌鸦嘴叼石子悬停在饮水机开关上方的抓拍照片，有新闻原视频",
-  "why_nini": "依据 profile.md 动物行为高权重；实证鸟类聪明程度堪比 7 岁儿童。"
+  "why_reader": "依据 profile.md 动物行为高权重；实证鸟类聪明程度堪比 7 岁儿童。"
 }
 ```
 

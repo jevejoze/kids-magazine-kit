@@ -64,6 +64,7 @@
       "minItems": 2,
       "description": "至少2个独立可靠的科学/常识来源",
       "items": { "type": "string" }
-    }
+    },
+    "entities": { "type": "array", "items": { "type": "string" }, "description": "自选时填：核心实体规范名，去重用（有选题卡时以卡为准）" }
   }
 }

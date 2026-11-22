@@ -11,7 +11,7 @@
   - `data/child-questions.md`：孩子自己提过的问题（最优先题库）。
   - `data/feedback.jsonl`：每期结构化打卡反馈。
   - `data/letters.md`：孩子的来信与原话。
-- **`why_nini` 必须引用真实依据**：选题卡中的 `why_nini` 字段（为什么选这个题）必须具体指明出处，如 `"依据 profile.md 海洋生物高权重"`、`"依据 child-questions.md 11-20 提问"`、`"依据 curation-log.md 11-15 随手记"`。严禁凭空编造理由。
+- **`why_reader` 必须引用真实依据**：选题卡中的 `why_reader` 字段（为什么选这个题）必须具体指明出处，如 `"依据 profile.md 海洋生物高权重"`、`"依据 child-questions.md 11-20 提问"`、`"依据 curation-log.md 11-15 随手记"`。严禁凭空编造理由。
 
 ## 好题的六大标准
 

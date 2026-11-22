@@ -88,7 +88,7 @@ NOTIFY:
     "2026-11-30": {
       "status": "ready",                 // draft | ready；执行只把 ready 当定稿
       "revised": [                       // 前一晚定稿时的变更记录，可空
-        {"at": "2026-11-29T21:10:00+08:00", "by": "<agent>", "what": "换封面", "why": "妮妮问了鲸鱼怎么睡觉（child-questions 11-29）"}
+        {"at": "2026-11-29T21:10:00+08:00", "by": "<agent>", "what": "换封面", "why": "小满问了鲸鱼怎么睡觉（child-questions 11-29）"}
       ],
       "cover": { /* CoverCard */ },
       "check": { /* CheckCard */ },      // 本期不出真的假的时省略
@@ -116,7 +116,7 @@ NOTIFY:
 | `number` | ✓ | `{"value": "可核实的数字", "source": "https://…"}` |
 | `misconception` | ✓ | 要纠正的常见误解 |
 | `answer` | ✓ | 一句话答案 |
-| `why_nini` | ✓ | 为什么适合这个孩子，引用依据（profile、随手记日期、来信、child-questions） |
+| `why_reader` | ✓ | 为什么适合这个孩子，引用依据（profile、随手记日期、来信、child-questions） |
 | `avoid` |  | 不要讲成什么样 |
 | `entities` | ✓ | 核心实体，≥ 1 个，规范中文名，如 `["抹香鲸"]` |
 | `sources` | ✓ | 参考来源 URL，≥ 1 |
@@ -133,7 +133,7 @@ NOTIFY:
 | `truth` | ✓ | `真` / `假` / `说不清` |
 | `entities` | ✓ | ≥ 1 |
 | `sources` | ✓ | ≥ 1 |
-| `why_nini` | ✓ | |
+| `why_reader` | ✓ | |
 | `notes` |  | |
 | `allow_repeat` |  | |
 
@@ -149,7 +149,7 @@ NOTIFY:
 | `title_hint` | ✓ | 建议标题 |
 | `angle` | ✓ | 切入角度 / 讲给孩子的点 |
 | `photo` |  | 照片 URL 或方向；有视频写 `video` |
-| `why_nini` | ✓ | |
+| `why_reader` | ✓ | |
 | `followup_of` |  | 同一事件有新进展时写旧新闻的 URL，允许实体重复 |
 | `allow_repeat` |  | |
 
