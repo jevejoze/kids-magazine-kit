@@ -53,7 +53,7 @@ name: 某某              # 可选，用于锁文件与通知；未配则用主�
 2. 依赖的步骤没完成就停下，告诉家长先做哪一步
 3. 只写自己这一步的输出文件，不改别的步骤
 
-出刊时若已有当天的选题卡（由 `pipeline.mjs schedule` 自动快照至 `brief.plan` 锁定），制作 `cover`、`comic`、`check`、`news` 时必须照卡写，不得擅自换题；核实不了时通过 `node scripts/pipeline.mjs plan-fallback <issue> <栏目> "<原因>"` 替换备用卡或降级，不能自己换题或修改 `plan/`；`check` 会核对忠实度并强制总账去重。
+出刊时若已有当天的选题卡（由 `pipeline.mjs schedule` 自动快照至 `brief.plan` 锁定），制作 `cover`、`comic`、`check`、`news` 时必须照卡写，不得擅自换题；核实不了时通过 `node scripts/pipeline.mjs plan-fallback <issue> cover|check "<原因>"` 或 `plan-fallback <issue> news <卡 id> "<原因>"` 替换备用卡或降级，不能自己换题或修改 `plan/`；`check` 会核对忠实度并强制总账去重。
 
 步骤总表、目录结构和脚本用法见 `pipeline/README.md`；需要跑脚本的步骤（30 合并、40 渲染、60 语音、70 视频）由 agent 在有 Node、Chrome、ffmpeg 的环境里直接运行，命令见 `pipeline/README.md`。下文的栏目规则、角色、图片新闻、讲读版、内容红线是各步共同遵守的总规则。
 

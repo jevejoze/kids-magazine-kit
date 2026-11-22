@@ -101,10 +101,16 @@ node .engine/scripts/pipeline.mjs plan-fallback issues/NNN news <卡 id> "原配
 5. 语音与视频：按流程运行语音与视频制作脚本。
 6. 归档（第 90 步）：
    - 运行：`node .engine/scripts/pipeline.mjs archive issues/NNN`。
-   - 助手脚本会自动将本期 cover、check、news 追加进 `state/topics.jsonl`，并同步成品至网盘 `成品/NNN/`。
+   - 助手脚本会把本期 cover、check、news 写进 `state/topics.jsonl`（改稿后重跑会换成新内容），把页图、PDF、讲读视频复制到本地 `成品/NNN/`，最后打印一行归档回执。
+   - 照 `pipeline/stages/archive.md` 做完脚本不做的部分：更新"未回收伏笔"、把 `成品/NNN/` 的文件上传网盘并核对齐全，然后把脚本打印的回执写进 `issues/NNN/archive.json`。
 7. 推送仓库：
    - 运行：`sh .engine/scripts/sync.sh push "NNN: 出刊"`。
-   - 锁文件在此步由脚本一并删除并推送到远端。
+   - 归档脚本已删掉本地的 `.lock`，这一步把回执、总账和删锁一起推送。推送前中断也没关系：下次 `run.sh` 会提示补推。
 8. 发送出刊通知：
    - 运行：`node .engine/scripts/notify.mjs issue issues/NNN`。
    - 用自己的渠道将纯文本通知发给家长（包含期号、网盘位置、fallback 记录、审稿看点等）。
+
+## 注意
+
+- 同一个工作目录里同时只跑一个角色的任务；定时任务的间隔要比出一期的时间长，不要让同一个执行并发跑两次。
+- 只装一个执行。多个执行并发时，开工锁能防止同一期被做两遍，但备用卡的占用还不是原子的。

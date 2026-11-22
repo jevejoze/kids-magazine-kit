@@ -648,7 +648,7 @@ export function createPipeline(issueArg) {
     if (video) copyFileSync(join(issue, "final", "讲读版.mp4"), join(pubDir, `${merged.masthead.zh}-第${padNum}期-讲读版.mp4`));
 
     if (rows.length) {
-      appendTopics(dataDir, rows);
+      appendTopics(dataDir, rows, { replace: true });
       updated.push(TOPICS_FILE);
     }
     // 写好 archive.json 后，sync.sh push 会把锁的删除与回执一起推送。

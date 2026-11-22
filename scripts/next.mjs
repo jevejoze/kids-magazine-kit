@@ -59,7 +59,10 @@ function editTomorrow(data, today) {
     `4. 运行 \`node .engine/scripts/notify.mjs plan ${week}\` 生成通知。`,
     "5. 接着把明天定稿。", ...finalize.map(line => `   - ${line}`),
   ] };
-  const started = issueBriefs(data).find(b => b.date === date);
+  // 执行开工先推锁、出完才推任务书：锁上的日期也算已开工
+  const started = issueBriefs(data).find(b => b.date === date || (() => {
+    try { return readJson(join(data, b.issue, LOCK)).date === date; } catch { return false; }
+  })());
   if (started) return { ...base, issue: started.issue, action: "none", instructions: ["明天已开工，选题卡已锁定。"] };
   if (planDay(plan, date)?.status === "ready") return { ...base, action: "none", instructions: ["明天已定稿。"] };
   return { ...base, action: "finalize", instructions: ["1. 阅读 \`.engine/roles/editor.md\`。", ...finalize.map((line, i) => `${i + 2}. ${line}`)] };
@@ -84,7 +87,7 @@ function blocked(base, lock) {
   };
 }
 
-function acquire(data, issue, name, old) {
+function acquire(data, issue, name, old, date) {
   const branch = requireGit(data, "symbolic-ref", "HEAD");
   const [remote, ref] = requireGit(data, "for-each-ref", "--format=%(upstream:remotename)%00%(upstream:remoteref)", branch).split("\0");
   if (!remote || !ref) throw new Error("当前数据分支没有上游，无法推送开工锁");
@@ -93,7 +96,7 @@ function acquire(data, issue, name, old) {
   const current = readLock(data, issue);
   if (current && (!old || !current.expired || current.at !== old.at)) return { conflict: current };
   const previous = current ? readFileSync(file, "utf8") : null;
-  const lock = { by: name, role: "producer", at: new Date().toISOString(), host: hostname() };
+  const lock = { by: name, role: "producer", at: new Date().toISOString(), host: hostname(), date };
   const folder = dirname(file), created = !existsSync(folder);
   mkdirSync(folder, { recursive: true });
   try { writeFileSync(file, JSON.stringify(lock) + "\n", { flag: current ? "w" : "wx" }); }
@@ -134,6 +137,16 @@ function acquire(data, issue, name, old) {
   throw new Error(`推送开工锁失败：${detail(pushed)}`);
 }
 
+// 本地有、上游还没有的提交（锁、回执）：重跑时先补推，推不上去就拉取后重新判断
+function unpushed(data) {
+  const dirty = git(data, "status", "--porcelain").stdout.trim() !== "";
+  const ahead = Number(git(data, "rev-list", "--count", "@{u}..HEAD").stdout.trim() || 0);
+  return { dirty, ahead };
+}
+function lockOnUpstream(data, issue) {
+  return git(data, "cat-file", "-e", `@{u}:${issue}/${LOCK}`).status === 0;
+}
+
 function status(data, issue) {
   const result = spawnSync(process.execPath, [CLI, "status", issue], { cwd: data, encoding: "utf8" });
   if (result.status !== 0) throw new Error(`读取 ${issue} 进度失败：${detail(result)}`);
@@ -146,7 +159,7 @@ function produceToday(data, date, name, retry = true) {
   const today = todays[0], base = { role: "producer", date };
   const lockPath = issue => join(data, issue, LOCK);
   function takeLock(lock, fields) {
-    const result = acquire(data, fields.issue, name, lock);
+    const result = acquire(data, fields.issue, name, lock, fields.date);
     if (result.conflict) return blocked(fields, result.conflict);
     if (result.retry) {
       if (retry) return produceToday(data, date, name, false);
@@ -157,6 +170,12 @@ function produceToday(data, date, name, retry = true) {
   if (today) {
     const { issue } = today, fields = { ...base, issue };
     if (createPipeline(join(data, issue)).archiveRecorded()) {
+      const { dirty, ahead } = unpushed(data);
+      if (dirty || ahead) return { ...fields, action: "resume", instructions: [
+        "本期已归档，但还没推送（上次可能在推送前中断）。",
+        `1. 运行 \`sh .engine/scripts/sync.sh push "${issue.slice(-3)}: 出刊"\`，把回执、总账和删锁一起推送。`,
+        `2. 运行 \`node .engine/scripts/notify.mjs issue ${issue}\` 生成通知。`,
+      ] };
       const instructions = ["本期已归档。"];
       if (existsSync(lockPath(issue))) {
         rmSync(lockPath(issue));
@@ -187,6 +206,15 @@ function produceToday(data, date, name, retry = true) {
   // 自己领的锁、任务书还没写（上次触发中断了）：照常接着开工，不再重领
   const own = lock && lock.by === name && lock.host === hostname();
   if (lock && !lock.expired && !own) return blocked(fields, lock);
+  if (own && !lockOnUpstream(data, issue)) {
+    // 上次锁提交了却没推上去：补推；被拒就说明别人抢先了，拉取后重新判断
+    if (git(data, "push").status !== 0) {
+      const pulled = pull(data);
+      if (pulled.status !== 0) throw pullError(pulled);
+      if (retry) return produceToday(data, date, name, false);
+      throw new Error("补推开工锁失败，请检查远端后重跑");
+    }
+  }
   const card = planDay(readPlan(data, isoWeek(date)), date);
   const changed = own ? null : takeLock(lock, fields);
   if (changed) return changed;
@@ -195,8 +223,11 @@ function produceToday(data, date, name, retry = true) {
     "1. 阅读 \`.engine/roles/producer.md\`。",
     `2. 运行 \`node .engine/scripts/pipeline.mjs schedule ${issue} ${date}\`，按任务书出刊。`,
     `3. 归档后推送回执，运行 \`node .engine/scripts/notify.mjs issue ${issue}\` 生成通知。`,
-  ], notify: card?.status === "draft" ? "⚠️ 今天的选题没定稿，按周排草稿出刊" :
-    !card ? "⚠️ 今天没有选题卡，执行自选（去重照样拦截）" : undefined };
+  ], notify: [
+    card?.status === "draft" ? "⚠️ 今天的选题没定稿，按周排草稿出刊" : !card ? "⚠️ 今天没有选题卡，执行自选（去重照样拦截）" : null,
+    ...briefs.filter(b => b.brief && b.date < date && b.date >= addDays(date, -3) && !createPipeline(join(data, b.issue)).archiveRecorded())
+      .slice(-3).map(b => `⚠️ 第 ${b.issue.slice(-3)} 期（${b.date}）没有做完归档，今天先出新一期`),
+  ].filter(Boolean).join("\n") || undefined };
 }
 
 function pullError(result) {

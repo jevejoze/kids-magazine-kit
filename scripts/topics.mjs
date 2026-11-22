@@ -1,5 +1,5 @@
 // 题目总账：读写记录、比较选题，以及从旧稿机械补录。
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMagazine, parseDate } from "./schedule.mjs";
@@ -38,7 +38,7 @@ export const isUrl = v => {
   if (!isText(v) || !/^https?:\/\//i.test(v)) return false;
   try { return !!new URL(v).hostname; } catch { return false; }
 };
-const urlKey = value => {
+export const urlKey = value => {
   if (!isUrl(value)) return "";
   const url = new URL(value);
   url.hash = "";
@@ -100,9 +100,23 @@ function newRows(rows, previous) {
 }
 
 // 同期同栏一组追加，新闻有多条。归档与补录都能重跑。
-export function appendTopics(dataDir, rows) {
+// replace：归档用。改稿后重新归档时，同期同栏的旧记录（补录或上次归档）换成本次内容，内容没变就不动文件
+export function appendTopics(dataDir, rows, { replace = false } = {}) {
   const file = join(dataDir, TOPICS_FILE);
-  const additions = newRows(rows, readTopics(dataDir));
+  const previous = readTopics(dataDir);
+  if (replace) {
+    const buckets = new Set(rows.map(bucket));
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const old = previous.filter(row => buckets.has(bucket(row)));
+    const changed = rows.length !== old.length || rows.some((row, i) => !same(row, old[i]));
+    if (old.length && changed) {
+      const kept = previous.filter(row => !buckets.has(bucket(row)));
+      mkdirSync(dirname(file), { recursive: true });
+      writeFileSync(file, [...kept, ...rows].map(row => JSON.stringify(row)).join("\n") + "\n");
+      return;
+    }
+  }
+  const additions = newRows(rows, previous);
   if (additions.length) {
     const previous = existsSync(file) ? readFileSync(file, "utf8") : "";
     mkdirSync(dirname(file), { recursive: true });
@@ -147,7 +161,9 @@ export function compareTopics(topic, previous, { rules, canonical, generic = new
     const repeated = topicUrls(topic).find(url => used.has(urlKey(url)));
     add("news_url", repeated, `新闻 URL 重复：${repeated}`);
     add("news_event", similar(topic.event, previous.event, 10), "新闻同事件重复");
-    add("news_entity_days", shared && !topic.followup_of, `新闻实体重复：${shared}`);
+    // followup_of 只豁免它真正指向的那条旧新闻
+    const followsThis = topic.followup_of && used.has(urlKey(topic.followup_of));
+    add("news_entity_days", shared && !followsThis, `新闻实体重复：${shared}`);
   }
   if (sameSection && section === "check") add("claim", similar(topic.title, previous.title, 8), "说法重复");
   if (sameSection && section === "cover") {

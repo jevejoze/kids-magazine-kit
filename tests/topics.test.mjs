@@ -164,3 +164,29 @@ test("自选新闻自带的 entities 和 event 归档时进总账", t => {
     assert.deepEqual([rows[0].entities, rows[0].event, rows[0].url], [["虎鲸"], "虎鲸戴鲑鱼帽", "https://example.org/x"]);
   });
 });
+
+test("归档改稿后同期同栏的总账记录换成新内容，内容不变不动文件", t => {
+  const { data } = fixture(t);
+  const a = row({ issue: 7, date: "2026-10-07", title: "新闻A", url: "https://example.org/a" });
+  appendTopics(data, [row({ issue: 6, date: "2026-10-06" }), a]);
+  const b = { ...a, title: "新闻B", url: "https://example.org/b", entities: ["虎鲸"] };
+  appendTopics(data, [b], { replace: true });
+  const rows = readTopics(data);
+  assert.deepEqual(rows.map(r => r.title), ["旧报里的太空探测器", "新闻B"]);
+  const before = readFileSync(join(data, TOPICS_FILE), "utf8");
+  appendTopics(data, [b], { replace: true });
+  assert.equal(readFileSync(join(data, TOPICS_FILE), "utf8"), before);
+});
+
+test("followup_of 只豁免它指向的旧新闻；忠实度匹配忽略 URL 锚点", async t => {
+  const { data } = fixture(t);
+  const ctx = topicContext(data);
+  const old = row({ url: "https://example.org/old" });
+  const next = row({ id: "n-follow", date: "2026-10-05", title: "旅行者新进展", url: "https://example.org/new", event: "全新事件" });
+  assert.match(compareTopics({ ...next, followup_of: "https://example.org/unrelated" }, old, ctx)[0].text, /新闻实体重复/);
+  assert.deepEqual(compareTopics({ ...next, followup_of: "https://example.org/old#top" }, old, ctx), []);
+  const { outputTopics } = await import("../scripts/plan.mjs");
+  const brief = { issue: 9, date: "2026.10.14 周三", plan: { status: "ready", news: [{ id: "n-a", url: "https://example.org/story", entities: ["虎鲸"] }], fallback: [] } };
+  const { errors } = outputTopics(brief, { news: { items: [{ title: "虎鲸", sources: ["https://example.org/story#details", "https://example.org/z"] }] } });
+  assert.deepEqual(errors, []);
+});

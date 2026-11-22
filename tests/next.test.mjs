@@ -97,11 +97,14 @@ test("producer 开工推锁并区分 ready、draft、missing，重复触发不�
     git(root, "add", "--", "待续写.md");
     const result = run(root, "2026-10-15", "producer", { KIDS_MAG_AGENT: "首位执行", KIDS_MAG_ROLE: "editor" });
     action(result, "produce role=producer date=2026-10-15 issue=issues/004");
-    if (state === "ready") assert.doesNotMatch(result.stdout, /NOTIFY:/);
+    if (state === "ready") assert.doesNotMatch(result.stdout, /选题没定稿|没有选题卡/);
+    // 前一天的 003 期没归档：提醒家长，但照常出今天这期
+    assert.match(result.stdout, /第 003 期（2026-10-14）没有做完归档/);
     if (state === "draft") assert.match(result.stdout, /NOTIFY:\n.*按周排草稿出刊/);
     if (state === "missing") assert.match(result.stdout, /NOTIFY:\n.*今天没有选题卡/);
     const lock = JSON.parse(git(remote, "show", "main:issues/004/.lock"));
-    assert.deepEqual(Object.keys(lock), ["by", "role", "at", "host"]);
+    assert.deepEqual(Object.keys(lock), ["by", "role", "at", "host", "date"]);
+    assert.equal(lock.date, "2026-10-15");
     assert.equal(lock.by, "首位执行");
     assert.equal(lock.role, "producer");
     assert.equal(lock.host, hostname());
@@ -191,4 +194,26 @@ test("本机角色支持 YAML 和环境变量，拉取失败输出 NOTIFY 并返
   assert.equal(failed.status, 2);
   assert.match(failed.stdout, /^ACTION: blocked role=producer date=2026-10-14[\s\S]+NOTIFY:\n.*同步失败/);
   assert.match(failed.stderr, /拉取失败/);
+});
+
+test("执行只推了锁（还没推任务书）时，主编也把那天当作已开工", t => {
+  const { seed, publish, clone } = fixture(t), root = clone("editor");
+  const path = join(seed, "plan/2026-W42.json"), plan = json(path);
+  plan.days["2026-10-15"] = { ...plan.days["2026-10-14"], status: "draft" };
+  put(path, plan);
+  mkdirSync(join(seed, "issues/004"));
+  put(join(seed, "issues/004/.lock"), { by: "执行", role: "producer", at: new Date().toISOString(), host: "remote", date: "2026-10-15" });
+  publish("执行开工只推了锁");
+  const locked = run(root, "2026-10-14", "editor");
+  action(locked, "none role=editor date=2026-10-15 week=2026-W42 issue=issues/004");
+  assert.match(locked.stdout, /已锁定/);
+});
+
+test("本地已归档但没推送：不判 none，提示先推送", t => {
+  const { clone } = fixture(t), root = clone("producer");
+  const issue = join(root, "issues/003");
+  put(join(issue, "archive.json"), { issue: 3, content_hash: contentFingerprint(issue), updated: ["vocab.json"] });
+  const pending = run(root, "2026-10-14", "producer");
+  action(pending, "resume role=producer date=2026-10-14 issue=issues/003");
+  assert.match(pending.stdout, /还没推送[\s\S]+sync\.sh push "003: 出刊"/);
 });

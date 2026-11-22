@@ -9,7 +9,7 @@ import { loadMagazine, parseDate, schedule } from "./schedule.mjs";
 import { loadSections } from "./sections.mjs";
 import { newsCount } from "../sections/news/check.mjs";
 import { parseYaml } from "./yaml.mjs";
-import { cardTopic, compareTopics, isDate, isMap, isText, isUrl, readJson, stripTags, topicContext } from "./topics.mjs";
+import { cardTopic, compareTopics, isDate, isMap, isText, isUrl, readJson, stripTags, topicContext, urlKey } from "./topics.mjs";
 
 const ENGINE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DAY = 86400e3;
@@ -253,7 +253,8 @@ export function checkPlan(file) {
       if (!pending(candidate)) continue;
       // 同一事件的跟进由日期较晚的卡说明；同日有说明的卡作为跟进。
       const [a, b] = [topic, candidate.topic].sort((x, y) => y.date.localeCompare(x.date) || Number(!!y.followup_of) - Number(!!x.followup_of));
-      emit(compareTopics(a, b, ctx, a.allow_repeat ?? b.allow_repeat));
+      // 只用较晚那张卡自己的重复理由：较早的卡一归档，较晚的卡就要单独面对总账
+      emit(compareTopics(a, b, ctx, a.allow_repeat));
     }
   }
   return { errors: [...new Set(errors)], warnings: [...new Set(warnings)] };
@@ -340,10 +341,11 @@ export function outputTopics(brief, values, source = "archive") {
   if (Array.isArray(values.news?.items)) {
     const items = values.news.items, cards = activeCards(plan, "news");
     const sources = items.map(item => (Array.isArray(item?.sources) ? item.sources : []).filter(isUrl));
+    const keys = sources.map(urls => urls.map(urlKey));
     const assigned = new Map();
     // 增广匹配：一条稿件即便引用多张卡的来源，也只能匹配一张卡。
     const assign = (card, seen) => sources.some((urls, index) => {
-      if (!urls.includes(card.url) || seen.has(index)) return false;
+      if (!keys[index].includes(urlKey(card.url)) || seen.has(index)) return false;
       seen.add(index);
       if (assigned.has(index) && !assign(assigned.get(index), seen)) return false;
       assigned.set(index, card);
