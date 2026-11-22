@@ -23,6 +23,21 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 - 第一次使用：把 `templates/data/` 整个复制成数据目录
 - 示例数据在 `examples/demo/`，读者是虚构的孩子「小满」
 
+## 角色：主编与执行
+
+编辑部拆成两个角色，分工明确：
+- **主编 `editor`**：负责选题策展，每周预排（weekly-plan）+ 前一晚定稿（finalize），写出选题卡 `plan/<YYYY-Www>.json`。**只选题、不出刊、不改别人的稿**。手册见 [`roles/editor.md`](roles/editor.md)。
+- **执行 `producer`**：负责照选题卡出刊，走完流水线并归档推送。**照卡出刊、不换题、不改 `plan/`**；核实遇阻走 `plan-fallback` 换备用卡。手册见 [`roles/producer.md`](roles/producer.md)。
+
+**本机配置**：数据目录根目录下的 `.agent.yaml`（进 `.gitignore`，不提交）：
+```yaml
+role: editor            # editor | producer | [editor, producer]
+name: 某某              # 可选，用于锁文件与通知；未配则用主机名
+```
+也可以用环境变量：`KIDS_MAG_ROLE=editor`、`KIDS_MAG_AGENT=某某`（环境变量优先于文件）。没配角色时运行会报错提示。
+
+**统一入口**：定时任务只跑 `sh .engine/scripts/run.sh`，按输出第一行固定机读行 `ACTION:` 做事。两边通过数据仓库 git 协作，重要进展用 `notify.mjs` 生成纯文本通知发给家长（只周知，不审批）。
+
 ## 第一次使用："按问卷给孩子建刊"
 
 1. 数据目录不存在就把 `templates/data/` 整个复制过去
@@ -38,6 +53,8 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 2. 依赖的步骤没完成就停下，告诉家长先做哪一步
 3. 只写自己这一步的输出文件，不改别的步骤
 
+出刊时若已有当天的选题卡（由 `pipeline.mjs schedule` 自动快照至 `brief.plan` 锁定），制作 `cover`、`comic`、`check`、`news` 时必须照卡写，不得擅自换题；核实不了时通过 `node scripts/pipeline.mjs plan-fallback <issue> <栏目> "<原因>"` 替换备用卡或降级，不能自己换题或修改 `plan/`；`check` 会核对忠实度并强制总账去重。
+
 步骤总表、目录结构和脚本用法见 `pipeline/README.md`；需要跑脚本的步骤（30 合并、40 渲染、60 语音、70 视频）由 agent 在有 Node、Chrome、ffmpeg 的环境里直接运行，命令见 `pipeline/README.md`。下文的栏目规则、角色、图片新闻、讲读版、内容红线是各步共同遵守的总规则。
 
 ### 没有指定步骤时：一个 agent 走完全程
@@ -45,11 +62,11 @@ description: 为一个孩子生成每日中英双语电子杂志（团子编辑�
 家长只说"出下一期""做第 N 期"、没有指定做哪一步时，由当前 agent 从brief 这一步一直做到archive 这一步：
 
 1. 按 `pipeline/stages.json` 的依赖顺序逐步做；能派子 agent 的环境，可以把 00 之后互不依赖的步骤（09、10、12、13、14、16、17、18、19）并行交出去
-2. 先跑 `sync.sh start`，按它打印的进度从缺的那一步接着做（家长可能已经让 agent 做了几步）。每步照常写中间文件、做自检
+2. 先跑 `sync.sh start`，按它打印的进度从缺的那一步接着做（家长可能已经让 agent 做了几步）。有选题卡时按卡制作（`ready` 正常照卡写，`draft` 照周排草稿出刊，`missing` 自选但去重照样拦截），每步照常写中间文件、做自检
 3. review 这一步审核后记录 `pipeline.mjs fingerprint <issue>` 输出的内容指纹，narration 这一步讲读稿也把同一指纹放进 `_meta.content_hash`；内容或图片变化后，旧审稿和下游制作记录自动失效，须重做。review 这一步审稿结论是"需修改"时，回到对应步骤改完，重新合并、再审，直到"通过"
 4. 脚本步骤（30、40、70）在当前环境里直接运行；环境缺 Node、Chrome 或 ffmpeg 时，做到能做的最后一步，告诉家长缺什么、剩下哪几步
 5. audio 这一步语音：默认用 Azure（`node scripts/tts_azure.mjs <issue>`，环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`，可选付费兜底 `AZURE_SPEECH_KEY_PAID`、`AZURE_SPEECH_REGION_PAID`）；数据目录有 `voices/voicestudio.json` 时，Azure 跑完再跑 `node scripts/tts_voicestudio.mjs <issue>` 换成克隆声音（VoiceStudio 连不上就报错停下，audio 这一步算没完成，不拿 Azure 的替身出视频）；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`node scripts/tts_mimo.mjs <issue>`，环境变量 `MIMO_API_KEY`），代替 Azure，跑完同样再跑 `tts_voicestudio.mjs` 把旁白换成克隆声音；数据目录有 `voices/elevenlabs.json` 时，在 `tts_voicestudio.mjs` 之前先跑 `node scripts/tts_elevenlabs.mjs <issue>` 把编辑部成员换成 ElevenLabs 声音（环境变量 `ELEVENLABS_API_KEY`，连不上就沿用原版）；没有密钥也没有别的语音合成时，跳过 60、70，把讲读稿整理成 `final/家长讲读稿.md`
-6. 最后做 archive 这一步，`sync.sh push` 推送数据仓库、网盘上成品传齐了，然后告诉家长：成品在网盘哪里、哪几步没做成以及原因、审稿里值得家长看一眼的地方
+6. 最后做 archive 这一步（脚本自动将本期题目追加至 `state/topics.jsonl`），`sync.sh push` 推送数据仓库、网盘上成品传齐了，然后用 `notify.mjs issue` 生成通知发给家长（告知成品在网盘哪里、哪几步没做成以及原因、审稿里值得家长看一眼的地方）
 
 ## 编辑部角色
 

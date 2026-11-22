@@ -13,7 +13,11 @@
   magazine.yaml             杂志配置：出哪些栏目、哪天出、周五轮换、参数（可选，没有就用默认配置）
   MY_CHILD.md  profile.md  curation-log.md  letters.md  child-questions.md
   serial-bible.md  creature-log.md  think-log.md  thinking-plan.md  vocab.json  feedback.jsonl
-  state/story/               小剧场：config.md 设定、log.jsonl 每集一行、open-threads.md 未回收伏笔（旧数据目录是 story-bible.md）
+  plan/                     每周选题卡（如 2026-W49.json，由主编维护）
+  state/
+    topics.jsonl            题目总账（只追加，cover/check/news 历史去重）
+    topic-aliases.json      （可选）实体别名映射
+    story/                  小剧场：config.md 设定、log.jsonl 每集一行、open-threads.md 未回收伏笔（旧数据目录是 story-bible.md）
   voices/azure.json         讲读版每个角色用哪个 Azure 声音（可选，没写的用默认）
   voices/polyphones.json    这个孩子常用词的多音字读音（可选，补充引擎的通用词典）
   sfx/                       讲读版音效（可选）
@@ -104,6 +108,8 @@ sh .engine/scripts/sync.sh check                     # 有没提交或没推送�
 - review 这一步先检查当前合并内容，再运行 `node scripts/pipeline.mjs fingerprint <issue>`，将指纹填入审稿记录。内容变化后必须重新审稿；narration 这一步写稿前也读取这个指纹，放入 `_meta.content_hash`。
 - 第 40、70 步先在临时目录生成，完成后替换成品；失败保留上一版，页数变少时清掉多余旧页，目录里的其他笔记会保留。预览不生成正式制作记录。
 - 语音每完成一句就原子保存 manifest，失败后重跑同一命令可复用已完成的句子；`--dry` 不创建音频目录或制作记录。
+- 任务单 `ticket` 打印选题卡全文（标题带「选题卡（照写，不换题）」）与「近期用过」清单（实体、机制、新闻 URL/事件）。
+- `pipeline.mjs check` 强制检查对选题卡的忠实度（`cover` 的 `question.zh`、`check` 的 `claim`、`news` 的 `sources` 包含卡片 URL）；同时依据 `state/topics.jsonl` 题目总账与窗口规则强制去重拦截。执行自选或无选题卡时，去重同样拦截。核实不了时通过 `node scripts/pipeline.mjs plan-fallback` 换备用卡，不自行换题。
 - 输出写了 `_meta.ticket` 时，指纹要和当前任务单一致：任务书字段、本期参数、规则文件、cast 或上游值变了，`status` 把这一步标成过期，`check` 报「任务单变了」，合并也会停下。没写 `_meta.ticket` 的旧输出照旧有效。
 - 过期检测覆盖合并、审稿、讲读及脚本产物，不会自动改写 agent 撰写的各栏目。封面换题后是否重写漫画，仍需编辑按依赖判断。
 
@@ -117,7 +123,13 @@ node --test tests/*.test.mjs
 30、40、60、70 需要运行脚本，在任意有 Node 22+、Chrome、Python 3、ffmpeg 的环境里跑（Claude Code 云端会话、自己的电脑都可以）：
 
 ```bash
-node scripts/pipeline.mjs schedule <issue> [YYYY-MM-DD]  # brief 这一步：按 magazine.yaml 算本期栏目，写进任务书
+sh .engine/scripts/run.sh [--date YYYY-MM-DD] [--role editor|producer]  # 主编与执行统一入口：按第一行 ACTION 行动
+node scripts/pipeline.mjs plan-check plan/<YYYY-Www>.json  # 检查选题卡结构、字数、去重与锁定状态
+node scripts/pipeline.mjs plan-fallback <issue> cover|check|news [卡 id] "<原因>"  # 无法核实时换备用卡或标自选
+node scripts/notify.mjs plan|finalize|issue <目标>         # 生成周排、定稿或出刊的纯文本通知
+node scripts/topics.mjs recent                            # 查看题目总账近期用过的题目与实体
+node scripts/topics.mjs backfill [--write]                # 历史期刊题目补录入总账
+node scripts/pipeline.mjs schedule <issue> [YYYY-MM-DD]  # brief 这一步：按 magazine.yaml 算本期栏目，快照当天的选题卡至 brief.plan
 node scripts/pipeline.mjs status   <issue>   # 看每步做了没有、下一步能做什么
 node scripts/pipeline.mjs ticket   <issue> <栏目>   # 领任务单，指纹写进输出的 _meta.ticket
 node scripts/pipeline.mjs check    <issue>   # 检查已完成步骤的字段和字数
@@ -132,7 +144,7 @@ node scripts/tts_mimo.mjs <issue>           # audio 这一步（MiMo 语音）�
 node scripts/tts_elevenlabs.mjs <issue>     # audio 这一步之后（可选）：数据目录有 voices/elevenlabs.json 时把编辑部成员换成 ElevenLabs，在 tts_voicestudio.mjs 之前跑
 python3 scripts/make_video.py <issue>        # video 这一步
 node scripts/pipeline.mjs script   <issue>   # 没有语音合成时：导出 final/家长讲读稿.md
-node scripts/pipeline.mjs archive  <issue>   # archive 这一步助手：追加档案、整理 成品/NNN/
+node scripts/pipeline.mjs archive  <issue>   # archive 这一步助手：追加档案与 state/topics.jsonl、整理 成品/NNN/
 ```
 
 audio 这一步默认用 Azure 语音（`scripts/tts_azure.mjs`），需要环境变量 `AZURE_SPEECH_KEY`、`AZURE_SPEECH_REGION`；数据目录有 `voices/mimo.json` 时改用小米 MiMo（`scripts/tts_mimo.mjs`，环境变量 `MIMO_API_KEY`）；换别的语音服务也行，按 `stages/audio.md` 的约定把音频放好即可。
