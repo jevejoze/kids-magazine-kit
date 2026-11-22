@@ -105,6 +105,20 @@ function allPlans(dataDir, target) {
   return target ? [target, ...plans] : plans;
 }
 
+// 一周七天各出什么：主题和栏目，按 magazine.yaml 和调度规则现算，给主编排卡用
+export function weekLayout(dataDir, week) {
+  const monday = weekStart(week);
+  if (!monday) throw new Error(`ISO 周看不懂：${week}（写成 YYYY-Www）`);
+  const { registry, magazine } = loadSchedule(dataDir);
+  const nextIssue = Math.max(0, ...issueBriefs(dataDir).map(b => Number(b.brief?.issue) || 0)) + 1;
+  const names = { mon: "周一", tue: "周二", wed: "周三", thu: "周四", fri: "周五", sat: "周六", sun: "周日" };
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = addDays(monday, i);
+    const { weekday, weekday_theme, sections } = schedule({ magazine, date, dataDir, issueNo: nextIssue + i, registry });
+    return { date, weekday: names[weekday] ?? weekday, theme: weekday_theme, sections: Object.keys(sections) };
+  });
+}
+
 function loadSchedule(dataDir) {
   const { sections: registry, errors } = loadSections({ engine: ENGINE, data: dataDir });
   if (errors.length) throw new Error(`栏目注册表有问题：\n- ${errors.join("\n- ")}`);

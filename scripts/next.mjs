@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readFileSync, rmdirSync, rmSync, writeFileSync }
 import { hostname } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { addDays, isoWeek, issueBriefs, loadAgent, localDate, planDay, readPlan } from "./plan.mjs";
+import { addDays, isoWeek, issueBriefs, loadAgent, localDate, planDay, readPlan, weekLayout } from "./plan.mjs";
 import { createPipeline } from "./pipeline-lib.mjs";
 import { isDate, isMap, isText, readJson } from "./topics.mjs";
 
@@ -53,7 +53,8 @@ function editTomorrow(data, today) {
   ];
   if (!plan) return { ...base, action: "weekly-plan", instructions: [
     "1. 阅读 \`.engine/roles/editor.md\`，做本周策展。",
-    `2. 排 ${week} 的七天选题和备用卡，写入 \`${template}\`。`,
+    `2. 排 ${week} 的七天选题和备用卡，写入 \`${template}\`。本周每天的主题和栏目（按 magazine.yaml 算好，有 check 的日子才写 check 卡）：`,
+    ...weekLayout(data, week).map(d => `   - ${d.date} ${d.weekday}${d.theme ? ` ${d.theme}` : ""}：${d.sections.join("、")}`),
     `3. 运行 \`node .engine/scripts/pipeline.mjs plan-check ${template}\`，通过后用 \`sh .engine/scripts/sync.sh push "plan: ${week}"\` 推送。`,
     `4. 运行 \`node .engine/scripts/notify.mjs plan ${week}\` 生成通知。`,
     "5. 接着把明天定稿。", ...finalize.map(line => `   - ${line}`),

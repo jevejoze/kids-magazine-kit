@@ -1,5 +1,5 @@
 // 题目总账：读写记录、比较选题，以及从旧稿机械补录。
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMagazine, parseDate } from "./schedule.mjs";
@@ -218,7 +218,8 @@ function backfill(dataDir) {
   return rows.sort((a, b) => a.issue - b.issue);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// 用真实路径比较：数据目录里的 .engine 可能是符号链接
+if (process.argv[1] && realpathSync(resolve(process.argv[1])) === realpathSync(fileURLToPath(import.meta.url))) {
   const [, , cmd, arg, extra] = process.argv;
   try {
     const dataDir = process.cwd();

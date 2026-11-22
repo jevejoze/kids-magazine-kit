@@ -33,14 +33,16 @@ sh .engine/scripts/run.sh
 1. **做本周策展**：
    - 按 `SKILL.md`「做本周策展」读取 `MY_CHILD.md`、`profile.md`、`curation-log.md`、本周 `feedback.jsonl`、`letters.md` 和各期内容。
    - 总结起作用的、没起作用的、兴趣变化与难度观察。
-   - 调整直接生效：更新 `profile.md` 的兴趣权重与设定，在 `curation-log.md` 追加策展记录。只周知家长，不等待确认（若涉及修改 `MY_CHILD.md`，仍只写建议不手改）。
+   - **选题直接按策展结论排**，不等家长确认；策展报告的要点写进 plan 的 `curation`，随周排通知一起周知家长。
+   - `profile.md` 的兴趣权重、英文档位等设定**仍按 SKILL.md 的规矩**：先写进报告当建议，家长确认后才改（策展历史照常追加到 `curation-log.md`）。`MY_CHILD.md` 只读。
+   - 这一周没有新反馈、新随手记时，策展可以只写一句「本周无新数据，沿用上周结论」，直接排卡。
 2. **读取选题依据与历史总账**：
    - 读 `profile.md`（兴趣偏好）、`child-questions.md`（孩子提问）、`feedback.jsonl`、`core/rules/topic-quality.md`（好题标准）。
    - 查看题目总账近期记录（`node .engine/scripts/topics.mjs recent` 或查 `state/topics.jsonl`），避免近期撞题。
 3. **排整周选题卡**：
    - 在数据目录新建或编辑 `plan/<YYYY-Www>.json`（`<YYYY-Www>` 为下周的 ISO 周，如 `2026-W49.json`）。
    - 写入 `week`、`by`、`at`、`curation`（一两句本周选题依据）。
-   - 按 `magazine.yaml` 的周节奏与栏目，填写 `days` 下该周每一天的 `cover` 卡和 `check` 卡（当天不出真的假的时省略 check）。
+   - 按 `run.sh` 输出里列出的「本周每天的主题和栏目」填写 `days` 下每一天：有 cover 就写 cover 卡（封面方向贴合当天主题，如周一自然科学、周四数学趣题），有 check 才写 check 卡。
    - 周排时 `news` 一律填空数组 `[]`（新闻时效性强，定稿时再填）。
    - `status` 先设为 `"draft"`。
 4. **准备备用卡（spares）**：
@@ -70,13 +72,13 @@ sh .engine/scripts/run.sh
      ```
    - 注意：若明天那一天执行已经开工（已有对应日期的 `brief.json`），选题已锁定，不能再改。
 2. **搜索并挑选新闻**：
-   - 时间限制：距出刊日（明天）≤ 7 天（以 `published` 日期为准）。
+   - 时间限制：距出刊日（明天）≤ 7 天，`published` 写**这篇报道的发布日期**（不是事件或论文日期）。
    - 来源：选自权威儿童媒体或奇趣科学媒体（News for Kids、Science News Explores、DOGOnews、Time for Kids、BBC Newsround、Guinness World Records、UPI Odd News 等）。
    - 照片要求：必须一眼看懂、震撼奇趣（动物超常行为、搞怪纪录、民间发明现场），不选会议合影、抽象图标或图表。有视频优先（便于讲读版展开）。
    - 数量：按版面要求选够（海报版 poster 2 条，经典版 classic 3 条）。
    - 填写 `news` 数组，每条为一张 NewsCard。
 3. **核实与质量自查**：
-   - 逐张卡核实：来源 URL 真实且能打开、数字核对确凿、符合 `core/rules/topic-quality.md`、`why_reader` 引用依据真实有效。
+   - 逐张卡核实：来源 URL 真实且能在浏览器里打开（脚本请求被 403/405 拒绝不算死链，优先保留权威原始来源）、数字核对确凿、符合 `core/rules/topic-quality.md`、`why_reader` 引用依据真实有效。
 4. **标 ready 并校验**：
    - 将明天那一天的 `status` 改为 `"ready"`。
    - 运行校验：`node .engine/scripts/pipeline.mjs plan-check plan/<YYYY-Www>.json`。
@@ -100,7 +102,7 @@ sh .engine/scripts/run.sh
 - `number`：`{"value": "可核实数字", "source": "来源URL"}`，必须查证确凿。
 - `misconception`：要纠正的一个常见误解。
 - `answer`：一句话答案，留给今日一问讲。
-- `why_reader`：为什么适合这个孩子，必须引用档案依据（`profile.md` 兴趣权重、`curation-log.md` 随手记、`child-questions.md`、`feedback.jsonl`）。
+- `why_reader`：为什么适合这个孩子，必须引用档案依据（`profile.md` 兴趣权重、`curation-log.md` 随手记、`child-questions.md`、`feedback.jsonl`）。没有新提问、新反馈时，引用 `profile.md` 的兴趣权重或随手记的原话就够了，不要编依据。
 - `avoid`：不要讲成什么样（如避免枯燥分类）。
 - `entities`：核心实体列表，≥ 1 个，规范中文名，如 `["抹香鲸"]`。要写**具体**的物种、对象或事件（抹香鲸、旅行者1号、狮子座流星雨），不要只写大类（狗、猫、化石、月球）：大类是泛称，不参加去重，全写泛称 plan-check 会警告。同一事物用同一个名字，别名登记在数据目录的 `state/topic-aliases.json`。
 - `sources`：参考来源 URL 列表，≥ 1。
