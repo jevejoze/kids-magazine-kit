@@ -27,6 +27,8 @@ import {
   EMOTIONS,
   PAGE_TITLES,
 } from "./contracts.mjs";
+import { outputTopics } from "./plan.mjs";
+import { appendTopics, compareTopics, shares, TOPICS_FILE, topicContext } from "./topics.mjs";
 import { scheduledIn, LEGACY, parseDate } from "./schedule.mjs";
 import { ticket, ticketSkillOf } from "./ticket.mjs";
 import { loadSections, packFor } from "./sections.mjs";
@@ -73,14 +75,16 @@ export function createPipeline(issueArg) {
   const nonempty = f => existsSync(f) && statSync(f).isFile() && statSync(f).size > 0;
   // brief.json 的 story.ep 只在这期真的排了小剧场时才要求，不然结构校验跳过它
   const structuralOmit = (name, value) => name === "brief.json" && "sections" in value && !("story" in (value.sections ?? {})) ? ["story.ep"] : [];
+  // 回执和源稿随 git 分发；页图留在制作机器上。
+  const archiveRecorded = () => {
+    if (!has("archive.json")) return false;
+    const receipt = read("archive.json");
+    return receipt.issue === read("brief.json").issue && receipt.content_hash === contentFingerprint(issue) && Array.isArray(receipt.updated) && receipt.updated.length > 0
+      && receipt.updated.every(p => typeof p === "string" && nonempty(join(dataDir, p)));
+  };
   const done = s => {
     try {
-      if (s.id === "archive") {
-        if (!done(stages.find(s => s.id === "render"))) return false;
-        const receipt = read("archive.json");
-        return receipt.issue === read("brief.json").issue && receipt.content_hash === contentFingerprint(issue) && Array.isArray(receipt.updated) && receipt.updated.length > 0
-          && receipt.updated.every(p => typeof p === "string" && nonempty(join(dataDir, p)));
-      }
+      if (s.id === "archive") return done(stages.find(s => s.id === "render")) && archiveRecorded();
       if (s.id === "review") return reviewPassed();
       if (s.id === "render") {
         if (!reviewPassed() || !currentBuild(issue, s.id)) return false;
@@ -160,7 +164,6 @@ export function createPipeline(issueArg) {
   // ---------- check ----------
   const len = s => [...String(s ?? "").replace(/<[^>]+>/g, "")].length;
   const plain = s => String(s ?? "").replace(/<[^>]+>/g, "").replace(/[\s\p{P}\p{S}]/gu, "");
-  const shares = (a, b, k) => { for (let i = 0; i + k <= a.length; i++) if (b.includes(a.slice(i, i + k))) return true; return false; };
   const words = s => String(s ?? "").replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
   const problems = [];
   const need = (cond, where, msg) => { if (!cond) problems.push(`[${where}] ${msg}`); };
@@ -379,8 +382,9 @@ export function createPipeline(issueArg) {
     checks[out] = v => { common?.(v); if (packFor(section, registry, { [section]: v }) === pack) run(v); };
   }
 
-  function check({ contentOnly = false } = {}) {
+  function check({ contentOnly = false, warnings = [] } = {}) {
     problems.length = 0;
+    const topics = {};
     for (const [file, fn] of Object.entries(checks)) {
       if (!has(file) || (contentOnly && file === "narration.json")) continue;
       if (file === "think.json" && !useThink()) continue;
@@ -391,10 +395,27 @@ export function createPipeline(issueArg) {
         const value = read(file);
         const structural = validateStructure(file, value, structuralOmit(file, value));
         problems.push(...structural);
-        if (!structural.length) fn(value);
+        if (!structural.length) {
+          fn(value);
+          if (["cover.json", "check.json", "news.json"].includes(file)) topics[file.slice(0, -5)] = value;
+        }
         const stale = staleTicket(file, value);
         if (stale) problems.push(`[${stages.find(s => s.outputs.includes(`issue/${file}`))?.id ?? file}] ${stale}`);
       } catch (e) { problems.push(`[${file}] 读不了：${e.message}`); }
+    }
+    if (has("brief.json") && Object.keys(topics).length) {
+      try {
+        const { rows, errors } = outputTopics(read("brief.json"), topics, "check");
+        problems.push(...errors);
+        const ctx = topicContext(dataDir);
+        for (const [i, row] of rows.entries()) {
+          const previous = [...ctx.rows.filter(r => r.issue !== row.issue), ...rows.slice(0, i)];
+          for (const old of previous) {
+            for (const { warning, text } of compareTopics(row, old, ctx, row.allow_repeat ?? (old.source === "check" ? old.allow_repeat : undefined)))
+              (warning ? warnings : problems).push(text);
+          }
+        }
+      } catch (error) { problems.push(`[topics] ${error.message}`); }
     }
     if (!contentOnly && has("review.md")) need(reviewPassed(), "review", "审稿未通过或内容指纹已过期，请重新合并、审稿");
     return problems;
@@ -536,6 +557,10 @@ export function createPipeline(issueArg) {
     const num = Number(b.issue);
     const padNum = String(num).padStart(3, "0");
     const updated = [];
+    const values = Object.fromEntries(["cover", "check", "news"].filter(section => inIssue(section) !== false && has(`${section}.json`))
+      .map(section => [section, read(`${section}.json`)]));
+    const { rows, errors } = outputTopics(b, values);
+    if (errors.length) throw new Error(errors.join("\n"));
 
     if (has("words.json")) {
       const vocabPath = join(dataDir, "vocab.json");
@@ -622,11 +647,17 @@ export function createPipeline(issueArg) {
     const video = done(stages.find(s => s.id === "video"));
     if (video) copyFileSync(join(issue, "final", "讲读版.mp4"), join(pubDir, `${merged.masthead.zh}-第${padNum}期-讲读版.mp4`));
 
+    if (rows.length) {
+      appendTopics(dataDir, rows);
+      updated.push(TOPICS_FILE);
+    }
+    // 写好 archive.json 后，sync.sh push 会把锁的删除与回执一起推送。
+    rmSync(join(issue, ".lock"), { force: true });
     const receipt = { issue: num, content_hash: contentFingerprint(issue), updated: [...new Set(updated)] };
     console.log(`成品已整理到 ${pubDir}${video ? "" : "（讲读版未完成或已过期，没有复制）"}`);
     console.log(`核对网盘、更新"未回收伏笔"后，把下面这行写进 archive.json：\n${JSON.stringify(receipt)}`);
     return receipt;
   }
 
-  return { status, check, assemble, buildIssue, script, archive, assemblyErrors, reviewPassed, fingerprint: () => contentFingerprint(issue), done: id => done(stages.find(s => s.id === id)) };
+  return { status, check, assemble, buildIssue, script, archive, assemblyErrors, reviewPassed, archiveRecorded, fingerprint: () => contentFingerprint(issue), done: id => done(stages.find(s => s.id === id)) };
 }

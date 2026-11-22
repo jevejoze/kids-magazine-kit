@@ -6,3 +6,6 @@ output/
 issues/*/40-cards/
 issues/*/60-audio/
 issues/*/70-final/
+
+# 本机分工配置
+.agent.yaml

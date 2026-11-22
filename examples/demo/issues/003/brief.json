@@ -15,7 +15,7 @@
   },
   "send_note": "拍照发给妈妈",
   "english_level": "L2",
-  "topic_hint": "挪威的午夜太阳",
+  "topic_hint": "挪威夏天半夜 12 点，<br>太阳为啥还在天上？",
   "child_question": null,
   "focus": [
     "英文写作从一句完整的话开始"
@@ -29,5 +29,82 @@
   },
   "creature": false,
   "think": false,
-  "last_feedback": "上期没有收到回复"
+  "last_feedback": "上期没有收到回复",
+  "plan": {
+    "status": "ready",
+    "revised": [],
+    "cover": {
+      "id": "c-midnight-sun",
+      "question": "挪威夏天半夜 12 点，<br>太阳为啥还在天上？",
+      "mechanism": "夏季北极附近随地球自转时一直留在光照面。",
+      "mechanism_key": "地轴倾斜",
+      "number": {
+        "value": "地轴倾角约 23.5°",
+        "source": "https://en.wikipedia.org/wiki/Midnight_sun"
+      },
+      "misconception": "半夜不落山就意味着太阳不动。",
+      "answer": "地球倾斜，夏天北极附近连午夜也照得到太阳。",
+      "why_nini": "profile.md：喜欢大自然里让人觉得奇怪的现象。",
+      "entities": [
+        "极昼"
+      ],
+      "sources": [
+        "https://en.wikipedia.org/wiki/Midnight_sun"
+      ]
+    },
+    "check": {
+      "id": "k-sun-stands-still",
+      "claim": "极昼时，太阳一直停在同一个位置。",
+      "truth": "假",
+      "entities": [
+        "太阳视运动"
+      ],
+      "sources": [
+        "https://aa.usno.navy.mil/faq/eqtime",
+        "https://pmel.noaa.gov/arctic-zone/gallery_np_seasons.html"
+      ],
+      "why_nini": "profile.md：用可以观察的证据判断说法。"
+    },
+    "news": [
+      {
+        "id": "n-2026-10-14-chess",
+        "url": "https://newsforkids.net/articles/2026/10/08/british-girl-11-is-worlds-youngest-woman-grandmaster/",
+        "published": "2026-10-08",
+        "event": "伦敦女孩获国际象棋女子特级大师称号并刷新年龄纪录",
+        "entities": [
+          "国际象棋"
+        ],
+        "title_hint": "11 岁女孩成为最年轻的“女子特级大师”",
+        "angle": "看视频自学本领",
+        "why_nini": "profile.md：从动物行为和生活经验引出追问。"
+      },
+      {
+        "id": "n-2026-10-14-pelican",
+        "url": "https://newsforkids.net/articles/2026/10/01/injured-pelican-knocks-noaa-scientists-answer/",
+        "published": "2026-10-09",
+        "event": "受伤的褐鹈鹕敲实验室的门后获救",
+        "entities": [
+          "褐鹈鹕"
+        ],
+        "title_hint": "鹈鹕敲门求救",
+        "angle": "动物什么时候会向人求助",
+        "why_nini": "profile.md：从动物行为和生活经验引出追问。"
+      },
+      {
+        "id": "n-2026-10-14-dog-faces",
+        "url": "https://www.snexplores.org/article/dogs-read-anger-fear-emotion-human-faces",
+        "published": "2026-10-12",
+        "event": "研究人员发现犬能从面孔识别恐惧",
+        "entities": [
+          "犬"
+        ],
+        "title_hint": "狗狗看得出你在害怕",
+        "angle": "动物怎样读懂表情",
+        "why_nini": "profile.md：从动物行为和生活经验引出追问。"
+      }
+    ],
+    "week": "2026-W42",
+    "date": "2026-10-14",
+    "fallback": []
+  }
 }
