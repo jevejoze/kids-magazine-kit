@@ -115,7 +115,9 @@ export function weekLayout(dataDir, week) {
   return Array.from({ length: 7 }, (_, i) => {
     const date = addDays(monday, i);
     const { weekday, weekday_theme, sections } = schedule({ magazine, date, dataDir, issueNo: nextIssue + i, registry });
-    return { date, weekday: names[weekday] ?? weekday, theme: weekday_theme, sections: Object.keys(sections) };
+    const check = sections.check?.params;
+    return { date, weekday: names[weekday] ?? weekday, theme: weekday_theme, sections: Object.keys(sections),
+      check: check?.skill ? { skill: check.skill, choices: check.choices } : null };
   });
 }
 
@@ -145,7 +147,8 @@ function validateCard(card, section, at, errors) {
     need("number", isMap(card.number) && isText(card.number.value) && isUrl(card.number.source), "要有数字说明 value 和来源 URL source");
   } else if (section === "check") {
     length("claim", 30);
-    need("truth", ["真", "假", "说不清"].includes(card.truth), "要是「真」「假」或「说不清」");
+    // 没有思维课表时写 真/假/说不清；有课表时写当天选项里的那一个（如「以偏概全」），run.sh 的周排清单会列出选项
+    text("truth");
     text("notes", true);
   } else {
     need("url", isUrl(card.url), "要是 HTTP(S) URL");
