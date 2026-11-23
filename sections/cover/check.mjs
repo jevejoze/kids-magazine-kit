@@ -19,11 +19,11 @@ export function check(c, ctx = {}) {
 }
 
 // 这一页的讲读校验：checkNarration(lines) → 问题列表。lines 是这一页的 narration.json 台词数组
-//   封面讲读废除报幕腔，以环境声与角色的无厘头挑衅打赌开场
+//   封面讲读废除报幕腔，以轻松自然的好朋友聊天开场
 export function checkNarration(lines) {
   const problems = [];
   if (lines.some(l => /欢迎收听|今天的主题是/.test(l.text))) {
-    problems.push("封面讲读废除报幕腔，开场以环境声与角色的无厘头挑衅打赌开场");
+    problems.push("封面讲读废除报幕腔，改用轻松自然的好朋友聊天开场");
   }
   return problems;
 }
