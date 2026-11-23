@@ -3,12 +3,31 @@ import { inputFingerprint } from "./build-state.mjs";
 import { createPipeline } from "./pipeline-lib.mjs";
 import { scheduleIssue } from "./schedule.mjs";
 import { ticket } from "./ticket.mjs";
-const [, , cmd, issue, extraArg] = process.argv;
-if (!issue || !["status", "schedule", "check", "assemble", "fingerprint", "video-inputs", "script", "archive", "ticket"].includes(cmd) || (cmd === "ticket" && !extraArg)) {
-  console.error("用法: node pipeline.mjs <status|schedule|check|assemble|fingerprint|script|archive> <issue 目录>\n       node pipeline.mjs schedule <issue 目录> [YYYY-MM-DD]   第 00 步：按 magazine.yaml 和日期把本期栏目写进任务书\n       node pipeline.mjs ticket <issue 目录> <栏目|步骤|narration>   领任务单，指纹写进输出的 _meta.ticket");
+import { checkPlan, fallbackPlan } from "./plan.mjs";
+const [, , cmd, issue, extraArg, ...rest] = process.argv;
+if (!issue || !["plan-check", "plan-fallback", "status", "schedule", "check", "assemble", "fingerprint", "video-inputs", "script", "archive", "ticket"].includes(cmd) || (cmd === "ticket" && !extraArg)) {
+  console.error("用法: node pipeline.mjs <status|schedule|check|assemble|fingerprint|script|archive> <issue 目录>\n       node pipeline.mjs schedule <issue 目录> [YYYY-MM-DD]   第 00 步：按 magazine.yaml 和日期把本期栏目写进任务书\n       node pipeline.mjs ticket <issue 目录> <栏目|步骤|narration>   领任务单，指纹写进输出的 _meta.ticket\n       node pipeline.mjs plan-check <plan/YYYY-Www.json>\n       node pipeline.mjs plan-fallback <issue 目录> <cover|check|news> [新闻卡 id] <原因>");
   process.exit(1);
 }
 try {
+  if (cmd === "plan-check") {
+    if (extraArg) throw new Error("用法：plan-check plan/YYYY-Www.json");
+    const { errors, warnings } = checkPlan(issue);
+    for (const warning of warnings) console.log(`警告：${warning}`);
+    console.log(errors.length ? errors.join("\n") : "选题卡检查通过");
+    process.exitCode = errors.length ? 2 : 0;
+  } else if (cmd === "plan-fallback") {
+    const news = extraArg === "news";
+    if (rest.length !== (news ? 2 : 1)) throw new Error("用法：plan-fallback issues/NNN <cover|check|news> [新闻卡 id] <原因>");
+    const { from, to, reason } = fallbackPlan(issue, extraArg, news ? rest[0] : null, rest.at(-1));
+    console.log(`${extraArg} 降级：${from} → ${to}（${reason}）`);
+  } else runIssueCommand();
+} catch (error) {
+  console.error(error.message);
+  process.exitCode = 2;
+}
+
+function runIssueCommand() {
   const pipeline = createPipeline(issue);
   if (cmd === "ticket") {
     console.log(ticket(issue, extraArg).markdown);
@@ -17,7 +36,8 @@ try {
     console.log(`${brief.date} ${brief.weekday_theme}：${Object.keys(brief.sections).join("、")}`);
     for (const [id, { params }] of Object.entries(brief.sections)) console.log(`  ${id.padEnd(10)} ${JSON.stringify(params)}`);
   } else if (cmd === "check") {
-    const errors = pipeline.check();
+    const warnings = [], errors = pipeline.check({ warnings });
+    for (const warning of warnings) console.log(`警告：${warning}`);
     console.log(errors.length ? errors.join("\n") : "全部通过");
     process.exitCode = errors.length ? 2 : 0;
   } else if (cmd === "video-inputs") {
@@ -30,7 +50,4 @@ try {
   } else {
     pipeline[cmd]();
   }
-} catch (error) {
-  console.error(error.message);
-  process.exitCode = 2;
 }

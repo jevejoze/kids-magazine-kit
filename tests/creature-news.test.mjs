@@ -59,6 +59,8 @@ test("[creature] and [news] checks come from the packs", t => {
   const { issue } = copyDemo(t);
   const errors = tag => createPipeline(issue).check().filter(e => e.startsWith(tag));
   assert.deepEqual(errors("[news]"), []);
+  // 单独测版面允许的条数，移除示例任务书里固定的三张新闻卡。
+  edit(join(issue, "brief.json"), b => { delete b.plan; });
   // 2 items is valid (大图版)
   edit(join(issue, "news.json"), n => { n.items.pop(); });
   assert.deepEqual(errors("[news]"), []);

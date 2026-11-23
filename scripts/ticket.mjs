@@ -7,7 +7,9 @@ import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { LEGACY, loadMagazine, scheduledIn } from "./schedule.mjs";
+import { activeCards } from "./plan.mjs";
+import { recentTopics, shares, stripTags, topicContext } from "./topics.mjs";
+import { LEGACY, loadMagazine, parseDate, scheduledIn } from "./schedule.mjs";
 import { loadSections, packFor, sectionOrder } from "./sections.mjs";
 import { scaledMaxLines } from "./narration-budget.mjs";
 
@@ -37,8 +39,7 @@ const TOPIC_FIELD = {
   challenge: v => [v.title], check: v => [v.claim], serial: v => [v.title_zh], think: v => [v.title],
   news: v => (v.items ?? []).map(i => i.title),
 };
-const plain = s => String(s ?? "").replace(/<[^>]+>/g, "").replace(/[\s\p{P}\p{S}]/gu, "");
-const shares = (a, b, k) => { for (let i = 0; i + k <= a.length; i++) if (b.includes(a.slice(i, i + k))) return true; return false; };
+const plain = s => stripTags(s).replace(/[\s\p{P}\p{S}]/gu, "");
 
 function crossSectionTopics(issue, registry, brief) {
   const topics = [];
@@ -204,6 +205,16 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
     return [ref, value];
   }));
 
+  const topicSection = sp.section === "comic" ? "cover" : sp.section;
+  let topics;
+  if (["cover", "check", "news"].includes(topicSection)) {
+    const cards = activeCards(brief.plan, topicSection);
+    const recent = recentTopics(topicContext(dataDir, magazine), parseDate(brief.date).iso, topicSection, brief.issue);
+    topics = {
+      ...(cards.length && { plan_cards: topicSection === "news" ? cards : cards[0] }),
+      ...(brief.plan || Object.values(recent).some(list => list.length) ? { recent_topics: recent } : {}),
+    };
+  }
   const content = {
     skill: sp.id,
     stage: sp.stage,
@@ -214,14 +225,15 @@ export function ticket(issueDir, skill, { engine = ENGINE } = {}) {
     state: stateFiles(sp, dataDir),
     consumes,
     output: outputsOf(sp),
+    ...topics,
     ...(sp.id === "narration" ? { skeleton: narrationSkeleton(issue, registry, brief) } : {}),
     ...(sp.id === "review" ? { topic_warnings: crossSectionTopics(issue, registry, brief) } : {}),
   };
   const fingerprint = createHash("sha256").update(JSON.stringify(stable(content))).digest("hex");
-  return { content, fingerprint, markdown: markdown(content, fingerprint) };
+  return { content, fingerprint, markdown: markdown(content, fingerprint, topics !== undefined) };
 }
 
-function markdown(c, fingerprint) {
+function markdown(c, fingerprint, hasTopics) {
   const name = k => c.cast.characters[k]?.name ?? (k === "narrator" ? "旁白" : k);
   const out = [
     `# 任务单 · ${c.skill}`, "",
@@ -229,6 +241,18 @@ function markdown(c, fingerprint) {
     "## 本期参数", "", Object.keys(c.params).length ? "```json\n" + JSON.stringify(c.params, null, 2) + "\n```" : "（无）", "",
     "## 角色槽位", "", ...Object.entries(c.cast.slots).map(([s, k]) => `- ${s}：${name(k)}（${k}）`), "",
   ];
+  if (c.plan_cards) out.push("## 选题卡（照写，不换题）", "", "```json", JSON.stringify(c.plan_cards, null, 2), "```", "");
+  if (c.recent_topics) {
+    const list = [
+      ...c.recent_topics.entities.map(r => `${r.date} ${r.section} 实体：${r.entities.join("、")}`),
+      ...c.recent_topics.mechanisms.map(r => `${r.date} 机制：${r.mechanism}`),
+      ...c.recent_topics.news.map(r => `${r.date} ${r.event ?? r.title} ${r.urls.join(" ")}`.trimEnd()),
+      ...c.recent_topics.claims.map(r => `${r.date} 说法：${r.title}`),
+      ...c.recent_topics.questions.map(r => `${r.date} 问题：${r.title}`),
+    ];
+    out.push("## 近期用过", "", ...(list.length ? list.map(line => `- ${line}`) : ["（无）"]), "");
+  }
+  else if (hasTopics) out.push("## 近期用过", "", "（无）", "");
   if (c.state.length) out.push("## 要读、要更新的状态", "", ...c.state.map(f => `- ${f}`), "");
   if (Object.keys(c.consumes).length) out.push("## 上游值", "", ...Object.entries(c.consumes).map(([k, v]) => `- ${k}：${JSON.stringify(v)}`), "");
   if (c.topic_warnings) out.push("## 跨栏目撞题检查", "", c.topic_warnings.length ? c.topic_warnings.map(w => `- ${w}`).join("\n") : "没发现明显撞题", "");

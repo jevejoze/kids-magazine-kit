@@ -34,6 +34,8 @@
     "crew_say": { "type": "string", "minLength": 1, "description": "封面角色金句或吐槽，<= 12 字" },
     "credit": { "type": "string", "minLength": 1 },
     "theme_icon": { "type": "string" },
-    "sources": { "type": "array", "items": { "type": "string" } }
+    "sources": { "type": "array", "items": { "type": "string" } },
+    "entities": { "type": "array", "items": { "type": "string" }, "description": "自选时填：核心实体规范名，去重用（有选题卡时以卡为准）" },
+    "mechanism_key": { "type": "string", "description": "自选时填：机制规范短名，去重用" }
   }
 }

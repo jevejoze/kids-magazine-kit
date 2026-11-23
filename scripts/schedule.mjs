@@ -6,6 +6,8 @@
 import { readFileSync, existsSync, readdirSync, mkdirSync, writeFileSync, renameSync, rmSync } from "node:fs";
 import { join, resolve, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
+import { activeCards, snapshotPlan } from "./plan.mjs";
+import { DEDUPE, isMap } from "./topics.mjs";
 import { parseYaml } from "./yaml.mjs";
 import { checkParamValue, loadSections } from "./sections.mjs";
 import { NARRATION_MAX_LINES, SPEAKERS } from "./contracts.mjs";
@@ -52,8 +54,7 @@ export const DEFAULT_MAGAZINE = {
   params: {},
 };
 
-const TOP = ["masthead", "call", "send_note", "english_level", "image_policy", "cast", "sections", "schedule", "curriculum", "params", "voices"];
-const isMap = v => v && typeof v === "object" && !Array.isArray(v);
+const TOP = ["masthead", "call", "send_note", "english_level", "image_policy", "cast", "sections", "schedule", "curriculum", "params", "voices", "dedupe"];
 
 // 一个栏目可用的参数声明：旧版用 LEGACY，栏目包用 manifest（讲读句数取 narration.lines），都带 image_policy
 function declared(id, registry) {
@@ -132,6 +133,17 @@ export function validateMagazine(m, registry = []) {
         if (!d.open.includes(k)) { errors.push(`${at}：这个参数由调度填写，不在 magazine.yaml 里改`); continue; }
         errors.push(...checkParamValue(at, d.params[k], v));
       }
+    }
+  }
+  if ("dedupe" in m) {
+    if (!isMap(m.dedupe)) errors.push("dedupe 要是 map");
+    else for (const [key, value] of Object.entries(m.dedupe)) {
+      if (key === "generic") {
+        if (!Array.isArray(value) || !value.every(v => typeof v === "string" && v.trim()))
+          errors.push("dedupe.generic 要是泛称实体的字符串列表");
+      } else if (!Object.hasOwn(DEDUPE, key)) errors.push(`dedupe.${key} 是未知的去重规则`);
+      else if (!(Number.isInteger(value) && value >= 0) && !(typeof DEDUPE[key] === "boolean" && typeof value === "boolean"))
+        errors.push(`dedupe.${key} 要是非负天数${typeof DEDUPE[key] === "boolean" ? "、true（永久）或 false（关闭）" : ""}`);
     }
   }
   if ("voices" in m && !(isMap(m.voices) && Object.entries(m.voices).every(([k, v]) => SPEAKERS.includes(k) && isMap(v))))
@@ -241,8 +253,11 @@ export function scheduleIssue(issueDir, date) {
   const result = schedule({ magazine, date, dataDir, issueNo, registry });
   const { iso, weekday } = parseDate(date);
   const zh = { sun: "日", mon: "一", tue: "二", wed: "三", thu: "四", fri: "五", sat: "六" }[weekday];
+  const plan = brief.plan ?? snapshotPlan(dataDir, iso);
+  const [cover] = activeCards(plan, "cover");
   const next = {
-    ...brief,
+    ...brief, plan,
+    ...(cover && { topic_hint: cover.question }),
     date: brief.date && parseDate(brief.date).iso === iso ? brief.date : `${iso.replaceAll("-", ".")} 周${zh}`,
     weekday_theme: result.weekday_theme,
     creature: "creature" in result.sections,
