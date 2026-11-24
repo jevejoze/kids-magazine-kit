@@ -217,3 +217,17 @@ test("本地已归档但没推送：不判 none，提示先推送", t => {
   action(pending, "resume role=producer date=2026-10-14 issue=issues/003");
   assert.match(pending.stdout, /还没推送[\s\S]+sync\.sh push "003: 出刊"/);
 });
+
+test("最近几天排了选题、仓库里却没有那一期：主编暂停排题，标成 skipped 后放行", t => {
+  const { seed, publish, clone } = fixture(t), root = clone("editor");
+  rmSync(join(seed, "issues/003/brief.json"));
+  publish("执行出了 003 却没推送");
+  const stale = run(root, "2026-10-16", "editor");
+  action(stale, "blocked role=editor date=2026-10-17 week=2026-W42");
+  assert.match(stale.stdout, /2026-10-14[\s\S]+sync\.sh push[\s\S]+skipped[\s\S]+NOTIFY:/);
+  const path = join(seed, "plan/2026-W42.json"), plan = json(path);
+  plan.days["2026-10-14"] = { status: "skipped", revised: [], notes: "这天没出" };
+  put(path, plan);
+  publish("标记没出的日子");
+  assert.notEqual(run(root, "2026-10-16", "editor").stdout.split("\n")[0].split(" ")[1], "blocked");
+});

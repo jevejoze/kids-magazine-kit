@@ -126,6 +126,7 @@ node --test tests/*.test.mjs
 sh .engine/scripts/run.sh [--date YYYY-MM-DD] [--role editor|producer]  # 主编与执行统一入口：按第一行 ACTION 行动
 node scripts/pipeline.mjs plan-check plan/<YYYY-Www>.json  # 检查选题卡结构、字数、去重与锁定状态
 node scripts/pipeline.mjs plan-fallback <issue> cover|check|news [卡 id] "<原因>"  # 无法核实时换备用卡或标自选
+node scripts/pipeline.mjs plan-amend <issue> "<原因>"   # 主编改了已开工那天的卡后，重新快照进任务书
 node scripts/notify.mjs plan|finalize|issue <目标>         # 生成周排、定稿或出刊的纯文本通知
 node scripts/topics.mjs recent                            # 查看题目总账近期用过的题目与实体
 node scripts/topics.mjs backfill [--write]                # 历史期刊题目补录入总账

@@ -50,7 +50,7 @@ test("plan-check 校验结构、ISO 周、新闻条数和日期、跨计划卡 i
   put(planFile, plan);
   const broken = planCheck(data);
   assert.equal(broken.status, 2);
-  for (const message of [/24 字/, /30 字/, /number/, /日前 7 天/, /news 要有 2–3 条/, /不在 2026-W42 内/]) assert.match(broken.stdout, message);
+  for (const message of [/24 字/, /30 字/, /number/, /日前 7 天/, /news 要有 3 条/, /不在 2026-W42 内/]) assert.match(broken.stdout, message);
 
   put(planFile, original);
   const other = { ...original, week: "2026-W43", days: {} };
@@ -60,11 +60,13 @@ test("plan-check 校验结构、ISO 周、新闻条数和日期、跨计划卡 i
   assert.match(duplicate.stdout, /id 重复：c-bubbles/);
 });
 
-test("ready 新闻数量调用新闻布局的允许范围，没排新闻时为零条", t => {
+test("ready 新闻条数等于 params.news.count（默认 3），没排新闻时为零条", t => {
   const { data, planFile, brief } = fixture(t);
   rmSync(brief);
+  edit(planFile, p => { p.days[date].news = p.days[date].news.slice(0, 2); });
+  assert.match(planCheck(data).stdout, /news 要有 3 条（magazine.yaml params.news.count），当前 2 条/);
   writeFileSync(join(data, "magazine.yaml"), readFileSync(join(data, "magazine.yaml"), "utf8")
-    .replace("    narration_lines: 26", "    narration_lines: 26\n    layout: poster"));
+    .replace("    narration_lines: 26", "    narration_lines: 26\n    layout: poster\n    count: 1"));
   edit(planFile, p => { p.days[date].news = p.days[date].news.slice(0, 1); });
   const poster = planCheck(data);
   assert.equal(poster.status, 0, poster.stdout + poster.stderr);
@@ -180,4 +182,41 @@ test("check 核对封面、说法和新闻独立来源，新闻作废后允许�
   put(claim, claimBefore);
   assert.doesNotMatch(errors(), /选题卡|降级/);
   assert.doesNotMatch(ticket(issue, "news").markdown, /n-2026-10-14-pelican/);
+});
+
+test("plan-amend 把主编改过的卡重新快照进已开工的任务书，保留仍有效的降级", t => {
+  const { data, issue, planFile, brief } = fixture(t);
+  assert.equal(run(data, "plan-amend", "issues/003").status, 2, "必须写原因");
+  const news = run(data, "plan-fallback", "issues/003", "news", "n-2026-10-14-pelican", "来源打不开");
+  assert.equal(news.status, 0, news.stderr);
+  const chess = json(planFile).days[date].news.find(c => c.id === "n-2026-10-14-chess");
+  edit(planFile, p => {
+    const day = p.days[date];
+    day.news = day.news.map(c => c.id === chess.id ? { ...c, id: "n-2026-10-14-chess-2" } : c);
+    day.revised.push({ at: "2026-10-13T20:00:00+08:00", by: "测试主编", what: "换新闻卡", why: "测试" });
+  });
+  assert.match(planCheck(data).stdout, /已开工，不能再改/);
+  const amended = run(data, "plan-amend", "issues/003", "主编换了一张新闻卡");
+  assert.equal(amended.status, 0, amended.stderr);
+  assert.match(amended.stdout, /改了 news/);
+  const planCheckAfter = planCheck(data);
+  assert.equal(planCheckAfter.status, 0, planCheckAfter.stdout);
+  const b = json(brief);
+  assert.ok(b.plan.news.some(c => c.id === "n-2026-10-14-chess-2"));
+  assert.deepEqual(b.plan.fallback.map(r => r.from), ["n-2026-10-14-pelican"], "原卡还在，降级保留");
+  assert.equal(b._meta.plan_amended.at(-1).reason, "主编换了一张新闻卡");
+  assert.match(ticket(issue, "news").markdown, /n-2026-10-14-chess-2/);
+  edit(planFile, p => { p.days[date].news[0].published = "2030-01-01"; });
+  assert.equal(run(data, "plan-amend", "issues/003", "坏卡").status, 2, "plan-check 不过就不快照");
+});
+
+test("skipped 的日子要写原因，不参与去重也不快照选题卡", t => {
+  const { data, issue, planFile, brief } = fixture(t);
+  rmSync(brief);
+  edit(planFile, p => { p.days[date] = { status: "skipped", revised: [] }; });
+  assert.match(planCheck(data).stdout, /skipped 时要在 notes/);
+  edit(planFile, p => { p.days[date].notes = "全家出门旅行，这天不出"; });
+  const ok = planCheck(data);
+  assert.equal(ok.status, 0, ok.stdout);
+  assert.equal(scheduleIssue(issue, date).plan.status, "missing");
 });

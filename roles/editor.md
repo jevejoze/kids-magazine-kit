@@ -22,6 +22,7 @@ sh .engine/scripts/run.sh
 |---|---|
 | `ACTION: weekly-plan ...` | **周排任务**：下一周尚无选题卡文件（通常在周日触发，为下周排期）。先做策展，排好下周 7 天的 cover、check 卡和备用卡，并接着定稿明天。 |
 | `ACTION: finalize date=<明天> ...` | **定稿任务**：明天那一天的选题卡未定稿（`status` 不是 `ready`）。处理插入的变更、挑新闻并核实，标 `ready`。 |
+| `ACTION: blocked` | **暂停排题**：最近 7 天有排了选题、仓库里却没有那一期的日子（执行可能出了没推送，总账缺这几期，去重会漏）。把 `NOTIFY:` 发给家长，等执行推送；那天确实没出，就把它的 `status` 改成 `skipped`、`notes` 写原因，`plan-check` 通过后推送。 |
 | `ACTION: none` | **无事**：下一周已排且明天已定稿，或明天已由执行开工锁定。直接正常退出。 |
 
 若输出包含 `NOTIFY:` 段，按文案通过自己的渠道发给家长。
@@ -75,7 +76,7 @@ sh .engine/scripts/run.sh
    - 时间限制：距出刊日（明天）≤ 7 天，`published` 写**这篇报道的发布日期**（不是事件或论文日期）。
    - 来源：选自权威儿童媒体或奇趣科学媒体（News for Kids、Science News Explores、DOGOnews、Time for Kids、BBC Newsround、Guinness World Records、UPI Odd News 等）。
    - 照片要求：必须一眼看懂、震撼奇趣（动物超常行为、搞怪纪录、民间发明现场），不选会议合影、抽象图标或图表。有视频优先（便于讲读版展开）。
-   - 数量：按版面要求选够（海报版 poster 2 条，经典版 classic 3 条）。
+   - 数量：正好排 `magazine.yaml` 的 `params.news.count` 条（默认 3：1 条头条 + 2 条短讯，poster、classic 都一样），`plan-check` 按这个数拦。执行只能换卡、不能加卡，少排一张，那期就少一条。
    - 填写 `news` 数组，每条为一张 NewsCard。
 3. **核实与质量自查**：
    - 逐张卡核实：来源 URL 真实且能在浏览器里打开（脚本请求被 403/405 拒绝不算死链，优先保留权威原始来源）、数字核对确凿、符合 `core/rules/topic-quality.md`、`why_reader` 引用依据真实有效。
@@ -194,5 +195,11 @@ sh .engine/scripts/run.sh
 ## 变更处理与锁定
 
 - 执行一旦开工（`issues/NNN/brief.json` 写入且日期等于当天），该日选题即进入锁定状态。
-- `plan-check` 会检查锁定状态。如果已开工日期的选题卡与 `brief.plan` 里的快照不一致，会报错拦截。主编不得在开工后强行改动已开工日期的卡。
+- `plan-check` 会检查锁定状态。如果已开工日期的选题卡与 `brief.plan` 里的快照不一致，会报错拦截。
+- 开工后确实要改卡（排漏了、撞题、少一张新闻卡），不要手改任务书，按这个顺序：
+  1. 改 `plan/` 里那天的卡，`revised` 写一条记录；
+  2. `node .engine/scripts/pipeline.mjs plan-amend issues/NNN "<原因>"`：先按新卡跑 `plan-check`，通过才重新快照进任务书，原因记在 `brief._meta.plan_amended`；执行做过的降级，原卡还在的保留，原卡被换掉的作废；
+  3. `plan-check` 通过后推送，告诉执行先 `git pull`。改到的栏目任务单会变，`status` 把那几步标成过期，执行照新卡重做。
+- 已归档的期不能再改。
+- 某天确实不出刊：`status` 写 `skipped`，`notes` 写原因。这天不参与去重，也不给执行快照卡。
 - 主编推送前必须通过 `plan-check`。未通过校验严禁 push。

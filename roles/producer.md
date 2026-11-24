@@ -51,7 +51,7 @@ node .engine/scripts/pipeline.mjs schedule issues/NNN YYYY-MM-DD
 - 若当天选题卡为 `draft`：照用周排草稿出刊，并在通知中提醒家长。
 - 若无 plan 文件或无当天卡：`plan.status` 记为 `"missing"`，执行自选制作（去重依然强制拦截），并在通知中提醒家长。
 
-快照一旦写入即在任务书中锁定，换卡只能通过 `plan-fallback` 命令，不能手改。
+快照一旦写入即在任务书中锁定，换卡只能通过 `plan-fallback` 命令，不能手改。卡不够用（比如新闻卡比版面要的少）不要自己加，停下请主编改 `plan/` 再跑 `plan-amend`，`git pull` 后按 `status` 重做过期的步骤。
 
 ### 3. 领任务单与照卡制作
 
