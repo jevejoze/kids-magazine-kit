@@ -59,6 +59,7 @@ export function readPlan(dataDir, week) {
 export function planDay(plan, date) {
   if (!plan || !Object.hasOwn(plan.days, date)) return null;
   const day = plan.days[date];
+  if (day?.status === "skipped") return null;
   if (!isMap(day) || !["draft", "ready"].includes(day.status) || !isMap(day.cover)
     || !Array.isArray(day.news) || !day.news.every(isMap) || (day.check !== undefined && !isMap(day.check)))
     throw new Error(`${plan.week} 的 ${date} 选题卡结构不对，请跑 plan-check`);
@@ -92,7 +93,7 @@ function planCards(plan) {
         cards.push({ card, topic: cardTopic(section, card, date, through), week: plan.week, spare });
     }
   };
-  for (const [date, day] of Object.entries(plan.days)) if (isDate(date) && isMap(day)) collect(day, date, date);
+  for (const [date, day] of Object.entries(plan.days)) if (isDate(date) && isMap(day) && day.status !== "skipped") collect(day, date, date);
   const monday = weekStart(plan.week);
   collect(plan.spares, monday, addDays(monday, 6), true);
   return cards;
@@ -159,7 +160,7 @@ function validateCard(card, section, at, errors) {
   }
 }
 
-function validatePlan(plan, dataDir, { magazine, registry }, briefs) {
+function validatePlan(plan, dataDir, { magazine, registry }, briefs, unlock = null) {
   const errors = [];
   for (const key of ["by", "curation"]) if (!isText(plan[key])) errors.push(`${key} 要是非空字符串`);
   if (!timestamp(plan.at)) errors.push("at 要是 ISO 日期时间");
@@ -167,8 +168,12 @@ function validatePlan(plan, dataDir, { magazine, registry }, briefs) {
     if (!isDate(date) || isoWeek(date) !== plan.week) { errors.push(`日期 ${date} 不在 ${plan.week} 内`); continue; }
     if (!isMap(day)) { errors.push(`${date} 要是对象`); continue; }
     const { sections } = schedule({ magazine, date, dataDir, issueNo: Infinity, registry });
+    if (day.status === "skipped") {
+      if (!isText(day.notes)) errors.push(`${date} 标成 skipped 时要在 notes 里写明为什么这天不出`);
+      continue;
+    }
     const ready = day.status === "ready";
-    if (!ready && day.status !== "draft") errors.push(`${date}.status 要是 draft 或 ready`);
+    if (!ready && day.status !== "draft") errors.push(`${date}.status 要是 draft、ready 或 skipped`);
     if (!Array.isArray(day.revised) || !day.revised.every(r => isMap(r) && timestamp(r.at) && ["by", "what", "why"].every(k => isText(r[k]))))
       errors.push(`${date}.revised 要是带 at、by、what、why 的记录数组（可空）`);
     if (Object.hasOwn(day, "notes") && typeof day.notes !== "string") errors.push(`${date}.notes 要是字符串`);
@@ -178,9 +183,11 @@ function validatePlan(plan, dataDir, { magazine, registry }, briefs) {
     if (Object.hasOwn(day, "check") || (ready && sections.check)) validateCard(day.check, "check", `${date}.check`, errors);
     if (!Array.isArray(day.news)) { errors.push(`${date}.news 要是选题卡数组`); continue; }
     if (ready) {
+      // 定稿条数 = magazine.yaml 的 params.news.count（默认 3）：执行只能换卡不能加卡，少一张这期就少一条
       const [min, max] = sections.news ? newsCount(sections.news.params.layout) : [0, 0];
-      if (day.news.length < min || day.news.length > max)
-        errors.push(`${date}.news 要有 ${min === max ? min : `${min}–${max}`} 条，当前 ${day.news.length} 条`);
+      const want = sections.news ? Math.min(max, Math.max(min, sections.news.params.count ?? max)) : 0;
+      if (day.news.length !== want)
+        errors.push(`${date}.news 要有 ${want} 条（magazine.yaml params.news.count），当前 ${day.news.length} 条`);
     }
     for (const [i, card] of day.news.entries()) {
       const at = `${date}.news[${i}]`;
@@ -195,7 +202,7 @@ function validatePlan(plan, dataDir, { magazine, registry }, briefs) {
     if (Array.isArray(list)) list.forEach((card, i) => validateCard(card, section, `spares.${section}[${i}]`, errors));
   }
   for (const { issue, brief, date } of briefs) {
-    if (!date || isoWeek(date) !== plan.week) continue;
+    if (!date || isoWeek(date) !== plan.week || issue === unlock) continue;
     const day = plan.days[date], expected = { ...day, week: plan.week, date, status: day?.status ?? "missing" };
     const { fallback, ...actual } = brief.plan ?? { week: plan.week, date, status: "missing" };
     const locked = brief._meta?.plan_hash ?? planHash(actual);
@@ -223,12 +230,12 @@ function archivedOrigin(entry, row, briefs) {
   ));
 }
 
-export function checkPlan(file) {
+export function checkPlan(file, { unlock = null } = {}) {
   file = resolve(file);
   const week = basename(file, ".json"), dataDir = resolve(dirname(file), "..");
   if (!file.endsWith(".json") || !weekStart(week)) throw new Error("选题文件名要是 YYYY-Www.json");
   const plan = loadPlan(file, week), config = loadSchedule(dataDir), briefs = issueBriefs(dataDir);
-  const errors = validatePlan(plan, dataDir, config, briefs), warnings = [];
+  const errors = validatePlan(plan, dataDir, config, briefs, unlock), warnings = [];
   if (errors.length) return { errors, warnings };
 
   const ctx = topicContext(dataDir, config.magazine);
@@ -307,6 +314,37 @@ export function fallbackPlan(issueDir, section, id, reason) {
     if (replacement) brief.topic_hint = replacement.question;
     else delete brief.topic_hint;
   }
+  atomicWrite(file, JSON.stringify(brief, null, 2) + "\n");
+  return record;
+}
+
+// 主编改已开工那天的卡：先改 plan/，再用这条命令把新卡重新快照进任务书。
+// 执行做过的降级：原卡没被主编换掉就保留（含换上的备用卡），换掉了就作废。改了哪一栏，那一栏的步骤会因任务单变化自动过期。
+export function amendPlan(issueDir, reason) {
+  const issue = resolve(issueDir), dataDir = resolve(issue, "../.."), file = join(issue, "brief.json");
+  if (!isText(reason)) throw new Error("plan-amend 需要写明原因");
+  if (!existsSync(file)) throw new Error("缺少 brief.json，还没开工，直接改 plan/ 就行");
+  if (existsSync(join(issue, "archive.json"))) throw new Error("本期已归档，不能再改卡");
+  const brief = readJson(file), date = parseDate(brief.date).iso, week = isoWeek(date);
+  const planFile = join(dataDir, "plan", `${week}.json`);
+  if (!existsSync(planFile)) throw new Error(`找不到 plan/${week}.json`);
+  const { errors } = checkPlan(planFile, { unlock: `issues/${basename(issue)}` });
+  if (errors.length) throw new Error(`选题卡检查没通过，先修好再重新快照：\n${errors.join("\n")}`);
+  const old = brief.plan ?? { status: "missing", fallback: [] };
+  const original = { ...planDay(readPlan(dataDir, week), date), week, date };
+  original.status = original.status ?? "missing";
+  const ids = section => cardList(original, section).map(card => card.id);
+  const fallback = (old.fallback ?? []).filter(r => ids(r.section).includes(r.from));
+  const next = { ...original, fallback };
+  for (const r of fallback) if (r.section !== "news" && r.to !== "free") next[r.section] = old[r.section];
+  const changed = SECTIONS.filter(s => JSON.stringify(cardList(old, s).map(c => c.id)) !== JSON.stringify(cardList(next, s).map(c => c.id)));
+  brief.plan = next;
+  const [cover] = activeCards(next, "cover");
+  if (cover) brief.topic_hint = cover.question;
+  else delete brief.topic_hint;
+  const record = { at: new Date().toISOString(), by: loadAgent(dataDir).name, reason: reason.trim(), changed,
+    dropped: (old.fallback ?? []).filter(r => !fallback.includes(r)).map(r => `${r.section}:${r.from}`) };
+  brief._meta = { ...brief._meta, plan_hash: planHash(original), plan_amended: [...(brief._meta?.plan_amended ?? []), record] };
   atomicWrite(file, JSON.stringify(brief, null, 2) + "\n");
   return record;
 }

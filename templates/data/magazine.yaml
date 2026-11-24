@@ -36,3 +36,4 @@ curriculum: thinking-plan.md   # 思维课表，按周给真的假的、周末�
 # params:
 #   news:
 #     narration_lines: 26
+#     count: 3          # 每期几条新闻，主编定稿时正好排这么多张卡

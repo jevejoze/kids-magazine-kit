@@ -42,9 +42,34 @@ function print({ action, role, date, week, issue, instructions = [], notify }) {
   if (notify) console.log("\nNOTIFY:\n" + notify);
 }
 
+// 已开工的日期：有任务书，或者只推了开工锁
+function startedDates(data) {
+  return new Set(issueBriefs(data).flatMap(b => {
+    try { return [b.date, readJson(join(data, b.issue, LOCK)).date]; } catch { return [b.date]; }
+  }).filter(Boolean));
+}
+
+// 最近 7 天按计划该出、仓库里却没有的日子：执行可能出了没推送，总账缺这几期，去重会漏
+function missingDays(data, today) {
+  const started = startedDates(data), plans = new Map();
+  return Array.from({ length: 7 }, (_, i) => addDays(today, i - 7)).filter(date => {
+    const week = isoWeek(date);
+    if (!plans.has(week)) plans.set(week, readPlan(data, week));
+    const day = plans.get(week)?.days?.[date];
+    return isMap(day) && ["draft", "ready"].includes(day.status) && !started.has(date);
+  });
+}
+
 function editTomorrow(data, today) {
   const date = addDays(today, 1), week = isoWeek(date), plan = readPlan(data, week);
   const base = { role: "editor", date, week };
+  const missing = missingDays(data, today);
+  if (missing.length) return { ...base, action: "blocked", instructions: [
+    `这几天排了选题，仓库里却没有对应的期：${missing.join("、")}。`,
+    "总账缺了这几期，现在排题去重会漏，先别排。",
+    "1. 请执行把已出的期用 `sh .engine/scripts/sync.sh push \"NNN: 出刊\"` 推送上来。",
+    "2. 确实没出的日子，主编在当周 plan 里把那天的 status 改成 `skipped`，notes 写明原因，plan-check 通过后推送。",
+  ], notify: `⚠️ 主编暂停排题\n${missing.join("、")} 排了选题但仓库里没有，执行可能出了刊没推送。` };
   const template = `plan/${week}.json`;
   const finalize = [
     "处理新问题和家长的变更，选齐最近 7 天的新闻，核实来源并标记 ready。",
