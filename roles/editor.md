@@ -75,7 +75,7 @@ sh .engine/scripts/run.sh
    - 时间限制：距出刊日（明天）≤ 7 天，`published` 写**这篇报道的发布日期**（不是事件或论文日期）。
    - 来源：选自权威儿童媒体或奇趣科学媒体（News for Kids、Science News Explores、DOGOnews、Time for Kids、BBC Newsround、Guinness World Records、UPI Odd News 等）。
    - 照片要求：必须一眼看懂、震撼奇趣（动物超常行为、搞怪纪录、民间发明现场），不选会议合影、抽象图标或图表。有视频优先（便于讲读版展开）。
-   - 数量：按版面要求选够（海报版 poster 2 条，经典版 classic 3 条）。
+   - 数量：定稿一律排 3 条（1 条头条 + 2 条短讯），海报版 poster 和经典版 classic 都一样。执行照卡出刊、只能换卡不能加卡，卡少一张这一期新闻就少一条。
    - 填写 `news` 数组，每条为一张 NewsCard。
 3. **核实与质量自查**：
    - 逐张卡核实：来源 URL 真实且能在浏览器里打开（脚本请求被 403/405 拒绝不算死链，优先保留权威原始来源）、数字核对确凿、符合 `core/rules/topic-quality.md`、`why_reader` 引用依据真实有效。

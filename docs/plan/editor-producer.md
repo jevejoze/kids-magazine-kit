@@ -153,7 +153,7 @@ NOTIFY:
 | `followup_of` |  | 同一事件有新进展时写旧新闻的 URL，允许实体重复 |
 | `allow_repeat` |  | |
 
-数量：`ready` 时 `news` 条数 = 本期新闻版面需要的条数（按 `magazine.yaml` 的 `params.news.layout`：`poster` 2 条，`classic` 3 条；实现时以 `sections/news` 的实际要求为准）。
+数量：`ready` 时 `news` 排 3 条（`poster`、`classic` 都是；`sections/news` 校验上限 3 条，poster 下限 1、classic 下限 2，下限只给 `plan-fallback` 作废后留余地）。执行不能加卡，主编少排一张，这一期就只能少一条新闻。
 
 ### 3.4 plan-check
 
