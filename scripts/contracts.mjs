@@ -13,8 +13,14 @@ export const COMIC_LIMITS = Object.freeze({ solo: 26, pair: 20, takeaway: 28, fa
 export const EMOTIONS = ["平静", "开心", "兴奋", "惊讶", "神秘", "紧张", "困倦", "得意", "委屈", "温柔"];
 // issue._order（调度按 magazine.yaml 的 sections 顺序算出来）存在就按它排，不然退回旧的固定页序
 export const pageOrder = issue => Array.isArray(issue._order) ? issue._order.filter(key => issue[key] != null) : PAGE_KEYS.filter(key => issue[key] != null);
-// 经典连载（读书）页在渲染顺序里是第几张；周五的音乐盒、放映室、动手做不算，返回 0
-export const serialCardOf = issue => issue.serial && (issue.serial.kind ?? "book") === "book" ? pageOrder(issue).indexOf("serial") + 1 : 0;
+// 一栏渲染出几张卡：海报版环球小报每条新闻一张（见 sections/news/page.js），其余每栏一张
+export const cardCount = (issue, key) => key === "news" && issue.news?.layout === "poster" ? Math.max(1, (issue.news.items || []).length) : 1;
+// 经典连载（读书）页在渲染顺序里是第几张卡（按 cardCount 累加，海报版新闻占几张就算几张）；周五的音乐盒、放映室、动手做不算，返回 0
+export const serialCardOf = issue => {
+  if (!issue.serial || (issue.serial.kind ?? "book") !== "book") return 0;
+  const order = pageOrder(issue), i = order.indexOf("serial");
+  return i < 0 ? 0 : order.slice(0, i).reduce((n, key) => n + cardCount(issue, key), 0) + 1;
+};
 // voices/voicestudio.json 里这句该用哪个克隆档案：键是 角色/语言，加 @serial 只用于连载页；不用克隆返回 undefined
 export const cloneProfile = (conf, line, card, serialCard) => (card === serialCard && conf[`${line.who}/${line.lang}@serial`]) || conf[`${line.who}/${line.lang}`];
 
